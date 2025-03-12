@@ -1,0 +1,50 @@
+- hosts: all
+  vars_files:
+    - ../group_vars/all/vars.yml
+  tasks: 
+    - name: Update package cache
+      ansible.builtin.apt: 
+        update_cache: yes
+    - name: Upgrade packages
+      ansible.builtin.apt: 
+        upgrade: dist
+    - name: Install base dev tools
+      ansible.builtin.apt:
+        name:
+          - fonts-firacode
+          - graphviz
+          - nmap
+          - openssh-server
+          - vagrant
+          - vagrant-libvirt
+          - wireshark
+          - dnsutils
+          - speedtest-cli
+          - jq
+          - git
+          - openjdk-17-jdk
+          - nodejs
+          - npm
+        state: present
+        update_cache: yes
+    - name: Add HashiCorp GPG key
+      ansible.builtin.get_url:
+        url: https://apt.releases.hashicorp.com/gpg
+        dest: /etc/apt/keyrings/hashicorp.gpg
+        mode: '0644'
+    - name: Add HashiCorp repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/hashicorp.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+        state: present
+        filename: hashicorp
+    - name: Install HashiCorp packages (Terraform, Vault, Consul, Nomad, Packer)
+      ansible.builtin.apt:
+        name:
+          - terraform
+          - vault
+          - consul
+          - nomad
+          - packer
+        state: present
+ 
+    
