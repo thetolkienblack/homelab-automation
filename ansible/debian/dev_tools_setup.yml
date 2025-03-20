@@ -1,20 +1,23 @@
-- hosts: all
+- name: Install Development Tools
+  hosts: all
   vars_files:
     - ../group_vars/all/vars.yml
-  tasks: 
+  tasks:
     - name: Update package cache
-      ansible.builtin.apt: 
-        update_cache: yes
+      ansible.builtin.apt:
+        update_cache: true
+
     - name: Upgrade packages
-      ansible.builtin.apt: 
+      ansible.builtin.apt:
         upgrade: dist
+
     - name: Install base dev tools
       ansible.builtin.apt:
         name:
           - fonts-firacode
           - graphviz
           - nmap
-          - openssh-server
+          - libvirt
           - vagrant
           - vagrant-libvirt
           - wireshark
@@ -25,18 +28,41 @@
           - openjdk-17-jdk
           - nodejs
           - npm
+          - software-properties-common
         state: present
-        update_cache: yes
-    - name: Add HashiCorp GPG key
+        update_cache: true
+
+    - name: Ensure /etc/apt/keyrings directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download HashiCorp GPG key
       ansible.builtin.get_url:
         url: https://apt.releases.hashicorp.com/gpg
-        dest: /etc/apt/keyrings/hashicorp.gpg
+        dest: /tmp/hashicorp-archive-keyring.gpg
         mode: '0644'
-    - name: Add HashiCorp repository
+
+    - name: Dearmor HashiCorp GPG key
+      ansible.builtin.command:
+        cmd: gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg /tmp/hashicorp-archive-keyring.gpg
+      args:
+        creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+    - name: Set correct permissions on the GPG key
+      ansible.builtin.file:
+        path: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        mode: '0644'
+
+    - name: Add HashiCorp APT repository
       ansible.builtin.apt_repository:
-        repo: "deb [signed-by=/etc/apt/keyrings/hashicorp.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+        repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
         state: present
         filename: hashicorp
+        install_python_apt: true
+
+
     - name: Install HashiCorp packages (Terraform, Vault, Consul, Nomad, Packer)
       ansible.builtin.apt:
         name:
@@ -46,5 +72,3 @@
           - nomad
           - packer
         state: present
- 
-    

@@ -1,13 +1,24 @@
-- hosts: all
+---
+- name: Install the basic requirements
+  hosts: all
   vars_files:
     - ../group_vars/all/vars.yml
-  tasks: 
-    - name: Update package cache
-      ansible.builtin.apt: 
-        update_cache: yes
-    - name: Upgrade packages
-      ansible.builtin.apt: 
+
+  tasks:
+    - name: Add non-free and contrib repositories
+      ansible.builtin.lineinfile:
+        path: /etc/apt/sources.list
+        line: "deb http://deb.debian.org/debian {{ ansible_distribution_release }} main contrib non-free non-free-firmware"
+        create: true
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Update package cache and upgrade packages
+      ansible.builtin.apt:
+        update_cache: true
         upgrade: dist
+
     - name: Install prerequisite packages
       ansible.builtin.apt:
         name:
@@ -17,7 +28,7 @@
           - p7zip
           - p7zip-full
           - unzip
-          - unrar
+          - rar
           - vim-nox
           - vim-common
           - iptables
@@ -41,7 +52,8 @@
           - cron
           - plocate
         state: present
-        update_cache: yes
+        update_cache: true
+
     - name: Install system tools
       ansible.builtin.apt:
         name:
@@ -58,5 +70,4 @@
           - python3-venv
           - htop
         state: present
-        update_cache: yes
-    
+        update_cache: true
