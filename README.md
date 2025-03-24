@@ -71,4 +71,9 @@ Ansible playbooks for docker containers
    1. Docker containers
    2. Crowdsec configs
    3. Wazuh configs
-   4. 
+
+# TODO
+- [ ] Create role to install vagrant vm
+- [ ] Create role to install LXC vm
+- [ ] Create role to install LXD vm
+- [ ] Create role to install VM via libvirt

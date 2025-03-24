@@ -1,0 +1,71 @@
+- name: Ensure required packages are installed
+  ansible.builtin.apt:
+    name:
+      - software-properties-common
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+
+- name: Add Podman official repository key
+  ansible.builtin.apt_key:
+    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_{{ ansible_distribution_version }}/Release.key
+    state: present
+
+- name: Add Podman repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_{{ ansible_distribution_version }}/ /"
+    state: present
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install Podman and Podman Compose
+  ansible.builtin.apt:
+    name:
+      - podman
+      - podman-compose
+      - podman-docker
+      - podman-toolbox
+    state: present
+
+- name: Create a default Podman machine
+  ansible.builtin.command:
+    cmd: podman machine init
+  args:
+    creates: ~/.local/share/containers/podman/machine/default
+
+- name: Start the default Podman machine
+  ansible.builtin.command:
+    cmd: podman machine start
+
+- name: Log in to Docker registry
+  ansible.builtin.command:
+    cmd: podman login --username={{ docker_username }} --password={{ docker_password }} {{ docker_registry }}
+  when:
+    - docker_username is defined
+    - docker_password is defined
+    - docker_registry is defined
+
+- name: Check if NVIDIA module is loaded
+  ansible.builtin.shell: "lsmod | grep -q nvidia"
+  register: nvidia_module_loaded
+  ignore_errors: true
+
+- name: Install NVIDIA Container Toolkit
+  ansible.builtin.apt:
+    name: nvidia-container-toolkit
+    state: present
+  when: nvidia_module_loaded.rc == 0
+
+- name: Check if Cockpit is installed
+  ansible.builtin.shell: dpkg -l | grep -q cockpit
+  register: cockpit_installed
+  ignore_errors: true
+
+- name: Install Cockpit Podman
+  ansible.builtin.apt:
+    name: cockpit-podman
+    state: present
+  when: cockpit_installed.rc == 0

@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT-0
+---
+- hosts: localhost
+  remote_user: root
+  vars:
+    docker_username: "your_docker_username"
+    docker_password: "your_docker_password"
+    docker_registry: "docker.io"
+  roles:
+    - podman_container

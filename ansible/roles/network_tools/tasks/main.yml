@@ -1,0 +1,6 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for install_network_tools
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: debian.yml
+  when: ansible_os_family == 'Debian'

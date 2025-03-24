@@ -1,0 +1,12 @@
+#SPDX-License-Identifier: MIT-0
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - virt_tools
+
+- hosts: localhost
+  roles:
+    - role: virt_tools
+      virt_manager_enabled: true
+      libvirt_service: "libvirtd"

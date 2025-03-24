@@ -2,3 +2,7 @@ gather_facts: true
 ansible_become: true
 ansible_become_method: sudo
 bridge_name: "br0"
+kde_user: sidney
+install_vagrant: false
+install_lxc: false
+install_lxd: false

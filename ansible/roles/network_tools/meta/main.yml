@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT-0
+galaxy_info:
+  author: thetokienblack
+  description: Install and configure essential network diagnostic and utility tools for Debian-based systems.
+  company: Graylock
+
+  license: MIT
+
+  min_ansible_version: '2.11'
+
+  galaxy_tags:
+    - networking
+    - diagnostics
+    - monitoring
+    - utilities
+    - debian
+
+dependencies:
+  - role: common

@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: MIT-0
+galaxy_info:
+  author: thetokienblack
+  description: Role to configure Podman containers on Debian-based systems.
+  company: Graylock
+
+  # Choose a valid license ID from https://spdx.org - some suggested licenses:
+  # - BSD-3-Clause (default)
+  # - MIT
+  # - GPL-2.0-or-later
+  # - GPL-3.0-only
+  # - Apache-2.0
+  # - CC-BY-4.0
+  license: MIT
+
+  min_ansible_version: 2.9
+
+  # If this is a Container Enabled role, provide the minimum Ansible Container version.
+  # min_ansible_container_version:
+
+  galaxy_tags:
+    - podman
+    - containers
+    - debian
+    - automation
+    - nvidia
+    - cockpit
+
+dependencies:
+  - role: common
+  - role: install_cockpit
+  - role: nvidia_drivers

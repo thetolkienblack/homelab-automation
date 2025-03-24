@@ -1,0 +1,32 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for vagrant_alpine
+- name: Ensure the storage pool is created
+  ansible.builtin.command:
+    virsh pool-info {{ storage_pool_name }}
+  register: storage_pool_check
+  failed_when: storage_pool_check.rc not in [0, 1]
+  changed_when: storage_pool_check.rc == 1
+  ignore_errors: true
+
+- name: Create the storage pool if it does not exist  
+  ansible.builtin.command:
+    virsh pool-create-as {{ storage_pool_name }} dir --target /var/lib/libvirt/pools/{{ storage_pool_name }}
+  when: storage_pool_check.rc == 1
+
+- name: Ensure the storage prefix directory exists
+  ansible.builtin.file:
+    path: "/var/lib/libvirt/pools/{{ storage_pool_name }}/{{ storage_default_prefix }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy the Vagrant template and replace placeholders
+  ansible.builtin.template:
+    src: templates/vagrant.libvirt.alpine.j2
+    dest: "{{ linux_type }}/{{ vm_name }}/Vagrantfile"
+
+- name: Start the Vagrant VM  
+  ansible.builtin.command:
+    vagrant up
+  args:
+    chdir: "{{ linux_type }}/{{ vm_name }}"

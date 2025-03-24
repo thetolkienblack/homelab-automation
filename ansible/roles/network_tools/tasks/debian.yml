@@ -1,0 +1,12 @@
+- name: Install network tools
+  ansible.builtin.apt:
+    name:
+      - nmap
+      - dnsutils
+      - wireshark
+      - speedtest-cli
+      - jq
+      - git
+      - software-properties-common
+    state: present
+    update_cache: true

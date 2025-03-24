@@ -1,0 +1,13 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for common
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: ansible_os_family == 'Debian'
+
+- name: Ugrade apt packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: dist
+  when: ansible_os_family == 'Debian'

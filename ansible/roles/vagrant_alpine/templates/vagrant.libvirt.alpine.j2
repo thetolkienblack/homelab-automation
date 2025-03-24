@@ -1,0 +1,49 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/alpine318"
+  config.vm.box_version = "4.3.12"
+  config.vm.disk :disk, size: "{{ disk_size }}", primary: true
+
+  config.vm.provider "libvirt" do |libvirt|
+    libvirt.memory = {{ ram_memory }}
+    libvirt.cpus = {{ cpu_core }}
+
+    libvirt.storage_pool_name = "{{ storage_pool_name }}"
+    libvirt.default_prefix = "{{ storage_default_prefix }}"
+    libvirt.storage :file, :size => "{{ disk_size | replace('GB', 'G') }}", :path => "{{ storage_pool_name }}/{{ vm_name }}.img"
+  end
+
+  # Set the hostname
+  config.vm.hostname = "{{ vm_hostname }}"
+
+  # Configure the network to use DHCP
+  config.vm.network "{{ network_name }}", 
+    bridge: "{{ bridge_interface }}", 
+    dev: "{{ bridge_interface }}",
+    type: "bridge"
+
+  # Define a new NFS mount (e.g., /mnt/my_nfs)
+  config.vm.synced_folder "{{ synced_host_folder_dir }}", "{{ synced_guest_folder_dir }}"
+
+  # Provisioning with shell script
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y openssh-server ansible nfs-common resolvconf
+    systemctl enable ssh
+    systemctl restart ssh
+
+    # Force eth1 to use DHCP
+    echo "auto eth1" >> /etc/network/interfaces
+    echo "iface eth1 inet dhcp" >> /etc/network/interfaces
+    systemctl restart networking
+
+    mkdir -p /home/vagrant/.ssh
+    echo "{{ lookup('file', host_ssh_file) }}" >> /home/vagrant/.ssh/authorized_keys
+    chmod 600 /home/vagrant/.ssh/authorized_keys
+    chown -R vagrant:vagrant /home/vagrant/.ssh
+
+    # Set DNS servers manually
+    {% for nameserver in nameservers %}
+    echo "nameserver {{ nameserver }}" >> /etc/resolv.conf
+    {% endfor %}
+  SHELL
+end
