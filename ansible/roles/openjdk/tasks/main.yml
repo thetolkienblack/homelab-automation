@@ -1,0 +1,43 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_init
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure ansible_user variable is defined
+  ansible.builtin.fail:
+    msg: "The variable 'ansible_user' is not defined. Please provide it in your inventory or playbook."
+  when: ansible_user is not defined
+
+- name: Clone jenv repository
+  ansible.builtin.git:
+    repo: https://github.com/jenv/jenv.git
+    dest: /home/{{ ansible_user }}/.jenv
+    update: true
+    version: master
+  become: false
+  become_user: "{{ ansible_user }}"
+
+- name: Add jenv initialization to .bashrc
+  ansible.builtin.lineinfile:
+    path: /home/{{ ansible_user }}/.bashrc
+    line: |
+      # jenv initialization
+      export PATH="$HOME/.jenv/bin:$PATH"
+      eval "$(jenv init -)"
+    insertafter: EOF
+    create: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Ensure jenv is initialized for the user
+  ansible.builtin.shell: |
+    export PATH="$HOME/.jenv/bin:$PATH" && eval "$(jenv init -)" && jenv doctor
+  become: false
+  become_user: "{{ ansible_user }}"
+  environment:
+    PATH: "/home/{{ ansible_user }}/.jenv/bin:{{ ansible_env.PATH }}"
+  args:
+    creates: /home/{{ ansible_user }}/.jenv/version

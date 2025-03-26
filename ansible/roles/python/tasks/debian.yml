@@ -1,0 +1,39 @@
+- name: Install system tools
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+
+- name: Ensure ansible_user variable is defined
+  ansible.builtin.fail:
+    msg: "The variable 'ansible_user' is not defined. Please provide it in your inventory or playbook."
+  when: ansible_user is not defined
+
+- name: Create a directory for the virtual environment
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/python-venv
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+- name: Set up Python virtual environment
+  ansible.builtin.command:
+    cmd: python3 -m venv /home/{{ ansible_user }}/python-venv
+  args:
+    creates: /home/{{ ansible_user }}/python-venv/bin/activate
+
+- name: Add venv activation to .bashrc
+  ansible.builtin.lineinfile:
+    path: /home/{{ ansible_user }}/.bashrc
+    line: |
+      # Activate Python virtual environment
+      source /home/{{ ansible_user }}/python-venv/bin/activate
+    insertafter: EOF
+    create: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"

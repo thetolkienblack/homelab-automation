@@ -36,9 +36,17 @@
   args:
     creates: ~/.local/share/containers/podman/machine/default
 
+- name: Check Podman machine status
+  ansible.builtin.command:
+    cmd: podman machine list --format=json
+  register: podman_machine_status
+
 - name: Start the default Podman machine
   ansible.builtin.command:
     cmd: podman machine start
+  when: "'running' not in podman_machine_status.stdout"
+  register: podman_machine_status
+  changed_when: "'running' not in podman_machine_status.stdout"
 
 - name: Log in to Docker registry
   ansible.builtin.command:

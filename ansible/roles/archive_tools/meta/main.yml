@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: MIT-0
+galaxy_info:
+  author: thetolkienblack
+  description: This role installs the tools required to work with archives.
+  company: Graylock
+
+  license: BSD-3-Clause
+
+  min_ansible_version: "2.1"
+
+  galaxy_tags:
+    - tools
+    - archives
+    - rar
+    - p7zip
+    - zip
+    - extract
+    - compress
+
+dependencies:
+  - role: common

@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT-0
+galaxy_info:
+  author: thetolkienblack
+  description: This role installs diagnostic tools for system monitoring and troubleshooting.
+  company: Graylock
+
+  license: BSD-3-Clause
+
+  min_ansible_version: "2.1"
+
+  galaxy_tags:
+    - diagnostic
+    - tools
+    - system
+    - memory
+    - cpu
+    - network
+
+dependencies:
+  - role: common

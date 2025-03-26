@@ -1,0 +1,29 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_init
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Install starship prompt
+  ansible.builtin.shell: "set -o pipefail && curl -sS https://starship.rs/install.sh | sh -s -- -y"
+  args:
+    creates: /usr/local/bin/starship
+
+- name: Add Starship exports to .bashrc
+  ansible.builtin.lineinfile:
+    path: /home/{{ ansible_user }}/.bashrc
+    line: |
+      # Starship
+      export STARSHIP_LOG=error
+      export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+      export ANSIBLE_VAULT_PASSWORD_FILE="$HOME/Developer/.vault.pwd"
+      # Activate Starship shell customizer
+      eval "$(starship init zsh)"
+    insertafter: EOF
+    create: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  notify: Restart bash
+

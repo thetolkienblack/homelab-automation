@@ -1,9 +1,0 @@
-{
-    "ansible.python.interpreterPath": "/opt/homebrew/bin/python3.12",
-    "ansible.lightspeed.suggestions.enabled": false,
-    "ansible.executionEnvironment.enabled": false,
-    "ansible.validation.lint.path": "/opt/homebrew/bin/ansible-lint",
-    "ansible.ansible.path": "/opt/homebrew/bin/ansible",
-    "ansible.validation.enabled": true,
-    "ansible.lightspeed.URL": ""
-}

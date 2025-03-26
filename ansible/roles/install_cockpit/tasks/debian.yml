@@ -1,0 +1,43 @@
+- name: Install Cockpit and related packages
+  ansible.builtin.apt:
+    name:
+      - cockpit
+      - cockpit-machines
+      - cockpit-bridge
+      - cockpit-networkmanager
+      - cockpit-packagekit
+      - cockpit-storaged
+      - cockpit-system
+      - cockpit-ws
+    state: present
+    update_cache: true
+  become: true
+
+- name: Configure dnsmasq to run on port 3265
+  ansible.builtin.lineinfile:
+    path: /etc/dnsmasq.conf
+    regexp: "^port="
+    line: "port=3265"
+    create: true
+  notify: Restart dnsmasq
+
+- name: Set Cockpit cache limit to 256MB
+  ansible.builtin.lineinfile:
+    path: /etc/cockpit/cockpit.conf
+    section: "Cache"
+    option: "Limit"
+    value: "256M"
+    create: true
+  notify: Restart cockpit
+
+- name: Ensure dnsmasq service is running
+  ansible.builtin.service:
+    name: dnsmasq
+    state: started
+    enabled: true
+
+- name: Ensure cockpit service is running
+  ansible.builtin.service:
+    name: cockpit
+    state: started
+    enabled: true

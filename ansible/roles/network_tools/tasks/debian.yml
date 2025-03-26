@@ -5,8 +5,12 @@
       - dnsutils
       - wireshark
       - speedtest-cli
-      - jq
-      - git
-      - software-properties-common
+      - curl
+      - wget
+      - iptables
+      - iputils-ping
+      - nmap
+      - traceroute
+      - dnsutils
     state: present
     update_cache: true

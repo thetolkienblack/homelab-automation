@@ -1,4 +1,4 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 ---
 # handlers file for common
 - name: Update apt cache
@@ -10,4 +10,10 @@
   ansible.builtin.apt:
     update_cache: true
     upgrade: dist
+  when: ansible_os_family == 'Debian'
+
+- name: Restart bash
+  ansible.builtin.systemd:
+    name: bash
+    state: restarted
   when: ansible_os_family == 'Debian'

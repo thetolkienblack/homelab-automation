@@ -1,0 +1,13 @@
+- name: Install archive tools
+  ansible.builtin.apt:
+    name:
+      - atool
+      - p7zip
+      - p7zip-full
+      - unzip
+      - rar
+      - xz-utils
+      - libbz2-dev
+      - liblzma-dev
+    state: present
+    update_cache: true
