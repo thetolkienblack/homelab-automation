@@ -1,22 +1,23 @@
 # SPDX-License-Identifier: MIT-0
 ---
-- hosts: localhost
+- name: Test Vagrant Alpine Role
+  hosts: localhost
   remote_user: root
   roles:
     - role: vagrant_alpine
       vars:
-        disk_size: "15GB"
-        ram_memory: 1024
-        cpu_core: 1
-        storage_pool_name: "default"
-        storage_default_prefix: "test_vm"
-        vm_name: "test_alpine"
-        vm_hostname: "test-alpine-vm"
-        network_name: "private_network"
-        bridge_interface: "virbr0"
-        synced_host_folder_dir: "/tmp/host_folder"
-        synced_guest_folder_dir: "/tmp/guest_folder"
-        host_ssh_file: "/root/.ssh/id_rsa.pub"
-        nameservers:
+        vagrant_alpine_disk_size: "15GB"
+        vagrant_alpine_ram_memory: 1024
+        vagrant_alpine_cpu_core: 1
+        vagrant_alpine_storage_pool_name: "default"
+        vagrant_alpine_storage_default_prefix: "test_vm"
+        vagrant_alpine_vm_name: "test_alpine"
+        vagrant_alpine_vm_hostname: "test-alpine-vm"
+        vagrant_alpine_network_name: "private_network"
+        vagrant_alpine_bridge_interface: "virbr0"
+        vagrant_alpine_synced_host_folder_dir: "/tmp/host_folder"
+        vagrant_alpine_synced_guest_folder_dir: "/tmp/guest_folder"
+        vagrant_alpine_host_ssh_file: "/root/.ssh/id_rsa.pub"
+        vagrant_alpine_nameservers:
           - 1.1.1.1
           - 8.8.8.8
