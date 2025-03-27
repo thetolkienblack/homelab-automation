@@ -14,7 +14,7 @@
       - libvirt-login-shell
       - libvirt-wireshark
     state: present
-    notify: Update apt cache
+  notify: Update apt cache
 
 - name: Install Vagrant
   ansible.builtin.apt:
@@ -22,8 +22,8 @@
       - vagrant
       - vagrant-libvirt
     state: present
-    when: { { install_vagrant } }
-    notify: Update apt cache
+  when: install_vagrant
+  notify: Update apt cache
 
 - name: Install LXC
   ansible.builtin.apt:
@@ -33,8 +33,8 @@
       - lxcfs
       - lxctl
     state: present
-    when: { { install_lxc } }
-    notify: Update apt cache
+  when: install_lxc
+  notify: Update apt cache
 
 - name: Install LXD
   ansible.builtin.apt:
@@ -45,5 +45,5 @@
       - lxd-client
       - lxd-migrate
     state: present
-    when: { { install_lxd } }
-    notify: Update apt cache
+  when: install_lxd
+  notify: Update apt cache
