@@ -1,4 +1,4 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 galaxy_info:
   author: thetolkienblack
   description: Ansible role for managing NVIDIA drivers installation and configuration

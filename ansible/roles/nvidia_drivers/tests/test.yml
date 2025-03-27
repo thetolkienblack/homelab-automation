@@ -1,17 +1,13 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 ---
-- hosts: localhost
-  remote_user: root
+- name: Install NVIDIA GPU drivers
+  hosts: gpu_hosts
+  become: true
   roles:
-    - nvidia_drivers
+    - role: nvidia_drivers
   vars:
     nvidia_enable_i386: true
     nvidia_packages:
       - nvidia-driver
       - libnvidia-gl-525:i386
-  tasks:
-    - name: Install NVIDIA GPU drivers
-      hosts: gpu_hosts
-      become: true
-      roles:
-        - role: nvidia_drivers
+
