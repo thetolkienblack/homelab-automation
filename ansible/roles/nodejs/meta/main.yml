@@ -1,4 +1,4 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 galaxy_info:
   author: thetolkienblack
   description: This role installs Node.js and npm for JavaScript development.
