@@ -19,16 +19,21 @@
     regexp: "^port="
     line: "port=3265"
     create: true
+    owner: root
+    group: root
+    mode: "0644"
   notify: Restart dnsmasq
 
-- name: Set Cockpit cache limit to 256MB
+- name: Limit Redis memory usage to 256MB
   ansible.builtin.lineinfile:
-    path: /etc/cockpit/cockpit.conf
-    section: "Cache"
-    option: "Limit"
-    value: "256M"
+    path: /etc/redis/redis.conf
+    regexp: "^maxmemory "
+    line: "maxmemory 256mb"
     create: true
-  notify: Restart cockpit
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart redis
 
 - name: Ensure dnsmasq service is running
   ansible.builtin.service:
@@ -39,5 +44,11 @@
 - name: Ensure cockpit service is running
   ansible.builtin.service:
     name: cockpit
+    state: started
+    enabled: true
+
+- name: Ensure Redis service is running
+  ansible.builtin.service:
+    name: redis-server
     state: started
     enabled: true

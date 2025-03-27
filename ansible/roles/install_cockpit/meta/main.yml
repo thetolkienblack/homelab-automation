@@ -1,12 +1,12 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 galaxy_info:
   author: thetolkienblack
   description: This role installs the Cockpit web-based interface for servers.
   company: Graylock
 
-  license: license (GPL-2.0-or-later, MIT, etc)
+  license: MIT
 
-  min_ansible_version: 2.1
+  min_ansible_version: "2.1"
 
   galaxy_tags:
     - cockpit
