@@ -1,0 +1,31 @@
+#include <tunables/global>
+
+profile usr.sbin.tcpdump {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+
+  capability net_raw,
+  capability net_admin,
+  capability dac_override,
+  capability sys_module,
+
+  network packet raw,
+  network packet packet,
+
+  /usr/sbin/tcpdump mr,
+  /etc/nsswitch.conf r,
+  /etc/group r,
+  /etc/passwd r,
+  /proc/net/** r,
+  /sys/kernel/debug/tracing/** rw,
+  /usr/share/tcpdump/** r,
+  /var/tmp/** rw,
+  /tmp/** rw,
+  /proc/sys/net/** r,
+
+  {% if tcpdump_additional_paths is defined %}
+  {% for path in tcpdump_additional_paths %}
+  {{ path }} rw,
+  {% endfor %}
+  {% endif %}
+}

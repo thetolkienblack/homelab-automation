@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
+
+- name: Check if AppArmor is installed
+  ansible.builtin.stat:
+    path: /etc/apparmor.d
+  register: apparmor_dir
+  become: true
+
+- name: Enable LXC AppArmor profile
+  ansible.builtin.command:
+    cmd: aa-complain /etc/apparmor.d/lxc-containers
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
+  changed_when: false
+  register: apparmor_lxc
+  failed_when: apparmor_lxc.rc != 0 and "No such file or directory" not in apparmor_lxc.stderr
+
+- name: Configure UFW rules for LXC
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  with_items: "{{ lxc_network_ports }}"
+  become: true
+  when: ufw_installed.rc == 0
+  notify: Reload UFW
+
+- name: Allow traffic from LXC bridge network
+  community.general.ufw:
+    rule: allow
+    from: "{{ lxc_bridge_network }}"
+  become: true
+  when: ufw_installed.rc == 0
+  notify: Reload UFW
+
+- name: Start and enable LXC service
+  ansible.builtin.systemd:
+    name: lxc
+    state: started
+    enabled: true
+  when: install_lxc
+  become: true

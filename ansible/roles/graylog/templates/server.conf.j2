@@ -1,0 +1,48 @@
+# Graylog Server Configuration
+http_publish_uri = {{ graylog_http_bind_address }}
+# Bind address for REST API and Web Interface
+web_listen_uri = http://{{ ansible_default_ipv4.address }}:{{ graylog_port }}/
+rest_listen_uri = {{ web_listen_uri }}/api/
+
+# Security settings (update these with secure values)
+password_secret = {{ graylog_password_secret }}
+root_password = {{ graylog_root_password }}
+root_password_sha2 = {{ graylog_root_password_sha2 }}
+
+# Additional Graylog configuration options can be added here
+# Graylog Server Configuration
+
+# OpenSearch configuration
+opensearch_hosts = http://localhost:{{ opensearch_http_port }}
+
+# Input configuration
+# Example: Syslog TCP input on port 514
+inputs = syslog-tcp://127.0.0.1:514
+
+# Output configuration
+# Example: Forward logs to another Graylog instance
+# outputs = graylog://another-graylog-server:12201
+
+# Stream and alert configuration
+# These are typically configured through the web interface
+
+# Index rotation and retention
+rotation_strategy = count
+elasticsearch_max_docs_per_index = 20000000
+elasticsearch_max_number_of_indices = 20
+retention_strategy = delete
+
+# TLS/SSL configuration
+# http_enable_tls = true
+# http_tls_cert_file = /path/to/graylog-cert.pem
+# http_tls_key_file = /path/to/graylog-key.pem
+
+# Authentication and authorization
+# ldap_enabled = true
+# ldap_uri = ldap://your-ldap-server:389
+# ldap_search_base = ou=users,dc=example,dc=com
+# ldap_search_pattern = (uid={0})
+# ldap_default_group = Reader
+
+# System monitoring
+metrics_collection_interval = 60

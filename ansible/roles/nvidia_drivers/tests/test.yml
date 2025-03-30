@@ -10,4 +10,3 @@
     nvidia_packages:
       - nvidia-driver
       - libnvidia-gl-525:i386
-

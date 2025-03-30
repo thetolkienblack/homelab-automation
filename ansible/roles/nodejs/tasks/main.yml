@@ -2,5 +2,5 @@
 ---
 # tasks file for ansible_role_init
 - name: Include Debian-specific tasks
-  ansible.builtin.include_tasks: debian.yml
-  when: ansible_os_family == 'Debian'
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name

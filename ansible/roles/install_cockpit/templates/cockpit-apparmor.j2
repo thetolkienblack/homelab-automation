@@ -1,0 +1,21 @@
+#include <tunables/global>
+
+profile cockpit-ws /usr/lib/cockpit/cockpit-ws {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+  #include <abstractions/openssl>
+
+  /usr/lib/cockpit/cockpit-ws mr,
+  /etc/cockpit/** r,
+  /usr/share/cockpit/** r,
+  /var/lib/cockpit/** rw,
+  /run/cockpit/* rw,
+  /run/user/*/cockpit/* rw,
+{% if cockpit_extra_dirs is defined %}
+{% for dir in cockpit_extra_dirs %}
+  {{ dir }} rw,
+{% endfor %}
+{% endif %}
+  network inet stream,
+  network inet6 stream,
+}

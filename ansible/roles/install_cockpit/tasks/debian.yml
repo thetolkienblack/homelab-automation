@@ -23,6 +23,7 @@
     group: root
     mode: "0644"
   notify: Restart dnsmasq
+  become: true
 
 - name: Limit Redis memory usage to 256MB
   ansible.builtin.lineinfile:
@@ -34,21 +35,64 @@
     group: root
     mode: "0644"
   notify: Restart redis
+  become: true
 
-- name: Ensure dnsmasq service is running
-  ansible.builtin.service:
-    name: dnsmasq
-    state: started
-    enabled: true
+- name: Check if AppArmor is installed
+  ansible.builtin.stat:
+    path: /etc/apparmor.d
+  register: apparmor_dir
+  become: true
 
-- name: Ensure cockpit service is running
-  ansible.builtin.service:
-    name: cockpit
-    state: started
-    enabled: true
+- name: Create Cockpit AppArmor profile from template
+  ansible.builtin.template:
+    src: cockpit-apparmor.j2
+    dest: /etc/apparmor.d/usr.lib.cockpit.cockpit-ws
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
 
-- name: Ensure Redis service is running
-  ansible.builtin.service:
-    name: redis-server
-    state: started
-    enabled: true
+- name: Enable Cockpit AppArmor profile in complain mode
+  ansible.builtin.command:
+    cmd: aa-complain /etc/apparmor.d/usr.lib.cockpit.cockpit-ws
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
+  changed_when: false
+  register: apparmor_cockpit
+  failed_when: apparmor_cockpit.rc != 0 and "No such file or directory" not in apparmor_cockpit.stderr
+
+- name: Check if UFW is installed
+  ansible.builtin.command:
+    cmd: dpkg -s ufw
+  register: ufw_installed
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: Configure UFW rules for Cockpit and related services
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  with_items: "{{ cockpit_ufw_rules }}"
+  become: true
+  when: ufw_installed.rc == 0
+  notify: Reload UFW
+
+- name: Enable Cockpit services through UFW
+  community.general.ufw:
+    rule: allow
+    name: "{{ item }}"
+  with_items:
+    - "Cockpit"
+    - "cockpit"
+  become: true
+  when: ufw_installed.rc == 0
+  notify: Reload UFW
+  register: ufw_result
+  failed_when: "'already exists' not in ufw_result.stderr and ufw_result.rc != 0"

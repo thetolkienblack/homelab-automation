@@ -1,0 +1,29 @@
+# Local AppArmor profile for NVIDIA tools
+
+#include <tunables/global>
+
+profile nvidia_{{ item }} flags=(complain) {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+  #include <abstractions/user-tmp>
+
+  # Access to NVIDIA devices
+  /dev/nvidia* rw,
+  /dev/dri/* rw,
+
+  # Allow execution of NVIDIA binaries
+  /usr/bin/nvidia-* rmix,
+
+  # Allow reading NVIDIA configs
+  /etc/nvidia/* r,
+
+  # Allow reading system information
+  /proc/driver/nvidia/** r,
+  /proc/devices r,
+  /proc/modules r,
+  /sys/class/nvidia*/** r,
+  /sys/devices/system/node/* r,
+
+  # Allow writing to log files
+  /var/log/nvidia* rw,
+}

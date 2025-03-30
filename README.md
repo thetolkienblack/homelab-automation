@@ -1,4 +1,214 @@
 # docker-ansible
+This repository contains Ansible playbooks for setting up a secure and efficient environment using Docker, Kubernetes, and Libvirt. The playbooks are designed to automate the installation and configuration of various tools and services, including security tools, development environments, and GPU support.
+
+## Requirements
+- Ansible 2.8 or higher
+- Python 3.x
+- Docker (for Docker playbooks)
+- Kubernetes (for Kubernetes playbooks)
+- Libvirt (for Libvirt playbooks)
+
+## Overview
+This repository contains the following main components:
+1. Basic setup playbook
+2. Development tools playbook
+3. Nvidia playbook
+4. Security tools playbook
+5. Docker playbook
+6. Kubernetes playbook
+7. Libvirt playbook
+
+## Directory Structure
+- `ansible.cfg`: Ansible configuration file.
+- `inventory`: Inventory file for specifying hosts and groups.
+- `playbooks/`: Directory containing various Ansible playbooks.
+  - `basic_setup.yml`: Basic setup playbook.
+  - `dev_tools.yml`: Development tools playbook.
+  - `nvidia.yml`: Nvidia playbook.
+  - `security_tools.yml`: Security tools playbook.
+  - `docker.yml`: Docker playbook.
+  - `kubernetes.yml`: Kubernetes playbook.
+  - `libvirt.yml`: Libvirt playbook.
+
+## Usage
+To run a specific playbook, use the following command:
+```bash
+ansible-playbook -i inventory playbooks/<playbook_name>.yml
+```
+
+## Examples
+### Basic Setup Playbook
+```bash
+ansible-playbook -i inventory playbooks/basic_setup.yml
+```
+
+### Development Tools Playbook
+```bash
+ansible-playbook -i inventory playbooks/dev_tools.yml
+```
+
+### Nvidia Playbook
+```bash
+ansible-playbook -i inventory playbooks/nvidia.yml
+```
+
+### Security Tools Playbook
+```bash
+ansible-playbook -i inventory playbooks/security_tools.yml
+```
+
+### Docker Playbook
+```bash
+ansible-playbook -i inventory playbooks/docker.yml
+```
+
+### Kubernetes Playbook
+```bash
+ansible-playbook -i inventory playbooks/kubernetes.yml
+```
+
+### Libvirt Playbook
+```bash
+ansible-playbook -i inventory playbooks/libvirt.yml
+```
+
+## Notes
+- Ensure that you have the necessary permissions to run the playbooks and install packages.
+- Review each playbook before running it to understand what changes will be made to your system.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Contributing
+Contributions are welcome! Please create a pull request or open an issue if you have suggestions or improvements.
+
+## Author
+This project is maintained by [Your Name]. For more information, visit [Your Website or GitHub Profile].
+
+# Ansible playbooks for docker containers
+This repository contains Ansible playbooks for setting up a secure and efficient environment using Docker, Kubernetes, and Libvirt. The playbooks are designed to automate the installation and configuration of various tools and services, including security tools, development environments, and GPU support.
+
+## Requirements
+- Ansible 2.8 or higher
+- Python 3.x
+- Docker (for Docker playbooks)
+- Kubernetes (for Kubernetes playbooks)
+- Libvirt (for Libvirt playbooks)
+
+## Overview
+This repository contains the following main components:
+1. Basic setup playbook
+2. Development tools playbook
+3. Nvidia playbook
+4. Security tools playbook
+5. Docker playbook
+6. Kubernetes playbook
+7. Libvirt playbook
+
+## Directory Structure
+- `ansible.cfg`: Ansible configuration file.
+- `inventory`: Inventory file for specifying hosts and groups.
+- `playbooks/`: Directory containing various Ansible playbooks.
+  - `basic_setup.yml`: Basic setup playbook.
+  - `dev_tools.yml`: Development tools playbook.
+  - `nvidia.yml`: Nvidia playbook.
+  - `security_tools.yml`: Security tools playbook.
+  - `docker.yml`: Docker playbook.
+  - `kubernetes.yml`: Kubernetes playbook.
+  - `libvirt.yml`: Libvirt playbook.
+
+## Usage
+To run a specific playbook, use the following command:
+```bash
+ansible-playbook -i inventory playbooks/<playbook_name>.yml
+```
+
+## Examples
+### Basic Setup Playbook
+```bash
+ansible-playbook -i inventory playbooks/basic_setup.yml
+```
+
+### Development Tools Playbook
+```bash
+ansible-playbook -i inventory playbooks/dev_tools.yml
+```
+
+### Nvidia Playbook
+```bash
+ansible-playbook -i inventory playbooks/nvidia.yml
+```
+
+### Security Tools Playbook
+```bash
+ansible-playbook -i inventory playbooks/security_tools.yml
+```
+
+### Docker Playbook
+```bash
+ansible-playbook -i inventory playbooks/docker.yml
+```
+
+### Kubernetes Playbook
+```bash
+ansible-playbook -i inventory playbooks/kubernetes.yml
+```
+
+### Libvirt Playbook
+```bash
+ansible-playbook -i inventory playbooks/libvirt.yml
+```
+
+## Notes
+- Ensure that you have the necessary permissions to run the playbooks and install packages.
+- Review each playbook before running it to understand what changes will be made to your system.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Contributing
+Contributions are welcome! Please create a pull request or open an issue if you have suggestions or improvements.
+
+## Author
+This project is maintained by [Your Name]. For more information, visit [Your Website or GitHub Profile].
+
+## Ansible Playbooks for Docker Containers
+This repository contains Ansible playbooks for setting up a secure and efficient environment using Docker, Kubernetes, and Libvirt. The playbooks are designed to automate the installation and configuration of various tools and services, including security tools, development environments, and GPU support.
+
+## Requirements
+- Ansible 2.8 or higher
+- Python 3.x
+- Docker (for Docker playbooks)
+- Kubernetes (for Kubernetes playbooks)
+- Libvirt (for Libvirt playbooks)
+
+## Overview
+This repository contains the following main components:
+1. Basic setup playbook
+2. Development tools playbook
+3. Nvidia playbook
+4. Security tools playbook
+5. Docker playbook
+6. Kubernetes playbook
+7. Libvirt playbook
+
+## Directory Structure
+- `ansible.cfg`: Ansible configuration file.
+- `inventory`: Inventory file for specifying hosts and groups.
+- `playbooks/`: Directory containing various Ansible playbooks.
+  - `basic_setup.yml`: Basic setup playbook.
+  - `dev_tools.yml`: Development tools playbook.
+  - `nvidia.yml`: Nvidia playbook.
+  - `security_tools.yml`: Security tools playbook.
+  - `docker.yml`: Docker playbook.
+  - `kubernetes.yml`: Kubernetes playbook.
+  - `libvirt.yml`: Libvirt playbook.
+
+## Usage
+To run a specific playbook, use the following command:
+```bash
+ansible-playbook -i inventory playbooks/<playbook_name>.yml
+```
 Ansible playbooks for docker containers
 
 # Playbook

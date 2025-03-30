@@ -43,3 +43,47 @@
     state: directory
     mode: "0755"
   become: true
+
+- name: Install AppArmor packages
+  ansible.builtin.apt:
+    name:
+      - apparmor
+      - apparmor-utils
+      - apparmor-profiles
+      - apparmor-profiles-extra
+    state: present
+    update_cache: true
+  become: true
+
+- name: Ensure AppArmor service is enabled and started
+  ansible.builtin.systemd:
+    name: apparmor
+    state: started
+    enabled: true
+  become: true
+
+- name: Set AppArmor to enforcing mode
+  ansible.builtin.command:
+    cmd: aa-enforce /etc/apparmor.d/*
+  become: true
+  changed_when: false
+  register: apparmor_enforce
+  failed_when: apparmor_enforce.rc != 0 and "No such file or directory" not in apparmor_enforce.stderr
+
+- name: Update kernel boot parameters for AppArmor
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX="((?!apparmor=1|security=apparmor).)*"$'
+    line: 'GRUB_CMDLINE_LINUX="${GRUB_CMDLINE_LINUX} apparmor=1 security=apparmor"'
+    backrefs: true
+  become: true
+  notify: Update grub
+
+- name: Install UFW and Fail2ban packages
+  ansible.builtin.apt:
+    name:
+      - ufw
+      - fail2ban
+    state: present
+    update_cache: true
+  become: true

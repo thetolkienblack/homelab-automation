@@ -1,0 +1,16 @@
+---
+- name: Setup graylock server
+  hosts: all
+  vars_files:
+    - ../../group_vars/all/vars.yml
+    - ../host_vars/graylock/vault.yml
+    - ../host_vars/graylock/vars.yml
+  become: true
+  gather_facts: true
+  roles:
+    - role: common
+    - role: host_setup
+    - role: network_tools
+    - role: development_tools
+    - role: virt_tools
+    - role: nvidia_drivers

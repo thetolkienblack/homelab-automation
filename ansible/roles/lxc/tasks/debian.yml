@@ -1,0 +1,21 @@
+# roles/lxc/tasks/debian.yml
+---
+- name: Install LXC
+  ansible.builtin.apt:
+    name:
+      - lxc
+      - lxc-templates
+      - lxcfs
+      - lxctl
+    state: present
+  when: install_lxc
+  notify: Update apt cache
+  become: true
+
+- name: Check if UFW is installed
+  ansible.builtin.command:
+    cmd: dpkg -s ufw
+  register: ufw_installed
+  changed_when: false
+  failed_when: false
+  become: true

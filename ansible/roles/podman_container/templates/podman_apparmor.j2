@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT-0
+#include <tunables/global>
+profile podman_{{ podman_profile_name | default("default") }} flags=(attach_disconnected, mediate_deleted) {
+  #include <abstractions/base>
+
+  # Insert custom Podman AppArmor rules below.
+  {% include 'podman_apparmor_rules.j2' %}
+}

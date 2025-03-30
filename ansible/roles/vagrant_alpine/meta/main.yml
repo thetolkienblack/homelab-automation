@@ -13,5 +13,4 @@ galaxy_info:
     - automation
 
 dependencies:
-  - common
-  - virt_tools
+  - vagrant

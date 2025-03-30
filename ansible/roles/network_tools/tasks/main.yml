@@ -2,5 +2,34 @@
 ---
 # tasks file for install_network_tools
 - name: Include Debian-specific tasks
-  ansible.builtin.include_tasks: debian.yml
-  when: ansible_os_family == 'Debian'
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
+
+- name: Configure UFW rules for network tools
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+    comment: "{{ item.comment }}"
+  with_items: "{{ network_tools_ufw_rules }}"
+  become: true
+  when: ufw_installed.rc == 0
+  notify: Reload UFW
+
+- name: Check if AppArmor is installed
+  ansible.builtin.stat:
+    path: /etc/apparmor.d
+  register: apparmor_dir
+  become: true
+
+- name: Configure AppArmor profiles for network tools
+  ansible.builtin.template:
+    src: network_tool_apparmor.j2
+    dest: "/etc/apparmor.d/local/usr.bin.{{ item }}"
+    mode: '0644'
+  with_items: "{{ network_tools_apparmor_profiles }}"
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
+  notify: Reload AppArmor profiles

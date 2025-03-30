@@ -2,8 +2,8 @@
 ---
 # tasks file for common
 - name: Include Debian-specific tasks
-  ansible.builtin.include_tasks: debian.yml
-  when: ansible_os_family == 'Debian'
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
 
 - name: Ensure ansible_user variable is defined
   ansible.builtin.fail:
@@ -17,3 +17,41 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: '0644'
+  become: false
+
+- name: Configure UFW defaults
+  community.general.ufw:
+    default: "{{ item.policy }}"
+    direction: "{{ item.direction }}"
+  with_items:
+    - { policy: 'deny', direction: 'incoming' }
+    - { policy: 'allow', direction: 'outgoing' }
+  become: true
+
+- name: Allow SSH through UFW
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH
+  become: true
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  become: true
+
+- name: Create fail2ban jail.local from template
+  ansible.builtin.template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  notify: Restart fail2ban
+
+- name: Ensure Fail2ban service is enabled and started
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: started
+    enabled: true
+  become: true

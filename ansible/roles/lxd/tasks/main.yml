@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for lxd
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
+
+- name: Configure UFW rules for LXD
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  with_items: "{{ lxd_network_ports }}"
+  become: true
+  when: ufw_installed.rc == 0
+  notify: Reload UFW
+
+- name: Allow traffic from LXD managed bridge network
+  community.general.ufw:
+    rule: allow
+    from: lxd_subnet
+  become: true
+  when: ufw_installed.rc == 0
+  notify: Reload UFW
+
+- name: Start and enable LXD service
+  ansible.builtin.systemd:
+    name: lxd
+    state: started
+    enabled: true
+  when: install_lxd
+  become: true

@@ -12,12 +12,14 @@
       - lsb-release
   state: present
   update_cache: true
+  become: true
 
 - name: Enable i386 architecture (needed for some NVIDIA components)
   ansible.builtin.command: dpkg --add-architecture i386
   args:
     creates: /etc/dpkg/dpkg.cfg.d/multiarch
   notify: Update apt cache
+  become: true
 
 - name: Install NVIDIA Driver (non-free)
   ansible.builtin.apt:
@@ -31,25 +33,12 @@
       - nvidia-xconfig
     state: present
     update_cache: true
+  become: true
 
-- name: Try loading NVIDIA module
-  ansible.builtin.command: modprobe nvidia
-  register: modprobe_result
-  failed_when: false
+- name: Check if UFW is installed
+  ansible.builtin.command:
+    cmd: dpkg -s ufw
+  register: ufw_installed
   changed_when: false
-
-- name: Check if /dev/nvidia0 exists
-  ansible.builtin.stat:
-  path: /dev/nvidia0
-  register: nvidia_device
-
-- name: Display warning if NVIDIA device is missing
-  ansible.builtin.debug:
-    msg: >
-      NVIDIA device nodes not found. Kernel module may not be loaded or
-      DKMS build may have failed. Reboot might be required.
-  when: nvidia_device is defined and not nvidia_device.stat.exists
-
-- name: Reboot if NVIDIA device node is missing
-  ansible.builtin.reboot:
-  when: nvidia_device is defined and not nvidia_device.stat.exists
+  failed_when: false
+  become: true

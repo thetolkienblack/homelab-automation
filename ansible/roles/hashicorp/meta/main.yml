@@ -3,16 +3,12 @@ galaxy_info:
   author: thetolkienblack
   description: This role installs HashiCorp tools for DevOps and infrastructure automation.
   company: Graylock
-
-  license: BSD-3-Clause
-
+  license: MIT
   min_ansible_version: "2.1"
-
   galaxy_tags:
     - hashicorp
     - terraform
     - devops
     - vault
-
 dependencies:
   - role: common

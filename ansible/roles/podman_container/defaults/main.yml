@@ -2,3 +2,13 @@
 ---
 # defaults file for podman_container
 docker_registry: docker.io
+# SPDX-License-Identifier: MIT-0
+podman_profile_name: default
+
+podman_ufw_rules:
+  - port: 2375
+    proto: tcp
+    comment: Podman API (unencrypted)
+  - port: 2376
+    proto: tcp
+    comment: Podman API (encrypted)

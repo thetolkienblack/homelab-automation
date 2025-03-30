@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
+
+- name: Generate random graylog password
+  ansible.builtin.set_fact:
+    graylog_root_password: "{{ lookup('pipe', 'pwgen -N 1 -s 96') }}"
+  when: graylog_root_password is not defined
+
+- name: Generate random graylog password SHA2
+  ansible.builtin.set_fact:
+    graylog_root_password_sha2: "{{ graylog_root_password | password_hash('sha256') }}"
+  when: graylog_root_password is not defined
+
+- name: Generate random opensearch admin username
+  ansible.builtin.set_fact:
+    opensearch_admin_username: "admin"
+  when: opensearch_admin_username is not defined
+
+- name: Generate random opensearch admin password
+  ansible.builtin.set_fact:
+    opensearch_admin_password: "{{ lookup('password', '/dev/null', length=20, chars='ascii_letters,digits') }}"
+  when: opensearch_admin_password is not defined

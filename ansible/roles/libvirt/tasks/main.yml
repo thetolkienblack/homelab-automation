@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for virt_tools
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
+
+- name: Check if AppArmor is installed
+  ansible.builtin.stat:
+    path: /etc/apparmor.d
+  register: apparmor_dir
+  become: true
+
+- name: Enable AppArmor profiles for libvirt and QEMU
+  ansible.builtin.file:
+    path: "/etc/apparmor.d/{{ item }}"
+    state: link
+    src: "/etc/apparmor.d/disable/{{ item }}"
+    force: true
+  with_items:
+    - usr.sbin.libvirtd
+    - usr.lib.libvirt.virt-aa-helper
+    - usr.bin.qemu-system-x86_64
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
+  register: apparmor_enabled
+  failed_when: false
+
+- name: Reload AppArmor profiles for libvirt and QEMU
+  ansible.builtin.command:
+    cmd: "apparmor_parser -r /etc/apparmor.d/{{ item }}"
+  with_items:
+    - usr.sbin.libvirtd
+    - usr.lib.libvirt.virt-aa-helper
+    - usr.bin.qemu-system-x86_64
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
+    - apparmor_enabled is not failed
+  changed_when: true
+
+- name: Configure UFW rules for libvirt and QEMU
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  with_items: "{{ libvirt_ufw_rules }}"
+  become: true
+  when: ufw_installed.rc == 0
+  notify: Reload UFW

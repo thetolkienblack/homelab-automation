@@ -1,0 +1,106 @@
+- name: KDE and GUI apps
+  hosts: all
+  become: true
+  vars_files:
+    - ../../group_vars/all/vars.yml
+
+  tasks:
+    - name: Update package cache
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install KDE and set Breeze Dark theme
+      block:
+        - name: Install KDE Full
+          ansible.builtin.apt:
+            name: kde-full
+            state: present
+            update_cache: true
+
+        - name: Set KDE Plasma theme to Breeze Dark
+          ansible.builtin.lineinfile:
+            path: "/home/{{ kde_user }}/.config/plasmarc"
+            regexp: '^theme='
+            line: 'theme=BreezeDark'
+            create: true
+            owner: "{{ kde_user }}"
+            group: "{{ kde_user }}"
+            mode: '0644'
+
+        - name: Reload KDE theme
+          ansible.builtin.command: qdbus org.kde.KWin /KWin reconfigure
+          changed_when: false
+          failed_when: false
+
+    - name: Install Flatpak and GUI applications
+      block:
+        - name: Install Flatpak
+          ansible.builtin.apt:
+            name: flatpak
+            state: present
+            update_cache: true
+
+        - name: Add Flathub remote repository if not already added
+          ansible.builtin.command: >
+            flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          args:
+            creates: /var/lib/flatpak/repo/flathub.trustedkeys.gpg
+
+        - name: Install Bitwarden via Flatpak
+          ansible.builtin.command: >
+            flatpak install -y flathub com.bitwarden.desktop
+          args:
+            creates: /var/lib/flatpak/app/com.bitwarden.desktop
+
+        - name: Install Brave via Flatpak
+          ansible.builtin.command: >
+            flatpak install -y flathub com.brave.Browser
+          args:
+            creates: /var/lib/flatpak/app/com.brave.Browser
+
+        - name: Install qBittorrent via Flatpak
+          ansible.builtin.command: >
+            flatpak install -y flathub org.qbittorrent.qBittorrent
+          args:
+            creates: /var/lib/flatpak/app/org.qbittorrent.qBittorrent
+
+        - name: Install VSCodium via Flatpak
+          ansible.builtin.command: >
+            flatpak install -y flathub com.vscodium.codium
+          args:
+            creates: /var/lib/flatpak/app/com.vscodium.codium
+
+        - name: Install VLC via Flatpak
+          ansible.builtin.command: >
+            flatpak install -y flathub org.videolan.VLC
+          args:
+            creates: /var/lib/flatpak/app/org.videolan.VLC
+
+        - name: Install Spotify via Flatpak
+          ansible.builtin.command: >
+            flatpak install -y flathub com.spotify.Client
+          args:
+            creates: /var/lib/flatpak/app/com.spotify.Client
+
+        - name: Install Darktable via Flatpak
+          ansible.builtin.command: >
+            flatpak install -y flathub org.darktable.Darktable
+          args:
+            creates: /var/lib/flatpak/app/org.darktable.Darktable
+
+        - name: Install Blender via Flatpak
+          ansible.builtin.command: >
+            flatpak install -y flathub org.blender.Blender
+          args:
+            creates: /var/lib/flatpak/app/org.blender.Blender
+
+        - name: Install GIMP via Flatpak
+          ansible.builtin.command: >
+            flatpak install -y flathub org.gimp.GIMP
+          args:
+            creates: /var/lib/flatpak/app/org.gimp.GIMP
+    - name: Install Timeshift
+      ansible.builtin.apt:
+        name: timeshift
+        state: present
+        update_cache: true

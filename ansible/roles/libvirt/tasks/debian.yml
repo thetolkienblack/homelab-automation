@@ -1,0 +1,24 @@
+# roles/libvirt/tasks/debian.yml
+---
+- name: Install libvirt packages
+  ansible.builtin.apt:
+    name:
+      - qemu-kvm
+      - libvirt-daemon-system
+      - libvirt-clients
+      - libvirt-daemon
+      - libvirt-daemon-system-systemd
+      - libvirt-daemon-config-network
+      - libvirt-login-shell
+      - libvirt-wireshark
+    state: present
+  notify: Update apt cache
+  become: true
+
+- name: Check if UFW is installed
+  ansible.builtin.command:
+    cmd: dpkg -s ufw
+  register: ufw_installed
+  changed_when: false
+  failed_when: false
+  become: true

@@ -2,13 +2,14 @@
 ---
 # tasks file for ansible_role_init
 - name: Include Debian-specific tasks
-  ansible.builtin.include_tasks: debian.yml
-  when: ansible_os_family == 'Debian'
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
 
 - name: Install starship prompt
   ansible.builtin.shell: "set -o pipefail && curl -sS https://starship.rs/install.sh | sh -s -- -y"
   args:
     creates: /usr/local/bin/starship
+  become: false
 
 - name: Add Starship exports to .bashrc
   ansible.builtin.lineinfile:
@@ -26,3 +27,4 @@
     group: "{{ ansible_user }}"
     mode: '0644'
   notify: Restart bash
+  become: false

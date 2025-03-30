@@ -4,16 +4,44 @@
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: true
-  when: ansible_os_family == 'Debian'
+  when: ansible_os_family == debian_family_name
+  become: true
 
 - name: Ugrade apt packages
   ansible.builtin.apt:
     update_cache: true
     upgrade: dist
-  when: ansible_os_family == 'Debian'
+  when: ansible_os_family == debian_family_name
+  become: true
 
 - name: Restart bash
   ansible.builtin.systemd:
     name: bash
     state: restarted
-  when: ansible_os_family == 'Debian'
+  become: true
+
+- name: Update grub
+  ansible.builtin.command: update-grub
+  become: true
+  changed_when: false
+
+- name: Restart fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: restarted
+  become: true
+
+- name: Reload AppArmor profiles
+  ansible.builtin.command:
+    cmd: apparmor_parser -r /etc/apparmor.d/usr.sbin.tcpdump
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
+  changed_when: true
+
+- name: Reload UFW
+  community.general.ufw:
+    state: reloaded
+  become: true
+  changed_when: false

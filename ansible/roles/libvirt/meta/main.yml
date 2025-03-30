@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT-0
+---
+galaxy_info:
+  author: thetolkienblack
+  description: Role to install and configure libvirt
+  license: MIT
+  min_ansible_version: "2.8"
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags:
+    - libvirt
+    - virtualization
+dependencies:
+  - common
+  - network_tools

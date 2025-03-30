@@ -1,0 +1,22 @@
+# roles/lxd/tasks/debian.yml
+---
+- name: Install LXD
+  ansible.builtin.apt:
+    name:
+      - lxd
+      - lxd-tools
+      - lxd-agent
+      - lxd-client
+      - lxd-migrate
+    state: present
+  when: install_lxd
+  notify: Update apt cache
+  become: true
+
+- name: Check if UFW is installed
+  ansible.builtin.command:
+    cmd: dpkg -s ufw
+  register: ufw_installed
+  changed_when: false
+  failed_when: false
+  become: true

@@ -11,3 +11,4 @@
       - liblzma-dev
     state: present
     update_cache: true
+  become: true

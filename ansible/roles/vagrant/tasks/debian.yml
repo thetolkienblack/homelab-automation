@@ -1,0 +1,11 @@
+# roles/qemu/tasks/debian.yml
+---
+- name: Install Vagrant
+  ansible.builtin.apt:
+    name:
+      - vagrant
+      - vagrant-libvirt
+    state: present
+  when: install_vagrant
+  notify: Update apt cache
+  become: true
