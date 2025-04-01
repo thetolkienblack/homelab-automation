@@ -1,5 +1,6 @@
 # Graylog Server Configuration
-http_publish_uri = {{ graylog_http_bind_address }}
+# Example configuration can be found on https://github.com/Graylog2/graylog2-server/blob/master/misc/graylog.conf
+http_publish_uri = 0.0.0.0:{{ graylog_http_port }}
 # Bind address for REST API and Web Interface
 web_listen_uri = http://{{ ansible_default_ipv4.address }}:{{ graylog_port }}/
 rest_listen_uri = {{ web_listen_uri }}/api/
@@ -21,7 +22,9 @@ inputs = syslog-tcp://127.0.0.1:514
 
 # Output configuration
 # Example: Forward logs to another Graylog instance
-# outputs = graylog://another-graylog-server:12201
+{% if not is_master_node %}
+outputs = graylog://{{ master_node_server }}
+{% endif %}
 
 # Stream and alert configuration
 # These are typically configured through the web interface
@@ -32,17 +35,120 @@ elasticsearch_max_docs_per_index = 20000000
 elasticsearch_max_number_of_indices = 20
 retention_strategy = delete
 
-# TLS/SSL configuration
-# http_enable_tls = true
-# http_tls_cert_file = /path/to/graylog-cert.pem
-# http_tls_key_file = /path/to/graylog-key.pem
-
-# Authentication and authorization
-# ldap_enabled = true
-# ldap_uri = ldap://your-ldap-server:389
-# ldap_search_base = ou=users,dc=example,dc=com
-# ldap_search_pattern = (uid={0})
-# ldap_default_group = Reader
-
 # System monitoring
 metrics_collection_interval = 60
+is_leader = {{ graylog_is_leader }}
+node_id_file = /etc/graylog/server/node-id
+root_username = admin
+root_email = "info@graylock.eu"
+root_timezone = UTC
+bin_dir = bin
+data_dir = data
+plugin_dir = plugin
+
+{% if is_master_node %}
+http_external_uri = {{ http_external_uri }}
+{% endif %}
+
+http_enable_gzip = true
+http_max_header_size = 8192
+http_thread_pool_size = 128
+http_enable_tls = true
+http_tls_cert_file = /etc/graylog/server/graylog-cert.pem
+http_tls_key_file = /etc/graylog/server/graylog-key.pem
+{% if http_tls_key_password %}
+http_tls_key_password = {{ http_tls_key_password }}
+{% endif %}
+stream_aware_field_types=false
+{ % if trusted_proxies %}
+trusted_proxies = {{ trusted_proxies }}
+{ % endif %}
+elasticsearch_version_probe_attempts = 5
+elasticsearch_version_probe_delay = 5s
+elasticsearch_connect_timeout = 10s
+elasticsearch_socket_timeout = 60s
+elasticsearch_idle_timeout = -1s
+elasticsearch_max_total_connections = 200
+elasticsearch_max_total_connections_per_route = 20
+elasticsearch_max_retries = 2
+elasticsearch_discovery_enabled = true
+elasticsearch_discovery_frequency = 30s
+elasticsearch_discovery_default_scheme = http
+elasticsearch_compression_enabled = true
+elasticsearch_use_expect_continue = true
+elasticsearch_index_prefix = graylog
+elasticsearch_template_name = graylog-internal
+default_events_index_prefix = gl-events
+default_system_events_index_prefix = gl-system-events
+elasticsearch_analyzer = standard
+elasticsearch_shards = 1
+elasticsearch_replicas = 2
+datanode_startup_connection_attempts = 5
+datanode_startup_connection_delay = 30s
+enabled_index_rotation_strategies = count,size,time,time-size-optimizing
+rotation_strategy = time-size-optimizing
+elasticsearch_max_docs_per_index = 20000000
+elasticsearch_max_size_per_index = 32212254720
+elasticsearch_max_time_per_index = 1w
+max_index_retention_period = P90d
+elasticsearch_max_write_index_age = 1d
+retention_strategy = delete
+elasticsearch_max_number_of_indices = 20
+allow_leading_wildcard_searches = true
+allow_highlighting = true
+allow_unmapped_fields = true
+output_batch_size = 500
+output_flush_interval = 5
+output_fault_count_threshold = 5
+output_fault_penalty_seconds = 30
+processbuffer_processors = 5
+outputbuffer_processors = 3
+outputbuffer_processor_threads_core_pool_size = 3
+udp_recvbuffer_sizes = 1048576
+processor_wait_strategy = blocking
+ring_size = 65536
+inputbuffer_ring_size = 65536
+inputbuffer_wait_strategy = blocking
+auto_restart_inputs = true
+message_journal_enabled = true
+message_journal_dir = data/journal
+message_journal_max_age = 12h
+message_journal_max_size = 5gb
+message_journal_flush_age = 1m
+message_journal_flush_interval = 1000000
+message_journal_segment_age = 1h
+message_journal_segment_size = 100mb
+async_eventbus_processors = 2
+lb_recognition_period_seconds = 3
+lb_throttle_threshold_percentage = 95
+stream_processing_timeout = 2000
+stream_processing_max_faults = 3
+output_module_timeout = 10000
+stale_leader_timeout = 2000
+shutdown_timeout = 30000
+mongodb_uri = {{ mongodb_uri }}
+mongodb_max_connections = 1000
+{% if transport_email_enabled %}
+transport_email_enabled = true
+transport_email_hostname = smtp.gmail.com
+transport_email_port = 587
+transport_email_use_auth = true
+transport_email_auth_username = info@graylock.eu
+transport_email_auth_password = {{ smtp_graylock_password }}
+transport_email_from_email = graylog@graylock.eu
+transport_email_socket_connection_timeout = 10s
+transport_email_socket_timeout = 10s
+transport_email_use_tls = true
+{% endif %}
+http_user_agent = Graylog
+http_connect_timeout = 5s
+http_read_timeout = 10s
+http_write_timeout = 10s
+enabled_tls_protocols = TLSv1.2,TLSv1.3
+{% if prometheus_exporter_enabled %}
+prometheus_exporter_enabled = {{ prometheus_exporter_enabled }}
+prometheus_exporter_bind_address = {{ prometheus_exporter_bind_address }}
+#prometheus_exporter_mapping_file_path_core = prometheus-exporter-mapping-core.yml
+#prometheus_exporter_mapping_file_path_custom = prometheus-exporter-mapping-custom.yml
+prometheus_exporter_mapping_file_refresh_interval = 60s
+{% endif %}

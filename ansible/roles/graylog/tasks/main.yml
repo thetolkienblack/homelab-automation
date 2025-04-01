@@ -5,22 +5,100 @@
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
   when: ansible_os_family == debian_family_name
 
-- name: Generate random graylog password
-  ansible.builtin.set_fact:
-    graylog_root_password: "{{ lookup('pipe', 'pwgen -N 1 -s 96') }}"
-  when: graylog_root_password is not defined
+# MongoDB
+- name: Create MongoDB keyfile
+  ansible.builtin.copy:
+    content: "{{ mongodb_keyfile_content }}"
+    dest: "{{ mongodb_keyfile }}"
+    owner: mongodb
+    group: mongodb
+    mode: "0600"
+  become: true
+  notify: Restart MongoDB
 
-- name: Generate random graylog password SHA2
-  ansible.builtin.set_fact:
-    graylog_root_password_sha2: "{{ graylog_root_password | password_hash('sha256') }}"
-  when: graylog_root_password is not defined
+- name: Configure MongoDB
+  ansible.builtin.template:
+    src: mongodb.conf.j2
+    dest: /etc/mongod.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: Restart MongoDB
 
-- name: Generate random opensearch admin username
-  ansible.builtin.set_fact:
-    opensearch_admin_username: "admin"
-  when: opensearch_admin_username is not defined
+- name: Ensure MongoDB is started and enabled
+  ansible.builtin.systemd:
+    name: mongod
+    enabled: true
+    state: started
+  become: true
 
-- name: Generate random opensearch admin password
-  ansible.builtin.set_fact:
-    opensearch_admin_password: "{{ lookup('password', '/dev/null', length=20, chars='ascii_letters,digits') }}"
-  when: opensearch_admin_password is not defined
+# OpenSearch
+- name: Configure OpenSearch
+  ansible.builtin.template:
+    src: opensearch.yml.j2
+    dest: /etc/opensearch/opensearch.yml
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: Restart OpenSearch
+
+- name: Ensure OpenSearch is started and enabled
+  ansible.builtin.systemd:
+    name: opensearch
+    enabled: true
+    state: started
+  become: true
+
+# Graylog Server
+- name: Ensure certificate directory exists
+  ansible.builtin.file:
+    path: /etc/graylog/server
+    state: directory
+    mode: '0750'
+    owner: graylog
+    group: graylog
+  become: true
+
+- name: Generate private key for Graylog
+  community.crypto.openssl_privatekey:
+    path: /etc/graylog/server/graylog-key.pem
+    size: 4096
+    mode: '0600'
+    owner: graylog
+    group: graylog
+  become: true
+
+- name: Generate self-signed certificate for Graylog
+  community.crypto.x509_certificate:
+    path: /etc/graylog/server/graylog-cert.pem
+    privatekey_path: /etc/graylog/server/graylog-key.pem
+    provider: selfsigned
+    selfsigned_not_after: "+3650d"  # Valid for ~10 years
+    attributes:
+      - name: commonName
+        value: "{{ ansible_fqdn }}"
+      - name: subjectAltName
+        value: "DNS:{{ ansible_fqdn }},IP:{{ ansible_default_ipv4.address }}"
+    mode: '0644'
+    owner: graylog
+    group: graylog
+  become: true
+
+- name: Enable and start Graylog service
+  ansible.builtin.systemd:
+    name: graylog-server
+    enabled: true
+    state: started
+  become: true
+
+- name: Configure Graylog server
+  ansible.builtin.template:
+    src: server.conf.j2
+    dest: /etc/graylog/server/server.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: Restart Graylog

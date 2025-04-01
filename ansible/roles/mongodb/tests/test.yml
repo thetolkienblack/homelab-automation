@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT-0
 ---
-- name: Test graylog role
+- name: Test mongodb role
   hosts: localhost
   remote_user: root
   roles:
-    - graylog
+    - mongodb

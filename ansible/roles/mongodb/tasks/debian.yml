@@ -1,0 +1,29 @@
+---
+- name: Ensure Graylog prerequisite packages are installed
+  ansible.builtin.apt:
+    name:
+      - uuid-runtime
+      - pwgen
+    state: present
+    update_cache: true
+  become: true
+
+- name: Add MongoDB GPG key
+  ansible.builtin.apt_key:
+    url: https://www.mongodb.org/static/pgp/server-{{ mongodb_repo_version }}.asc
+    state: present
+  become: true
+
+- name: Add MongoDB repository
+  ansible.builtin.apt_repository:
+    repo: "deb [ signed-by=/usr/share/keyrings/mongodb-server-{{ mongodb_repo_version }}.gpg ] \
+    http://repo.mongodb.org/apt/debian {{ ansible_distribution }}/mongodb-org/{{ mongodb_repo_version }} main"
+    state: present
+  become: true
+  notify: Update apt cache
+
+- name: Ensure MongoDB is installed
+  ansible.builtin.apt:
+    name: mongodb-org
+    state: present
+  become: true

@@ -1,0 +1,48 @@
+# ansible/roles/graylog/templates/opensearch.yml.j2
+# https://opensearch.org/docs/latest/install-and-configure/configuring-opensearch/index/
+cluster:
+  name: {{ opensearch_cluster_name | default("opensearch-cluster") }}
+    node:
+        name: {{ opensearch_node_name | default("node-1") }}
+node:
+  name: {{ opensearch_node_name | default("node-1") }}
+  master: true
+  data: true
+  ingest: true
+  attr:
+    rack: r1
+path:
+  data: {{ opensearch_data_path | default("/var/lib/opensearch") }}
+  logs: {{ opensearch_logs_path | default("/var/log/opensearch") }}
+discovery:
+  type: {{ opensearch_discovery_type | default("single-node") }}
+  seed_hosts: {{ opensearch_seed_hosts | default("['127.0.0.1']") }}
+  initial_master_nodes: {{ opensearch_initial_master_nodes | default("['node-1']") }}
+  zen:
+    minimum_master_nodes: 1
+    ping.timeout: 5s
+
+http:
+  host: {{ opensearch_host | default("0.0.0.0") }}
+  port: {{ opensearch_http_port | default(9200) }}
+  compression: true
+  enable: true
+
+transport.host: {{ opensearch_host | default("0.0.0.0") }}
+action.auto_create_index: true
+
+gateway:
+  expected_nodes: {{ opensearch_expected_nodes | default("['node-1']") }}
+  remote_cluster:
+    cluster_name: {{ opensearch_remote_cluster_name | default("remote-cluster") }}
+    nodes: {{ opensearch_remote_nodes | default("['node-2']") }}
+  replication:
+    enabled: true
+    auto_expand_replicas: 0-1
+
+indices.breaker.total.use_real_memory: true
+
+# Optional security settings for OpenSearch
+opensearch_security:
+  admin_username: {{ opensearch_admin_username }}
+  admin_password: {{ opensearch_admin_password }}

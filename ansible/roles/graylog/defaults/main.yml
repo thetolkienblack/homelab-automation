@@ -1,18 +1,18 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # graylog defaults
-graylog_http_bind_address: "0.0.0.0:9000"
-graylog_password_secret: "{{ lookup('pipe', 'pwgen -N 1 -s 96') }}"          # Change this to a secure random string
-graylog_root_password_sha2: "{{ lookup('pipe', 'echo -n ' ~ graylog_root_password ~ ' | shasum -a 256 | awk \'{print $1}\'') }}"
-graylog_port: 9000
-
-graylog_repo_version: "stable 4.2"
-mongodb_repo_version: "4.4"
-
-# Opensearch
-opensearch_initial_master_nodes: "['']"
-opensearch_http_port: 9200
-opensearch_data_path: "/var/lib/opensearch"
-opensearch_logs_path: "/var/log/opensearch"
-opensearch_cluster_name: "opensearch-cluster"
-opensearch_node_name: "node-1"
+graylog_repo_version: "graylog-6.1-repository_latest"
+graylog_password_secret: "{{ lookup('pipe', 'pwgen -N 1 -s 96') }}"
+graylog_root_password_sha2: "{{ lookup('pipe', 'echo -n ' ~ graylog_root_password | shasum -a 256 | awk '{print $1}') }}"
+graylog_port: 12201
+graylog_datanode_http_port: 12202
+is_master_node: true
+master_node_server: "192.168.50.1:12201"
+http_external_uri: "https://graylog.graylock.eu"
+http_tls_key_password: "{{ lookup('pipe', 'pwgen -N 1 -s 96') }}"
+trusted_proxies: ""
+mongodb_uri: "mongodb://{{ gl_mongo_username }}:{{ gl_mongo_password }}@{{ ansible_hostname }}:27017/graylog"
+smtp_graylock_password: ""
+transport_email_enabled: true
+prometheus_exporter_enabled: true
+prometheus_exporter_bind_address: "127.0.0.1:9833"

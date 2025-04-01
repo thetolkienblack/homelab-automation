@@ -287,3 +287,63 @@ Ansible playbooks for docker containers
 - [ ] Create role to install LXC vm
 - [ ] Create role to install LXD vm
 - [ ] Create role to install VM via libvirt
+
+# Roles
+## Base Setup
+### Common
+
+### Nvidia
+
+### Starship
+
+## System Administration
+### Archive Tools
+
+### Diagnostic Tools
+
+### Cockpit
+
+## Network Tools
+
+## Development
+### Development Tools
+
+### Hashicorp
+
+### NodeJS
+
+### OpenJDK
+
+### Python
+
+## Virtualization
+### Libvirt
+
+### Lxc
+
+### Lxd
+
+### Vagrant
+
+### Vagrant Alpine
+
+### Podman
+
+## Security Tools
+### Graylog
+
+### Graylog Agent
+
+### Wazuh
+
+### Trivvy
+
+### Falco 
+
+### Crowdsec
+
+### Crowdsec Agent
+
+### Netdata
+
+### Netdata Agent

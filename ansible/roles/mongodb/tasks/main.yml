@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
+
+# MongoDB
+- name: Create MongoDB keyfile
+  ansible.builtin.copy:
+    content: "{{ mongodb_keyfile_content }}"
+    dest: "{{ mongodb_keyfile }}"
+    owner: mongodb
+    group: mongodb
+    mode: "0600"
+  become: true
+  notify: Restart MongoDB
+
+- name: Configure MongoDB
+  ansible.builtin.template:
+    src: mongodb.conf.j2
+    dest: /etc/mongod.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: Restart MongoDB
+
+- name: Ensure MongoDB is started and enabled
+  ansible.builtin.systemd:
+    name: mongod
+    enabled: true
+    state: started
+  become: true

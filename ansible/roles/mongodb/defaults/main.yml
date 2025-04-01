@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT-0
+---
+mongodb_repo_version: "8.0"
+mongodb_bind_ip: 127.0.0.1
+mongodb_port: 27017
+mongodb_authorization: enabled
+mongodb_keyfile: /etc/graylog/mongodb-keyfile
+mongodb_keyfile_content: "{{ lookup('pipe', 'pwgen -N 1 -s 96') }}"

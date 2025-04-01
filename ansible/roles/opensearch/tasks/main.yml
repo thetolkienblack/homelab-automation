@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
+
+# OpenSearch
+- name: Configure OpenSearch
+  ansible.builtin.template:
+    src: opensearch.yml.j2
+    dest: /etc/opensearch/opensearch.yml
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: Restart OpenSearch
+
+- name: Ensure OpenSearch is started and enabled
+  ansible.builtin.systemd:
+    name: opensearch
+    enabled: true
+    state: started
+  become: true
+
+- name: Configure Opensearch java.options
+  ansible.builtin.template:
+    src: java.options.j2
+    dest: /etc/opensearch/jvm.options.d/java.options
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: Restart OpenSearch
+
+- name: Configure max_map_count in sysctl.conf
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: "{{ opensearch_max_map_count | default(262144) }}"
+    state: present
+    reload: true
+    sysctl_set: true
+  become: true
+
+- name: Set nofile
+  ansible.builtin.command:
+    cmd: "ulimit -n {{ opensearch_nofile_ulimit | default(65536) }}"
+  become: true
+  register: ulimit_result
+  changed_when: ulimit_result.stdout != "{{ opensearch_nofile_ulimit }}"

@@ -4,22 +4,24 @@
     name:
       - uuid-runtime
       - pwgen
-      - mongodb-org
-      - opensearch
     state: present
     update_cache: true
   become: true
 
-- name: Add Graylog GPG key
-  ansible.builtin.apt_key:
-    url: https://packages.graylog2.org/repo/packages/graylog-archive-keyring.deb
-    state: present
+- name: Download Graylog repository package
+  ansible.builtin.get_url:
+    url: https://packages.graylog2.org/repo/packages/{{ graylog_repo_version }}.deb
+    dest: /tmp/graylog_server_package.deb
+    mode: '0644'
+    owner: root
+    group: root
   become: true
 
-- name: Add Graylog apt repository
-  ansible.builtin.apt_repository:
-    repo: "deb https://packages.graylog2.org/repo/debian/ {{ graylog_repo_version }}"
-    state: present
+- name: Install Graylog repository package
+  ansible.builtin.command:
+    cmd: dpkg -i /tmp/graylog_server_package.deb
+  register: dpkg_result
+  changed_when: dpkg_result.stdout is defined and dpkg_result.stdout != "" and not dpkg_result.stdout is search("already installed")
   become: true
   notify: Update apt cache
 
@@ -27,60 +29,11 @@
   ansible.builtin.apt:
     name: graylog-server
     state: present
-    update_cache: true
   become: true
 
-- name: Configure Graylog server
-  ansible.builtin.template:
-    src: server.conf.j2
-    dest: /etc/graylog/server/server.conf
-    owner: root
-    group: root
-    mode: "0644"
-  become: true
-  notify: Restart Graylog
-
-- name: Add MongoDB GPG key
-  ansible.builtin.apt_key:
-    url: https://www.mongodb.org/static/pgp/server-4.4.asc
-    state: present
-  become: true
-
-- name: Add MongoDB repository
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu {{ ansible_distribution_release }}/mongodb-org/{{ mongodb_repo_version}} multiverse"
-    state: present
-  become: true
-  notify: Update apt cache
-
-- name: Ensure MongoDB is installed
-  ansible.builtin.apt:
-    name: mongodb-org
-    state: present
-  become: true
-
-- name: Add OpenSearch GPG key
-  ansible.builtin.apt_key:
-    url: https://artifacts.opensearch.org/publickeys/opensearch.pgp
-    state: present
-  become: true
-
-- name: Add OpenSearch repository
-  ansible.builtin.apt_repository:
-    repo: "deb https://artifacts.opensearch.org/releases/bundles/opensearch/2.8.0/debian/ stable main"
-    state: present
-  become: true
-  notify: Update apt cache
-
-- name: Ensure OpenSearch is installed
-  ansible.builtin.apt:
-    name: opensearch
-    state: present
-  become: true
-
-- name: Enable and start Graylog service
-  ansible.builtin.systemd:
-    name: graylog-server
-    enabled: true
-    state: started
+- name: Mark Graylog server package as held
+  ansible.builtin.command:
+    cmd: apt-mark hold graylog-server
+  register: apt_mark_result
+  changed_when: apt_mark_result.stdout is defined and apt_mark_result.stdout != "" and not apt_mark_result.stdout is search("was already set on hold")
   become: true

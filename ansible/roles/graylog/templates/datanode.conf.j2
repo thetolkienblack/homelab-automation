@@ -1,0 +1,22 @@
+# Graylog DataNode Configuration
+# Example configuration can be found on https://github.com/Graylog2/graylog2-server/blob/master/misc/datanode.conf
+node_id_file = /etc/graylog/server/node-id
+config_location = /etc/graylog/datanode
+password_secret = {{ graylog_password_secret }}
+root_username = admin
+root_password_sha2 = {{ graylog_root_password_sha2 }}
+mongodb_uri = {{ mongodb_uri }}
+bind_address = 0.0.0.0
+hostname = graylog-datanode
+datanode_http_port = {{ graylog_datanode_http_port }}
+http_publish_uri = 0.0.0.0:{{ graylog_datanode_http_port }}
+opensearch_http_port = 9200
+opensearch_transport_port = 9300
+node_name = {{ opensearch_node_name }}
+opensearch_location = dist/
+opensearch_config_location = config
+opensearch_data_location = data
+opensearch_logs_location = logs
+process_logs_buffer_size = 500
+indexer_jwt_auth_token_caching_duration = 60s
+indexer_jwt_auth_token_expiration_duration = 180s

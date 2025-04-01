@@ -8,4 +8,4 @@
     docker_password: "your_docker_password"
     docker_registry: "docker.io"
   roles:
-    - podman_container
+    - podman
