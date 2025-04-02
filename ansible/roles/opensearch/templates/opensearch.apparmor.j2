@@ -1,0 +1,46 @@
+# File: /etc/apparmor.d/usr.sbin.opensearch
+# ------------------------------------------------------------------
+# A minimal AppArmor profile for OpenSearch.
+# Adjust file paths, user/group ownership, and other permissions as needed.
+
+#include <tunables/global>
+
+profile /usr/share/opensearch/bin/opensearch flags=(complain) {
+
+# Allow this binary to be executed under AppArmor
+/usr/share/opensearch/bin/opensearch px,
+
+# Read access to the rest of the OpenSearch binaries/libs/plugins
+/usr/share/opensearch/bin/** r,
+/usr/share/opensearch/lib/** r,
+/usr/share/opensearch/plugins/** r,
+
+# If using the bundled Java (adjust path as necessary)
+/usr/share/opensearch/jdk/bin/java px,
+/usr/share/opensearch/jdk/lib/** r,
+/usr/share/opensearch/jdk/conf/** r,
+
+# Read configuration files
+/etc/opensearch/** r,
+
+# Write/Read to data and log directories
+/var/lib/opensearch/** rwk,
+/var/log/opensearch/** rwk,
+
+# Allow reading standard system info
+/proc/** r,
+/sys/** r,
+/dev/** r,
+
+# Temp / run directories
+/tmp/** rw,
+/run/** rw,
+
+# Networking
+network inet stream,
+network inet6 stream,
+
+# Deny dangerous operations by default
+deny @{PROC}/* w,
+deny /etc/shadow r,
+}

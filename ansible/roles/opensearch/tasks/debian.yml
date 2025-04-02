@@ -8,18 +8,34 @@
     update_cache: true
   become: true
 
-- name: Add OpenSearch GPG key
-  ansible.builtin.apt_key:
+- name: Download Opensearch GPG key
+  ansible.builtin.get_url:
     url: https://artifacts.opensearch.org/publickeys/opensearch.pgp
-    state: present
+    dest: /tmp/opensearch-key.gpg
+    mode: '0644'
   become: true
 
-- name: Add OpenSearch repository
-  ansible.builtin.apt_repository:
-    repo: "deb https://artifacts.opensearch.org/releases/bundles/opensearch/{{ opensearch_repo_version }}/debian/ stable main"
-    state: present
+- name: Import OpenSearch GPG key
+  ansible.builtin.command:
+    cmd: gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/opensearch.gpg --import /tmp/opensearch-key.gpg
+    creates: /usr/share/keyrings/opensearch.gpg
   become: true
-  notify: Update apt cache
+
+- name: Set permissions for OpenSearch GPG keyring
+  ansible.builtin.file:
+    path: /usr/share/keyrings/opensearch.gpg
+    mode: '0644'
+  become: true
+
+- name: Copy opensearch repository template
+  ansible.builtin.template:
+    src: opensearch.repo.j2
+    dest: /etc/apt/sources.list.d/opensearch.list
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
 
 - name: Ensure OpenSearch is installed
   ansible.builtin.apt:
@@ -28,3 +44,4 @@
   environment:
     OPENSEARCH_INITIAL_ADMIN_PASSWORD: "{{ opensearch_admin_password }}"
   become: true
+  update-cache: true

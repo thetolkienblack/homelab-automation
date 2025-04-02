@@ -8,22 +8,38 @@
     update_cache: true
   become: true
 
-- name: Add MongoDB GPG key
-  ansible.builtin.apt_key:
+- name: Download MongoDB GPG key
+  ansible.builtin.get_url:
     url: https://www.mongodb.org/static/pgp/server-{{ mongodb_repo_version }}.asc
-    state: present
+    dest: /tmp/server-{{ mongodb_repo_version }}.gpg
+    mode: '0644'
   become: true
 
-- name: Add MongoDB repository
-  ansible.builtin.apt_repository:
-    repo: "deb [ signed-by=/usr/share/keyrings/mongodb-server-{{ mongodb_repo_version }}.gpg ] \
-    http://repo.mongodb.org/apt/debian {{ ansible_distribution }}/mongodb-org/{{ mongodb_repo_version }} main"
-    state: present
+- name: Import MongoDB GPG key
+  ansible.builtin.command:
+    cmd: gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/server-{{ mongodb_repo_version }}.gpg \
+      --import /tmp/server-{{ mongodb_repo_version }}.gpg
+    creates: /usr/share/keyrings/server-{{ mongodb_repo_version }}.gpg
   become: true
-  notify: Update apt cache
+
+- name: Set permissions for MongoDB GPG keyring
+  ansible.builtin.file:
+    path: /usr/share/keyrings/server-{{ mongodb_repo_version }}.gpg
+    mode: '0644'
+  become: true
+
+- name: Copy mongo repository template
+  ansible.builtin.template:
+    src: mongodb.repo.j2
+    dest: /etc/apt/sources.list.d/mongodb.repo
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
 
 - name: Ensure MongoDB is installed
   ansible.builtin.apt:
     name: mongodb-org
     state: present
   become: true
+  update-cache: true

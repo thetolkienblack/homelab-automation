@@ -7,8 +7,7 @@
 
 - name: Dearmor HashiCorp GPG key
   ansible.builtin.command:
-    cmd: gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg /tmp/hashicorp-archive-keyring.gpg
-  args:
+    cmd: gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/hashicorp-archive-keyring.gpg --import /tmp/hashicorp-archive-keyring.gpg
     creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
   become: true
 

@@ -32,3 +32,20 @@
     enabled: true
     state: started
   become: true
+
+- name: Enable apparmor for MongoDB from template
+  ansible.builtin.template:
+    src: mongodb.apparmor.j2
+    dest: /etc/apparmor.d/usr.sbin.mongod
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Parse and load the MongoDB AppArmor profile in complain mode
+  ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/usr.bin.mongod
+  changed_when: false
+
+- name: Switch to enforce mode once tested for MongoDB
+  ansible.builtin.command: aa-enforce /usr/bin/mongod
+  changed_when: false

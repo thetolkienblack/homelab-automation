@@ -1,0 +1,25 @@
+#include <tunables/global>
+
+profile /usr/bin/mongod flags=(complain) {
+    # Allow execution
+    /usr/bin/mongod px,
+
+    # Basic library and file access
+    /usr/lib/** r,
+    /etc/mongod.conf r,
+    /var/lib/mongodb/** rwk,
+    /var/log/mongodb/** rwk,
+
+    # Needed for reading system info
+    /proc/** r,
+    /sys/** r,
+    /dev/** r,
+
+    # Networking
+    network inet stream,
+    network inet6 stream,
+
+    # Deny everything else
+    deny @{PROC}/* w,
+    deny /etc/shadow r,
+}

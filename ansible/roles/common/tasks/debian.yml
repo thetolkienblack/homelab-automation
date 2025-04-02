@@ -12,7 +12,6 @@
   ansible.builtin.apt:
     name:
       - ca-certificates
-      - openssh-server
       - openssh-client
       - cron
       - plocate
@@ -33,6 +32,18 @@
       - vim
       - vim-nox
       - libreadline-dev
+      - apt-transport-https
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install development tools
+  ansible.builtin.apt:
+    name:
+      - jq
+      - git
+      - vim
+      - vim-nox
     state: present
     update_cache: true
   become: true

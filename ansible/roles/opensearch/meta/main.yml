@@ -13,5 +13,6 @@ dependencies:
   - common
   - opensearch
   - mongodb
+  - openjdk
 collections:
   - ansible.posix
