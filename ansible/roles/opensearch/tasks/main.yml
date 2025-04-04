@@ -6,6 +6,40 @@
   when: ansible_os_family == debian_family_name
 
 # OpenSearch
+- name: Create OpenSearch certs directory
+  ansible.builtin.file:
+    path: "{{ opensearch_cert_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Generate private key
+  ansible.builtin.command: >
+    openssl genrsa -out {{ opensearch_ssl_pemkey_filepath }} 2048
+  args:
+    creates: "{{ opensearch_ssl_pemkey_filepath }}"
+  become: true
+
+- name: Generate self-signed certificate
+  ansible.builtin.command: >
+    openssl req -new -x509 -key {{ opensearch_ssl_pemkey_filepath }}
+    -out {{ opensearch_ssl_pemcert_filepath }}
+    -days 3650
+    -subj "/CN=opensearch-node"
+  args:
+    creates: "{{ opensearch_ssl_pemcert_filepath }}"
+  become: true
+
+- name: Copy CA certificate (self-signed in this case)
+  ansible.builtin.copy:
+    src: "{{ opensearch_ssl_pemcert_filepath }}"
+    dest: "{{ opensearch_ssl_pemtrustedcas_filepath }}"
+    remote_src: true
+  when: opensearch_ssl_pemtrustedcas_filepath != opensearch_ssl_pemcert_filepath
+  become: true
+
 - name: Configure OpenSearch
   ansible.builtin.template:
     src: opensearch.yml.j2
@@ -14,13 +48,21 @@
     group: root
     mode: "0644"
   become: true
-  notify: Restart OpenSearch
 
-- name: Ensure OpenSearch is started and enabled
-  ansible.builtin.systemd:
-    name: opensearch
-    enabled: true
-    state: started
+- name: Install OpenSearch plugins
+  ansible.builtin.shell: |
+    /usr/share/opensearch/bin/opensearch-plugin install --batch {{ item }}
+  args:
+    creates: "/usr/share/opensearch/plugins/{{ item | regex_replace('^.+/(?!$)', '') | lower }}"
+  loop: "{{ opensearch_plugins }}"
+  become: true
+
+- name: Install OpenSearch Dashboards plugins
+  ansible.builtin.shell: >
+    /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin install --allow-root --quiet {{ item }}
+  args:
+    creates: "/usr/share/opensearch-dashboards/plugins/{{ item | regex_replace('^.+/(?!$)', '') | lower }}"
+  loop: "{{ opensearch_dashboards_plugins }}"
   become: true
 
 - name: Configure Opensearch java.options
@@ -41,6 +83,7 @@
     reload: true
     sysctl_set: true
   become: true
+  notify: Reload sysctl
 
 - name: Set nofile
   ansible.builtin.command:
@@ -65,3 +108,21 @@
 - name: Switch to enforce mode once tested for OpenSearch
   ansible.builtin.command: aa-enforce /usr/bin/opensearch
   changed_when: false
+
+- name: Allow Graylog from anywhere UFW
+  community.general.ufw:
+    rule: allow
+    port: 9000
+    proto: tcp
+  become: true
+
+- name: Ensure OpenSearch is started and enabled
+  ansible.builtin.systemd:
+    name:
+      - opensearch
+      - opensearch-dashboards
+    enabled: true
+    state: started
+  become: true
+
+

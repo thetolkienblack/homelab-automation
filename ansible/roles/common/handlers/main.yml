@@ -45,3 +45,7 @@
     state: reloaded
   become: true
   changed_when: false
+
+- name: Apply all sysctl settings
+  ansible.builtin.command: sysctl --system
+  become: true

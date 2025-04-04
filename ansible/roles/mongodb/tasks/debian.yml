@@ -1,45 +1,32 @@
 ---
-- name: Ensure Graylog prerequisite packages are installed
-  ansible.builtin.apt:
-    name:
-      - uuid-runtime
-      - pwgen
-    state: present
-    update_cache: true
-  become: true
-
 - name: Download MongoDB GPG key
   ansible.builtin.get_url:
-    url: https://www.mongodb.org/static/pgp/server-{{ mongodb_repo_version }}.asc
-    dest: /tmp/server-{{ mongodb_repo_version }}.gpg
+    url: https://pgp.mongodb.com/server-{{ mongodb_repo_version }}.asc
+    dest: /tmp/mongodb-server-{{ mongodb_repo_version }}.asc
     mode: '0644'
   become: true
 
-- name: Import MongoDB GPG key
-  ansible.builtin.command:
-    cmd: gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/server-{{ mongodb_repo_version }}.gpg \
-      --import /tmp/server-{{ mongodb_repo_version }}.gpg
-    creates: /usr/share/keyrings/server-{{ mongodb_repo_version }}.gpg
-  become: true
-
-- name: Set permissions for MongoDB GPG keyring
-  ansible.builtin.file:
-    path: /usr/share/keyrings/server-{{ mongodb_repo_version }}.gpg
-    mode: '0644'
+- name: Convert MongoDB GPG key to dearmored format
+  ansible.builtin.command: >
+    gpg --dearmor -o /usr/share/keyrings/mongodb-server-{{ mongodb_repo_version }}.gpg /tmp/mongodb-server-{{ mongodb_repo_version }}.asc
+  args:
+    creates: /usr/share/keyrings/mongodb-server-{{ mongodb_repo_version }}.gpg
   become: true
 
 - name: Copy mongo repository template
   ansible.builtin.template:
-    src: mongodb.repo.j2
-    dest: /etc/apt/sources.list.d/mongodb.repo
+    src: mongodb.list.j2
+    dest: /etc/apt/sources.list.d/mongodb.list
     owner: root
     group: root
     mode: '0644'
   become: true
+  notify: Update apt cache
 
 - name: Ensure MongoDB is installed
   ansible.builtin.apt:
-    name: mongodb-org
+    name: "mongodb-org"
     state: present
+    update_cache: true
   become: true
-  update-cache: true
+  notify: Update apt cache

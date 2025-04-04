@@ -1,6 +1,8 @@
 - name: Install OpenJDK
   ansible.builtin.apt:
-    name: "{{ openjdk_packages }}"
+    name:
+      - openjdk-{{ openjdk_version }}-jdk
+      - openjdk-{{ openjdk_version }}-jre
     state: present
     update_cache: true
   become: true

@@ -11,13 +11,23 @@
   when: ansible_user is not defined
 
 - name: Copy bashrc file
-  ansible.builtin.copy:
+  ansible.builtin.template:
     src: bashrc.j2
     dest: /home/{{ ansible_user }}/.bashrc
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: '0644'
   become: false
+
+- name: Set Bash as the default shell for the user
+  ansible.builtin.command:
+    cmd: chsh -s /bin/bash {{ ansible_user }}
+
+- name: Ensure commands use bash shell
+  ansible.builtin.shell:
+    cmd: echo "Default shell set to bash"
+  args:
+    executable: /bin/bash
 
 - name: Configure UFW defaults
   community.general.ufw:

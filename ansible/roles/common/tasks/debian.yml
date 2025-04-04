@@ -27,7 +27,6 @@
       - jq
       - software-properties-common
       - build-essential
-      - apt-transports-https
       - git
       - vim
       - vim-nox

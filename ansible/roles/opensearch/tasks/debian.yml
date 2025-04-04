@@ -1,13 +1,4 @@
 ---
-- name: Ensure Graylog prerequisite packages are installed
-  ansible.builtin.apt:
-    name:
-      - uuid-runtime
-      - pwgen
-    state: present
-    update_cache: true
-  become: true
-
 - name: Download Opensearch GPG key
   ansible.builtin.get_url:
     url: https://artifacts.opensearch.org/publickeys/opensearch.pgp
@@ -16,8 +7,9 @@
   become: true
 
 - name: Import OpenSearch GPG key
-  ansible.builtin.command:
-    cmd: gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/opensearch.gpg --import /tmp/opensearch-key.gpg
+  ansible.builtin.command: >
+    gpg --dearmor --batch --yes -o /usr/share/keyrings/opensearch.gpg /tmp/opensearch-key.gpg
+  args:
     creates: /usr/share/keyrings/opensearch.gpg
   become: true
 
@@ -29,19 +21,31 @@
 
 - name: Copy opensearch repository template
   ansible.builtin.template:
-    src: opensearch.repo.j2
+    src: opensearch.list.j2
     dest: /etc/apt/sources.list.d/opensearch.list
     owner: root
     group: root
     mode: '0644'
   become: true
+  notify: Update apt cache
 
+- name: Copy opensearch repository template
+  ansible.builtin.template:
+    src: opensearch-dashboards.list.j2
+    dest: /etc/apt/sources.list.d/opensearch-dashboards.list
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  notify: Update apt cache
 
 - name: Ensure OpenSearch is installed
   ansible.builtin.apt:
-    name: opensearch
+    name:
+      - opensearch
+      - opensearch-dashboards
     state: present
+    update_cache: true
   environment:
     OPENSEARCH_INITIAL_ADMIN_PASSWORD: "{{ opensearch_admin_password }}"
   become: true
-  update-cache: true

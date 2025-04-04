@@ -1,3 +1,4 @@
+---
 - name: Install firacode
   ansible.builtin.apt:
     name: fonts-firacode

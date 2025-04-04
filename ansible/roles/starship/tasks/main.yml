@@ -6,8 +6,10 @@
   when: ansible_os_family == debian_family_name
 
 - name: Install starship prompt
-  ansible.builtin.shell: "set -o pipefail && curl -sS https://starship.rs/install.sh | sh -s -- -y"
+  ansible.builtin.shell: |
+    curl -sS https://starship.rs/install.sh | sh -s -- -y
   args:
+    executable: /bin/sh
     creates: /usr/local/bin/starship
   become: false
 
@@ -20,7 +22,7 @@
       export STARSHIP_CONFIG="$HOME/.config/starship.toml"
       export ANSIBLE_VAULT_PASSWORD_FILE="$HOME/Developer/.vault.pwd"
       # Activate Starship shell customizer
-      eval "$(starship init zsh)"
+      eval "$(starship init bash)"
     insertafter: EOF
     create: true
     owner: "{{ ansible_user }}"

@@ -106,6 +106,8 @@ local.properties
 *.*~
 roles/**
 !roles/requirements.yml
+.ansible
+ansible.cfg
 
 # Avoid plain-text passwords
 *pwd*

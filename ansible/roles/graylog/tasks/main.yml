@@ -5,52 +5,6 @@
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
   when: ansible_os_family == debian_family_name
 
-# MongoDB
-- name: Create MongoDB keyfile
-  ansible.builtin.copy:
-    content: "{{ mongodb_keyfile_content }}"
-    dest: "{{ mongodb_keyfile }}"
-    owner: mongodb
-    group: mongodb
-    mode: "0600"
-  become: true
-  notify: Restart MongoDB
-
-- name: Configure MongoDB
-  ansible.builtin.template:
-    src: mongodb.conf.j2
-    dest: /etc/mongod.conf
-    owner: root
-    group: root
-    mode: "0644"
-  become: true
-  notify: Restart MongoDB
-
-- name: Ensure MongoDB is started and enabled
-  ansible.builtin.systemd:
-    name: mongod
-    enabled: true
-    state: started
-  become: true
-
-# OpenSearch
-- name: Configure OpenSearch
-  ansible.builtin.template:
-    src: opensearch.yml.j2
-    dest: /etc/opensearch/opensearch.yml
-    owner: root
-    group: root
-    mode: "0644"
-  become: true
-  notify: Restart OpenSearch
-
-- name: Ensure OpenSearch is started and enabled
-  ansible.builtin.systemd:
-    name: opensearch
-    enabled: true
-    state: started
-  become: true
-
 # Graylog Server
 - name: Ensure certificate directory exists
   ansible.builtin.file:

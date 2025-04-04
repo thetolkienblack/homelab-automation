@@ -2,8 +2,28 @@
 # https://opensearch.org/docs/latest/install-and-configure/configuring-opensearch/index/
 cluster:
   name: {{ opensearch_cluster_name | default("opensearch-cluster") }}
-    node:
-        name: {{ opensearch_node_name | default("node-1") }}
+  node:
+    name: {{ opensearch_node_name | default("node-1") }}
+  routing:
+    allocation:
+      enable: all
+      cluster_concurrent_rebalance: 2
+      balance:
+        shard: 0.45
+        index: 0.55
+        threshold: 1.0
+        prefer_primary: true
+      rebalance:
+        primary:
+          enable: all
+          buffer: true
+  persistent_tasks:
+    allocation.enable: all
+  default:
+    index.refresh_interval: 1s
+  minimum:
+    index.refresh_interva: 1s
+
 node:
   name: {{ opensearch_node_name | default("node-1") }}
   master: true
@@ -11,12 +31,14 @@ node:
   ingest: true
   attr:
     rack: r1
+
 path:
   data: {{ opensearch_data_path | default("/var/lib/opensearch") }}
   logs: {{ opensearch_logs_path | default("/var/log/opensearch") }}
+
 discovery:
   type: {{ opensearch_discovery_type | default("single-node") }}
-  seed_hosts: {{ opensearch_seed_hosts | default("['127.0.0.1']") }}
+  seed_hosts: {{ opensearch_seed_hosts | default("node-1") }}
   initial_master_nodes: {{ opensearch_initial_master_nodes | default("['node-1']") }}
   zen:
     minimum_master_nodes: 1
@@ -30,6 +52,8 @@ http:
 
 transport.host: {{ opensearch_host | default("0.0.0.0") }}
 action.auto_create_index: true
+
+network.host: {{ opensearch_host | default("0.0.0.0") }}
 
 gateway:
   expected_nodes: {{ opensearch_expected_nodes | default("['node-1']") }}
@@ -46,3 +70,84 @@ indices.breaker.total.use_real_memory: true
 opensearch_security:
   admin_username: {{ opensearch_admin_username }}
   admin_password: {{ opensearch_admin_password }}
+
+plugins:
+  security:
+    allow_default_init_securityindex: true
+    roles_mapping_resolution: BOTH
+    restapi:
+      password_validation_regex: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$"
+      password_validation_error_message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character, and be at least 12 characters long."
+      password_min_length: 12
+      roles_enabled: ["all_access", "security_rest_api_access"]
+    ssl:
+      enable: true
+      transport:
+        pemcert_filepath: {{ opensearch_ssl_pemcert_filepath | default("/etc/opensearch/certs/transport.pem") }}
+        pemkey_filepath: {{ opensearch_ssl_pemkey_filepath | default("/etc/opensearch/certs/transport.key") }}
+        pemtrustedcas_filepath: {{ opensearch_ssl_pemtrustedcas_filepath | default("/etc/opensearch/certs/ca.pem") }}
+      http:
+        pemcert_filepath: {{ opensearch_ssl_pemcert_filepath | default("/etc/opensearch/certs/transport.pem") }}
+        pemkey_filepath: {{ opensearch_ssl_pemkey_filepath | default("/etc/opensearch/certs/transport.key") }}
+        pemtrustedcas_filepath: {{ opensearch_ssl_pemtrustedcas_filepath | default("/etc/opensearch/certs/ca.pem") }}
+    enable_snapshot_restore_privilege: true
+    check_snapshot_restore_write_privileges: true
+    cache.ttl_minutes: 60
+    scheduled_jobs.enabled: true
+    system_indices:
+        enabled: true
+        indices:
+            - name: ".opendistro_security"
+              privileges:
+                  - "read"
+                  - "write"
+                  - "create"
+                  - "delete"
+                  - "manage"
+                  - "all"
+            - name: ".opendistro_security_audit_log"
+              privileges:
+                  - "read"
+                  - "write"
+                  - "create"
+                  - "delete"
+                  - "manage"
+                  - "all"
+    audit:
+      enable_rest: true
+      enable_transport: true
+      threadpool:
+        max_queue_len: 100000
+        size: 10
+      type: "internal_opensearch"
+  alerting:
+    index_timeout: 60s
+    request_timeout: 10s
+  anomaly_detection:
+    enabled: true
+    hcad_cold_start_interpolation.enabled: true
+    door_keeper_in_cache.enabled: true
+  asynchronous_search.persist_search_failures: true
+  flow_framework:
+    enabled: true
+    request_timeout: 20s
+    task_request_retry_duration: 10s
+  geospatial:
+    ip2geo:
+      datasource:
+        update_interval_in_days: 7
+        timeout: 30s
+
+action:
+  auto_create_index: true
+  destructive_requires_name: true
+
+search:
+  max_buckets: 65535
+  default_allow_partial_results: true
+  cancel_after_time_interval: 5s
+  default_search_timeout: 5s
+  default_keep_alive: 5m
+  keep_alive_interval: 3m
+  max_keep_alive: 1h
+

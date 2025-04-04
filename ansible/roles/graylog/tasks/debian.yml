@@ -1,13 +1,4 @@
 ---
-- name: Ensure Graylog prerequisite packages are installed
-  ansible.builtin.apt:
-    name:
-      - uuid-runtime
-      - pwgen
-    state: present
-    update_cache: true
-  become: true
-
 - name: Download Graylog repository package
   ansible.builtin.get_url:
     url: https://packages.graylog2.org/repo/packages/{{ graylog_repo_version }}.deb
@@ -27,8 +18,11 @@
 
 - name: Install Graylog server
   ansible.builtin.apt:
-    name: graylog-server
+    name:
+      - graylog-server
+      - graylog-datanode
     state: present
+    update_cache: true
   become: true
 
 - name: Mark Graylog server package as held

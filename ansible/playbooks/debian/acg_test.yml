@@ -1,0 +1,20 @@
+---
+- name: Setup ACG server
+  hosts: all
+  vars_files:
+    - ../../group_vars/all/vars.yml
+  become: true
+  gather_facts: true
+  roles:
+    - role: common
+    - role: archive_tools
+    - role: diagnostic_tools
+    - role: network_tools
+    - role: hashicorp
+    - role: nodejs
+    - role: openjdk
+    - role: python
+    - role: starship
+    - role: opensearch
+    - role: podman
+    - role: cockpit

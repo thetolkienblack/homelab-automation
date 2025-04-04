@@ -1,3 +1,4 @@
+---
 - name: Install required dependencies
   ansible.builtin.apt:
     name:
@@ -10,8 +11,9 @@
       - curl
       - gnupg
       - lsb-release
-  state: present
-  update_cache: true
+    state: present
+    update_cache: true
+  notify: Update apt cache
   become: true
 
 - name: Enable i386 architecture (needed for some NVIDIA components)

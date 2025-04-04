@@ -2,14 +2,14 @@
 ---
 # graylog defaults
 graylog_repo_version: "graylog-6.1-repository_latest"
-graylog_password_secret: "{{ lookup('pipe', 'pwgen -N 1 -s 96') }}"
+graylog_password_secret: "{{ lookup('password', '/dev/null length=96 chars=ascii_letters,digits') }}"
 graylog_root_password_sha2: "{{ lookup('pipe', 'echo -n ' ~ graylog_root_password | shasum -a 256 | awk '{print $1}') }}"
 graylog_port: 12201
 graylog_datanode_http_port: 12202
 is_master_node: true
 master_node_server: "192.168.50.1:12201"
 http_external_uri: "https://graylog.graylock.eu"
-http_tls_key_password: "{{ lookup('pipe', 'pwgen -N 1 -s 96') }}"
+http_tls_key_password: "{{ lookup('password', '/dev/null length=96 chars=ascii_letters,digits') }}"
 trusted_proxies: ""
 mongodb_uri: "mongodb://{{ gl_mongo_username }}:{{ gl_mongo_password }}@{{ ansible_hostname }}:27017/graylog"
 smtp_graylock_password: ""

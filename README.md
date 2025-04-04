@@ -347,3 +347,61 @@ Ansible playbooks for docker containers
 ### Netdata
 
 ### Netdata Agent
+
+
+
+# Reformat the roles as:
+- core
+  - common
+  - archive_tools
+  - starship
+  - cockpit
+  - diagnostic_tools
+  - network_tools
+    - netdata
+      - netdata_server
+      - netdata_agent
+    - graylog
+      - opensearch
+          - opensearch_core
+          - opensearch_dashboards
+          - mongodb
+    - kibana
+    - grafana
+    - prometheus
+    - loki
+    - alertmanager
+    - node_exporter
+    - cadvisor
+    - blackbox_exporter
+    - influxdb
+    - telegraf
+    - diagnostic_tools
+- virtualization
+  - lxd
+  - vagrant
+    - vagrant_alpine
+  - libvirt
+    - libvirt_debian
+    - libvirt_alpine
+- containerization
+  - podman
+    - podman_container_core
+    - podman_gpu
+    - podman_ai
+  - lxc
+  - trivvy
+  - falco
+- development_tools
+  - python
+  - openjdk
+  - nodejs
+- nvidia
+- wazuh
+  - wazuh_server
+  - wazuh_agent
+- vpn
+  - tailscale
+  - pia
+  - nordvpn
+  - cloudflared

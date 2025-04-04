@@ -1,0 +1,86 @@
+server:
+  host: {{ opensearch_dashboards_host }}
+  port: {{ opensearch_dashboards_port }}
+  rewriteBasePath: true
+  maxPayloadBytes: 1048576
+  name: {{ opensearch_dashboards_hostname | default("opensearch-dashboards") }}
+  ssl:
+    enabled: true
+    certificate: {{ opensearch_ssl_pemcert_filepath | default("/etc/opensearch/certs/transport.pem") }}
+    key: {{ opensearch_ssl_pemkey_filepath | default("/etc/opensearch/certs/transport.key") }}
+    certificateAuthorities:
+      - {{ opensearch_ssl_pemtrustedcas_filepath | default("/etc/opensearch/certs/ca.pem") }}
+    verificationMode: full
+    redirectHttpFromPort: 80
+    redirectHttpFromPortEnabled: true
+
+opensearch:
+  hosts: {{ opensearch_dashboards_opensearch_hosts | default("['http://localhost:9200']") }}
+  optimizedHealthcheck:
+    id: {{ opensearch_node_name }}
+  username: "{{ opensearch_admin_username }}"
+  password: "{{ opensearch_admin_password }}"
+  ssl:
+    certificate: {{ opensearch_ssl_pemcert_filepath | default("/etc/opensearch/certs/transport.pem") }}
+    key: {{ opensearch_ssl_pemkey_filepath | default("/etc/opensearch/certs/transport.key") }}
+    certificateAuthorities:
+      - {{ opensearch_ssl_pemtrustedcas_filepath | default("/etc/opensearch/certs/ca.pem") }}
+  pingTimeout: 1500
+  requestTimeout: 30000
+  memoryCircuitBreaker:
+    enabled: true
+    maxPercentage: 1.0
+  shardTimeout: 30000
+  logQueries: false
+  disablePrototypePoisoningProtection: true
+
+opensearchDashboards:
+  index: ".opensearch_dashboards"
+  configIndex: ".opensearch_dashboards_config"
+  defaultAppId: "home"
+  dashboardAdmin:
+    groups: ["dashboard_admin"]
+    users: ["dashboard_admin"]
+
+application_config:
+  enabled: true
+
+csp_handler:
+  enabled: false
+
+home:
+  disableWelcomeScreen: false
+  disableNewThemeModal: false
+
+logging:
+  dest: stdout
+  ignoreEnospcError: true
+
+i18n.locale: "en"
+
+map.showRegionDeniedWarning: false
+
+# Set the value of this setting to false to suppress search usage telemetry
+# for reducing the load of OpenSearch cluster.
+data:
+  search:
+    usageTelemetry.enabled: false
+  savedQueriesNewUI.enabled: true
+
+data_source:
+  enabled: true
+  hideLocalCluster: false
+  ssl:
+    certificateAuthorities:
+      - {{ opensearch_ssl_pemtrustedcas_filepath | default("/etc/opensearch/certs/ca.pem") }}
+    verificationMode: full
+
+data_source_management:
+  manageableBy: "all"
+  dataSourceAdmin.groups: ["data_source_management"]
+
+savedObjects.permission.enabled: true
+
+workspace.maximum_workspaces: 100
+
+usageCollection.uiMetric.enabled: true
