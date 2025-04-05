@@ -1,0 +1,46 @@
+---
+- name: Check if OpenSearch Dashboards executable exists
+  ansible.builtin.stat:
+    path: /usr/share/opensearch-dashboards/bin/opensearch-dashboards
+  register: opensearch_dashboards_executable
+  when: opensearch_binary.stat.exists
+
+- name: Include Debian-specific tasks for OpenSearch Dashboards
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when:
+    - ansible_os_family == debian_family_name
+    - not opensearch_dashboards_executable.stat.exists
+    - opensearch_binary.stat.exists
+
+- name: Get OpenSearch Dashboards plugins
+  ansible.builtin.command: /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin list
+  register: opensearch_dashboards_plugins_list
+  changed_when: false
+  failed_when: false
+  when:
+    - opensearch_dashboards_executable.stat.exists
+    - opensearch_binary.stat.exists
+
+- name: Install OpenSearch Dashboards plugins
+  ansible.builtin.shell: >
+    /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin install --allow-root {{ item }}
+  args:
+    creates: "/usr/share/opensearch-dashboards/plugins/{{ item }}"
+  loop: "{{ opensearch_dashboards_plugins }}"
+  loop_control:
+    label: "{{ item }}"
+  become: true
+  when:
+    - opensearch_dashboards_plugins_list.stdout.find(item) == -1
+    - opensearch_dashboards_executable.stat.exists
+    - opensearch_binary.stat.exists
+
+- name: Ensure OpenSearch is started and enabled
+  ansible.builtin.systemd:
+    name: opensearch-dashboards
+    enabled: true
+    state: started
+  become: true
+  when:
+    - opensearch_dashboards_executable.stat.exists
+    - opensearch_binary.stat.exists

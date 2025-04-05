@@ -1,5 +1,6 @@
 # ansible/roles/graylog/templates/opensearch.yml.j2
 # https://opensearch.org/docs/latest/install-and-configure/configuring-opensearch/index/
+---
 cluster:
   name: {{ opensearch_cluster_name | default("opensearch-cluster") }}
   node:
@@ -22,7 +23,7 @@ cluster:
   default:
     index.refresh_interval: 1s
   minimum:
-    index.refresh_interva: 1s
+    index.refresh_interval: 1s
 
 node:
   name: {{ opensearch_node_name | default("node-1") }}
@@ -38,8 +39,8 @@ path:
 
 discovery:
   type: {{ opensearch_discovery_type | default("single-node") }}
-  seed_hosts: {{ opensearch_seed_hosts | default("node-1") }}
-  initial_master_nodes: {{ opensearch_initial_master_nodes | default("['node-1']") }}
+  seed_hosts: {{ opensearch_seed_hosts | default("['node-1']") | from_yaml }}
+  initial_master_nodes: {{ opensearch_initial_master_nodes | default("['node-1']") | from_yaml }}
   zen:
     minimum_master_nodes: 1
     ping.timeout: 5s
@@ -56,13 +57,7 @@ action.auto_create_index: true
 network.host: {{ opensearch_host | default("0.0.0.0") }}
 
 gateway:
-  expected_nodes: {{ opensearch_expected_nodes | default("['node-1']") }}
-  remote_cluster:
-    cluster_name: {{ opensearch_remote_cluster_name | default("remote-cluster") }}
-    nodes: {{ opensearch_remote_nodes | default("['node-2']") }}
-  replication:
-    enabled: true
-    auto_expand_replicas: 0-1
+  expected_nodes: {{ opensearch_expected_nodes | default("['node-1']") | from_yaml }}
 
 indices.breaker.total.use_real_memory: true
 
@@ -76,8 +71,11 @@ plugins:
     allow_default_init_securityindex: true
     roles_mapping_resolution: BOTH
     restapi:
-      password_validation_regex: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$"
-      password_validation_error_message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character, and be at least 12 characters long."
+      password_validation_regex: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)
+       (?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$"
+      password_validation_error_message: "Password must contain at least one uppercase letter,
+       one lowercase letter, one number,
+       and one special character, and be at least 12 characters long."
       password_min_length: 12
       roles_enabled: ["all_access", "security_rest_api_access"]
     ssl:
@@ -95,24 +93,7 @@ plugins:
     cache.ttl_minutes: 60
     scheduled_jobs.enabled: true
     system_indices:
-        enabled: true
-        indices:
-            - name: ".opendistro_security"
-              privileges:
-                  - "read"
-                  - "write"
-                  - "create"
-                  - "delete"
-                  - "manage"
-                  - "all"
-            - name: ".opendistro_security_audit_log"
-              privileges:
-                  - "read"
-                  - "write"
-                  - "create"
-                  - "delete"
-                  - "manage"
-                  - "all"
+      enabled: true
     audit:
       enable_rest: true
       enable_transport: true
@@ -150,4 +131,3 @@ search:
   default_keep_alive: 5m
   keep_alive_interval: 3m
   max_keep_alive: 1h
-

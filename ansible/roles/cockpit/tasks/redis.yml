@@ -1,0 +1,26 @@
+---
+- name: Check if redis memory limit is already configured
+  ansible.builtin.command: grep -q '^maxmemory {{ redis_memory_usage }}' /etc/redis/redis.conf
+  register: redis_memory_output
+  changed_when: false
+  failed_when: false
+
+- name: Limit Redis memory usage to 256MB
+  ansible.builtin.lineinfile:
+    path: /etc/redis/redis.conf
+    regexp: "^maxmemory "
+    line: "maxmemory {{ redis_memory_usage }}"
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart redis
+  become: true
+  when: redis_memory_output.rc != 0
+
+- name: Ensure Redis service is running
+  ansible.builtin.service:
+    name: redis-server
+    state: started
+    enabled: true
+  become: true

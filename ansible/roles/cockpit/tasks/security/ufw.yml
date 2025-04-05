@@ -1,0 +1,22 @@
+---
+- name: Check if UFW is installed
+  ansible.builtin.command:
+    cmd: dpkg -s ufw
+  register: ufw_installed
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: Configure UFW rules for Cockpit and related services
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  with_items: "{{ cockpit_ufw_rules }}"
+  become: true
+  when: ufw_installed.rc == 0
+  notify:
+    - Reload UFW
+    - Restart cockpit
+    - Restart dnsmasq
+    - Restart redis

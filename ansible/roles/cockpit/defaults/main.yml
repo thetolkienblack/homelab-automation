@@ -1,13 +1,22 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # defaults file for install_cockpit
-# Cockpit service ports
-cockpit_web_port: 9090
-cockpit_ws_port: 9898
-dnsmasq_port: 3265
+redis_memory_usage: 256mb
 
 # UFW rules for Cockpit
 cockpit_ufw_rules:
-  - { port: "{{ cockpit_web_port }}", proto: 'tcp', comment: 'Cockpit web UI' }
-  - { port: "{{ dnsmasq_port }}", proto: 'udp', comment: 'dnsmasq service' }
-  - { port: "{{ cockpit_ws_port }}", proto: 'tcp', comment: 'Cockpit websocket' }
+  - { port: "9090", proto: 'tcp', comment: 'Cockpit web UI' }
+  - { port: "3265", proto: 'udp', comment: 'dnsmasq service' }
+  - { port: "9898", proto: 'tcp', comment: 'Cockpit websocket' }
+  - { port: "6379", proto: 'tcp', comment: 'redis service' }
+
+cockpit_apparmor_profiles:
+  - { profile: "usr.bin.redis-server", template: "redis-apparmor.j2" }
+  - { profile: "usr.sbin.dnsmasq", template: "dnsmasq-apparmor.j2" }
+  - { profile: "usr.lib.cockpit.cockpit-ws", template: "cockpit-apparmor.j2" }
+
+cockpit_services:
+  - redis
+  - dnsmasq
+  - cockpit
+  - cockpit-ws

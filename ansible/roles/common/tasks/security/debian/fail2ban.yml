@@ -1,0 +1,9 @@
+---
+- name: Install UFW and Fail2ban packages
+  ansible.builtin.apt:
+    name:
+      - ufw
+      - fail2ban
+    state: present
+    update_cache: true
+  become: true

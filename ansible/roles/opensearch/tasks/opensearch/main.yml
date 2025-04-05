@@ -1,0 +1,96 @@
+---
+- name: Include Debian-specific tasks for OpenSearch
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name and not opensearch_binary.stat.exists
+
+- name: Configure OpenSearch
+  ansible.builtin.template:
+    src: opensearch.yml.j2
+    dest: /etc/opensearch/opensearch.yml
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  when: not opensearch_binary.stat.exists
+
+- name: Get OpenSearch plugins
+  ansible.builtin.command: /usr/share/opensearch/bin/opensearch-plugin list
+  register: opensearch_plugins_list
+  changed_when: false
+  failed_when: false
+  when: not opensearch_binary.stat.exists
+
+- name: Install OpenSearch plugins
+  ansible.builtin.shell: |
+    /usr/share/opensearch/bin/opensearch-plugin install --batch {{ item }}
+  args:
+    creates: "/usr/share/opensearch/plugins/{{ item | regex_replace('^.+/(?!$)', '') | lower }}"
+  loop: "{{ opensearch_plugins }}"
+  become: true
+  when: not opensearch_binary.stat.exists
+  changed_when: opensearch_plugins_list stdout.find(item) == -1
+
+- name: Check exists OpenSearch java.options
+  ansible.builtin.stat:
+    path: /etc/opensearch/jvm.options.d/java.options
+  register: opensearch_java_options
+  changed_when: false
+
+- name: Configure Opensearch java.options
+  ansible.builtin.template:
+    src: java.options.j2
+    dest: /etc/opensearch/jvm.options.d/java.options
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: Restart OpenSearch
+  when: not opensearch_java_options.stat.exists
+
+- name: Get sysctl max_map_count
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+  register: vm_max_map_count
+  changed_when: false
+
+- name: Configure max_map_count in sysctl.conf
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: "{{ opensearch_max_map_count | default(262144) }}"
+    state: present
+    reload: true
+    sysctl_set: true
+  become: true
+  notify: Reload sysctl
+  when: "vm_max_map_count != opensearch_max_map_count"
+
+- name: Check if drop-in directory exists for OpenSearch
+  ansible.builtin.stat:
+    path: /etc/systemd/system/opensearch.service.d
+  become: true
+  register: opensearch_service_d
+  changed_when: false
+
+- name: Ensure systemd drop-in directory exists for OpenSearch
+  ansible.builtin.file:
+    path: /etc/systemd/system/opensearch.service.d
+    state: directory
+    mode: '0755'
+  become: true
+  when: not opensearch_service_d.stat.exists
+
+- name: Check if limits.conf exist for OpenSearch
+  ansible.builtin.stat:
+    path: /etc/systemd/system/opensearch.service.d/limits.conf
+  register: opensearch_service_d_limits
+  changed_when: false
+
+- name: Set nofile limit for OpenSearch systemd service
+  ansible.builtin.template:
+    src: opensearch-limits.conf.j2
+    dest: /etc/systemd/system/opensearch.service.d/limits.conf
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - Restart OpenSearch
+  when: not opensearch_service_d_limits.stat.exists

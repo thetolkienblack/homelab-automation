@@ -1,0 +1,30 @@
+#include <tunables/global>
+
+profile dnsmasq /usr/sbin/dnsmasq flags=(complain) {
+    # Include common AppArmor abstractions
+    #include <abstractions/base>
+    #include <abstractions/nameservice>
+    #include <abstractions/user-tmp>
+
+    # Dnsmasq binary
+    /usr/sbin/dnsmasq rix,
+
+    # Config files
+    /etc/dnsmasq.conf r,
+    /etc/dnsmasq.d/** r,
+
+    # PID files and leases
+    /var/lib/misc/dnsmasq.leases rw,
+    /run/dnsmasq/** rwk,
+    /var/run/dnsmasq/** rwk,
+
+    # DHCP operations
+    capability net_admin,
+    capability net_raw,
+
+    # Bind network ports
+    network inet stream,
+    network inet6 stream,
+    network inet dgram,
+    network inet6 dgram,
+}

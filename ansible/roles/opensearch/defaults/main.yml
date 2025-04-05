@@ -2,7 +2,6 @@
 ---
 # Opensearch
 opensearch_host: "0.0.0.0"
-opensearch_initial_master_nodes: "['']"
 opensearch_http_port: 9200
 opensearch_data_path: "/var/lib/opensearch"
 opensearch_logs_path: "/var/log/opensearch"
@@ -14,10 +13,11 @@ opensearch_admin_password: "{{ lookup('password', '/dev/null', length=20, chars=
 opensearch_max_map_count: 262144
 opensearch_nofile_ulimit: 65536
 opensearch_repo_version: "2.x"
-opensearch_cert_dir: /etc/opensearch/certs
-opensearch_ssl_pemcert_filepath: "{{ opensearch_cert_dir }}/transport.pem"
-opensearch_ssl_pemkey_filepath: "{{ opensearch_cert_dir }}/transport.key"
-opensearch_ssl_pemtrustedcas_filepath: "{{ opensearch_cert_dir }}/ca.pem"
+opensearch_version: "2.19.1.0"
+opensearch_cert_dir: /etc/opensearch
+opensearch_ssl_pemcert_filepath: "{{ opensearch_cert_dir }}/kirk.pem"
+opensearch_ssl_pemkey_filepath: "{{ opensearch_cert_dir }}/kirk-key.pem"
+opensearch_ssl_pemtrustedcas_filepath: "{{ opensearch_cert_dir }}/root-ca.pem"
 opensearch_plugins:
   - analysis-icu
   - ingest-attachment
@@ -26,29 +26,30 @@ opensearch_plugins:
   - repository-s3
   - query-insights
   - transport-nio
-  - knn
   - opensearch-alerting
   - opensearch-anomaly-detection
   - opensearch-asynchronous-search
   - opensearch-sql
   - opensearch-observability
-opensearch_seed_hosts: node-1
+opensearch_seed_hosts:
+  - "{{ opensearch_node_name }}"
+opensearch_initial_master_nodes:
+  - "{{ opensearch_node_name }}"
+opensearch_expected_nodes:
+  - "{{ opensearch_node_name }}"
+
 # Opensearch Dashboards
 opensearch_dashboards_host: "0.0.0.0"
 opensearch_dashboards_port: 5601
 opensearch_dashboards_hostname: "opensearch-dashboards"
 opensearch_dashboards_opensearch_hosts: ["http://localhost:9200"]
 opensearch_dashboards_plugins:
-  - alerting-dashboards-plugin
-  - anomaly-detection-dashboards-plugin
-  - dashboards-maps
-  - dashboards-search-relevance
-  - gantt-chart
-  - index-management-dashboards-plugin
-  - dashboards-notebooks
-  - dashboards-notifications
-  - dashboards-observability
-  - query-workbench
-  - dashboards-reporting
-  - security-analytics-dashboards-plugin
-  - security-dashboards-plugin
+  - alertingDashboards
+  - anomalyDetectionDashboards
+  - searchRelevanceDashboards
+  - indexManagementDashboards
+  - notificationsDashboards
+  - observabilityDashboards
+  - queryWorkbenchDashboards
+  - reportsDashboards
+  - securityDashboards

@@ -5,32 +5,23 @@
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
   when: ansible_os_family == debian_family_name
 
-- name: Restart Cockpit service after AppArmor profile changes
-  ansible.builtin.service:
-    name: cockpit
-    state: restarted
-  become: true
-  when:
-    - apparmor_dir.stat.exists
-    - apparmor_dir.stat.isdir
+- name: Include Redis tasks
+  ansible.builtin.include_tasks: "redis.yml"
 
-- name: Ensure dnsmasq service is running
-  ansible.builtin.service:
-    name: dnsmasq
-    state: started
-    enabled: true
-  become: true
+- name: Include DNSMasq tasks
+  ansible.builtin.include_tasks: "dnsmasq.yml"
 
-- name: Ensure cockpit service is running
-  ansible.builtin.service:
-    name: cockpit
-    state: started
-    enabled: true
-  become: true
+- name: Include UFW tasks
+  ansible.builtin.include_tasks: "security/ufw.yml"
 
-- name: Ensure Redis service is running
-  ansible.builtin.service:
-    name: redis-server
-    state: started
+- name: Include Apparmor tasks
+  ansible.builtin.include_tasks: "security/{{ ansible_os_family | lower }}/apparmor.yml"
+  when: ansible_os_family == debian_family_name
+
+- name: Enable and start multiple systemd services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
     enabled: true
+    state: started
+  loop: "{{ cockpit_services }}"
   become: true

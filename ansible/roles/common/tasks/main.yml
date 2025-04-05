@@ -5,6 +5,18 @@
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
   when: ansible_os_family == debian_family_name
 
+- name: Get list of task files from security directory
+  ansible.builtin.find:
+    paths: "{{ role_path }}/tasks/security"
+    patterns: "*.yml"
+  register: security_tasks
+
+- name: Include all security task files
+  ansible.builtin.include_tasks: "{{ item.path }}"
+  loop: "{{ security_tasks.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+
 - name: Ensure ansible_user variable is defined
   ansible.builtin.fail:
     msg: "The variable 'ansible_user' is not defined. Please provide it in your inventory or playbook."
@@ -22,46 +34,11 @@
 - name: Set Bash as the default shell for the user
   ansible.builtin.command:
     cmd: chsh -s /bin/bash {{ ansible_user }}
+  changed_when: ansible_env.SHELL != '/bin/bash'
 
 - name: Ensure commands use bash shell
   ansible.builtin.shell:
     cmd: echo "Default shell set to bash"
   args:
     executable: /bin/bash
-
-- name: Configure UFW defaults
-  community.general.ufw:
-    default: "{{ item.policy }}"
-    direction: "{{ item.direction }}"
-  with_items:
-    - { policy: 'deny', direction: 'incoming' }
-    - { policy: 'allow', direction: 'outgoing' }
-  become: true
-
-- name: Allow SSH through UFW
-  community.general.ufw:
-    rule: allow
-    name: OpenSSH
-  become: true
-
-- name: Enable UFW
-  community.general.ufw:
-    state: enabled
-  become: true
-
-- name: Create fail2ban jail.local from template
-  ansible.builtin.template:
-    src: jail.local.j2
-    dest: /etc/fail2ban/jail.local
-    owner: root
-    group: root
-    mode: '0644'
-  become: true
-  notify: Restart fail2ban
-
-- name: Ensure Fail2ban service is enabled and started
-  ansible.builtin.systemd:
-    name: fail2ban
-    state: started
-    enabled: true
-  become: true
+  changed_when: false

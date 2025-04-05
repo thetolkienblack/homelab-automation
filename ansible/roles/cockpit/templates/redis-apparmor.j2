@@ -1,0 +1,27 @@
+#include <tunables/global>
+
+profile redis-server /usr/bin/redis-server flags=(complain) {
+    # Include common AppArmor abstractions
+    #include <abstractions/base>
+    #include <abstractions/nameservice>
+
+    # Redis binary
+    /usr/bin/redis-server rix,
+
+    # Config and runtime data
+    /etc/redis/** r,
+    /var/lib/redis/** rwk,
+    /var/log/redis/** rwk,
+
+    # System resources
+    capability setgid,
+    capability setuid,
+    capability sys_resource,
+    capability ipc_lock,
+
+    # Allow binding to ports (e.g., 6379)
+    network inet stream,
+    network inet6 stream,
+
+    /run/redis/** rwk,
+}
