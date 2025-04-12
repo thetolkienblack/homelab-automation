@@ -1,0 +1,52 @@
+---
+- name: Check if FiraCode font is installed
+  ansible.builtin.shell: |
+    set -o pipefail
+    fc-list | grep -i 'FiraCode'
+  register: firacode_check
+  changed_when: false
+  failed_when: false
+
+- name: Set firacode_install
+  ansible.builtin.set_fact:
+    firacode_installed: firacode_check is defined and firacode_check.stdout != ""
+
+- name: Download FiraCode font zip
+  ansible.builtin.get_url:
+    url: https://github.com/tonsky/FiraCode/releases/download/6.2/Fira_Code_v6.2.zip
+    dest: /tmp/Fira_Code_v6.2.zip
+    mode: '0644'
+  when: not firacode_installed
+
+- name: Unzip FiraCode font archive
+  ansible.builtin.unarchive:
+    src: /tmp/Fira_Code_v6.2.zip
+    dest: /tmp/firacode_fonts
+    remote_src: true
+  when: not firacode_installed
+
+- name: Ensure fonts directory exists
+  ansible.builtin.file:
+    path: /usr/local/share/fonts/firacode
+    state: directory
+    mode: '0755'
+  become: true
+  when: not firacode_installed
+
+- name: Copy FiraCode ttf files to system font directory
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /usr/local/share/fonts/firacode/
+    remote_src: true
+    mode: '0644'
+  with_fileglob:
+    - /tmp/firacode_fonts/**/ttf/*.ttf
+  become: true
+  when: not firacode_installed
+
+- name: Refresh font cache
+  ansible.builtin.command: fc-cache -f -v
+  become: true
+  changed_when: false
+  when: not firacode_installed
+  notify: Re-Check if FiraCode font is installed

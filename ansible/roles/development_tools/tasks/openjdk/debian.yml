@@ -1,0 +1,27 @@
+---
+- name: Install OpenJDK
+  ansible.builtin.apt:
+    name:
+      - openjdk-{{ openjdk_version }}-jdk
+      - openjdk-{{ openjdk_version }}-jre
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install jenv dependencies
+  ansible.builtin.apt:
+    name:
+      - git
+      - curl
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install jenv dependencies
+  ansible.builtin.apt:
+    name:
+      - git
+      - curl
+    state: present
+    update_cache: true
+  become: true

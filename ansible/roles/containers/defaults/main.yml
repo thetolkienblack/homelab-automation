@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT-0
+---
+install_podman: true
+install_docker: true
+docker_registry: docker.io
+docker_username: ''
+docker_password: ''

@@ -1,0 +1,39 @@
+---
+- name: Install required dependencies
+  ansible.builtin.apt:
+    name:
+      - dkms
+      - build-essential
+      - linux-headers-{{ ansible_kernel }}
+      - software-properties-common
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: true
+  notify: Update apt cache
+  become: true
+
+- name: Enable i386 architecture (needed for some NVIDIA components)
+  ansible.builtin.command: dpkg --add-architecture i386
+  args:
+    creates: /etc/dpkg/dpkg.cfg.d/multiarch
+  notify: Update apt cache
+  become: true
+
+- name: Install NVIDIA Driver (non-free)
+  ansible.builtin.apt:
+    name:
+      - nvidia-driver
+      - nvidia-kernel-dkms
+      - nvidia-kernel-support
+      - nvidia-vulkan-icd
+      - libnvidia-glcore
+      - nvidia-settings
+      - nvidia-xconfig
+    state: present
+    update_cache: true
+  become: true
+  notify: Try loading NVIDIA module

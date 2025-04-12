@@ -1,0 +1,27 @@
+- name: Install system tools
+  ansible.builtin.apt:
+    name:
+      - s-tui
+      - smem
+      - tcpdump
+      - python3
+      - python3-pip
+      - python3-venv
+      - htop
+    state: present
+    update_cache: true
+  become: true
+
+# AppArmor profiles for diagnostic tools that need it
+- name: Create AppArmor profile for tcpdump
+  ansible.builtin.template:
+    src: tcpdump-apparmor.j2
+    dest: /etc/apparmor.d/usr.sbin.tcpdump
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+  notify: Reload AppArmor profiles

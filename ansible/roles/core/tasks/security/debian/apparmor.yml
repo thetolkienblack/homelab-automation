@@ -1,0 +1,48 @@
+---
+- name: Install AppArmor packages
+  ansible.builtin.apt:
+    name:
+      - apparmor
+      - apparmor-utils
+      - apparmor-profiles
+      - apparmor-profiles-extra
+    state: present
+    update_cache: true
+  become: true
+
+- name: Check if AppArmor binary exists
+  ansible.builtin.stat:
+    path: /usr/sbin/aa-status
+  register: apparmor_binary
+
+- name: Check if AppArmor is installed
+  ansible.builtin.stat:
+    path: /etc/apparmor.d
+  register: apparmor_dir
+  become: true
+  when: apparmor_binary.stat.exists
+
+- name: Set Apparmor is installed
+  ansible.builtin.set_fact:
+    apparmor_installed: apparmor_binary.stat.exists and apparmor_dir.stat.exists and apparmor_dir.stat.isdir
+  changed_when: false
+  failed_when: false
+
+- name: Ensure AppArmor service is enabled and started
+  ansible.builtin.systemd:
+    name: apparmor
+    state: started
+    enabled: true
+  register: apparmor_started
+  become: true
+  notify: Reload apparmor profiles
+  when: apparmor_installed
+
+- name: Update kernel boot parameters for AppArmor
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX="((?!apparmor=1|security=apparmor).)*"$'
+    line: 'GRUB_CMDLINE_LINUX="${GRUB_CMDLINE_LINUX} apparmor=1 security=apparmor"'
+    backrefs: true
+  become: true
+  notify: Update grub

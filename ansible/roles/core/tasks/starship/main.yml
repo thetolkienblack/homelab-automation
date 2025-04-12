@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_init
+- name: Include Firacode tasks
+  ansible.builtin.include_tasks: "firacode.yml"
+
+- name: Check if Starship binary exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/starship
+  register: starship_binary
+  changed_when: false
+  failed_when: false
+
+- name: Download Starship installer
+  ansible.builtin.get_url:
+    url: https://starship.rs/install.sh
+    dest: /tmp/install_starship.sh
+    mode: '0755'
+  when: not starship_binary.stat.exists
+
+- name: Run Starship installer
+  ansible.builtin.command: /bin/bash /tmp/install_starship.sh -y
+  args:
+    creates: /usr/local/bin/starship
+  become: true
+  notify: Re-Check if Starship binary exists
+  when: not starship_binary.stat.exists
+
+- name: Add Starship exports to shell rc file
+  ansible.builtin.lineinfile:
+    path: "/home/{{ ansible_user }}/.{{ ansible_env.SHELL }}rc"
+    line: |
+      # Starship
+      export STARSHIP_LOG=error
+      export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+      export ANSIBLE_VAULT_PASSWORD_FILE="$HOME/Developer/.vault.pwd"
+      eval "$(starship init {{ current_shell }})"
+    insertafter: EOF
+    create: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  notify: Restart {{ ansible_env.SHELL }}
+  become: false
+  when:
+    - is_bash
+    - starship_binary is defined
+    - starship_binary.stat.exists

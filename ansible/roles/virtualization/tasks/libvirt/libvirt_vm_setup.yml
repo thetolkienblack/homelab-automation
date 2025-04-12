@@ -1,0 +1,176 @@
+---
+- name: Check if VM already exists
+  ansible.builtin.command: virsh list --all
+  register: vm_list
+  changed_when: false
+  when: virsh_installed.rc == 0
+
+- name: Fail if VM already exists
+  ansible.builtin.fail:
+    msg: "VM '{{ vm_name }}' already exists. Exiting..."
+  when:
+    - virsh_installed.rc == 0
+    - "' vm_name ' in vm_list.stdout"
+
+- name: Create disk image for the VM
+  ansible.builtin.command: qemu-img create -f qcow2 "{{ vm_disk_path }}" "{{ vm_disk_size }}"
+  args:
+    creates: "{{ vm_disk_path }}"
+  when: virsh_installed.rc == 0
+
+- name: Install the VM using virt-install
+  ansible.builtin.command: >
+    virt-install
+    --name "{{ vm_name }}"
+    --os-variant {{ vm_os_variant }}
+    --ram "{{ vm_ram_mb }}"
+    --vcpus "{{ vm_vcpus }}"
+    --disk path="{{ vm_disk_path }}",format=qcow2,size="{{ vm_disk_size | regex_replace('G', '') }}"
+    --cdrom "{{ vm_iso_path }}"
+    --network bridge="{{ vm_bridge_if }}",model=virtio
+    --graphics none
+    --console pty,target_type=serial
+    --noautoconsole
+    --virt-type kvm
+    --boot cdrom,hd
+  args:
+    creates: "/etc/libvirt/qemu/{{ vm_name }}.xml"
+  when: virsh_installed.rc == 0
+
+- name: Wait for VM to boot
+  ansible.builtin.pause:
+    seconds: 20
+
+- name: Get VM IP address
+  ansible.builtin.command: virsh domifaddr "{{ vm_name }}"
+  register: vm_ip_output
+  changed_when: false
+
+- name: Extract VM IP address
+  ansible.builtin.set_fact:
+    vm_ip: "{{ vm_ip_output.stdout | regex_search('ipv4\\s+([0-9.]+)/', '\\1') }}"
+
+- name: Fail if VM did not get an IP
+  ansible.builtin.fail:
+    msg: "VM did not get an IP. Check DHCP settings on bridge '{{ bridge_if }}'."
+  when: vm_ip is not defined or vm_ip == ""
+
+- name: Remove old SSH key for the VM
+  ansible.builtin.command: ssh-keygen -R "{{ vm_ip }}"
+  changed_when: false
+
+- name: Set up /etc/network/interfaces
+  ansible.builtin.copy:
+    dest: /etc/network/interfaces
+    content: |
+      auto eth0
+      iface eth0 inet dhcp
+    owner: root
+    group: root
+    mode: '0644'
+  delegate_to: '{{ vm_ip }}'
+  become: true
+
+- name: Set hostname
+  ansible.builtin.copy:
+    dest: /etc/hostname
+    content: '{{ vm_hostname }}'
+    owner: root
+    group: root
+    mode: '0644'
+  delegate_to: '{{ vm_ip }}'
+  become: true
+
+- name: Restart networking
+  ansible.builtin.command: rc-service networking restart
+  delegate_to: '{{ vm_ip }}'
+  become: true
+  changed_when: false
+
+- name: Ensure mount point exists
+  ansible.builtin.file:
+    path: '{{ vm_fstab_dst }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  delegate_to: '{{ vm_ip }}'
+  become: true
+
+- name: Add fstab entry
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: '{{ vm_fstab_root }} {{ vm_fstab_dst }} {{ vm_fstab_type }} defaults 0 0'
+    regexp: '^{{ vm_fstab_root | regex_escape }}\s+{{ vm_fstab_dst | regex_escape }}\s+'
+    mode: '0644'
+    create: true
+  delegate_to: '{{ vm_ip }}'
+  become: true
+
+- name: Mount the VM storage
+  ansible.posix.mount:
+    src: '{{ vm_fstab_root }}'
+    path: '{{ vm_fstab_dst }}'
+    fstype: '{{ vm_fstab_type }}'
+    state: mounted
+  delegate_to: '{{ vm_ip }}'
+  become: true
+
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: '/{{ vm_ssh_user }}/.ssh'
+    state: directory
+    owner: '{{ vm_ssh_user }}'
+    group: '{{ vm_ssh_user }}'
+    mode: '0700'
+  delegate_to: '{{ vm_ip }}'
+  become: true
+
+- name: Install SSH authorized key
+  ansible.builtin.copy:
+    dest: '/{{ vm_ssh_user }}/.ssh/authorized_keys'
+    content: "{{ lookup('file', ssh_key_source) }}"
+    owner: '{{ vm_ssh_user }}'
+    group: '{{ vm_ssh_user }}'
+    mode: '0600'
+  delegate_to: '{{ vm_ip }}'
+  become: true
+
+- name: Add Alpine package repositories
+  ansible.builtin.lineinfile:
+    path: /etc/apk/repositories
+    line: '{{ item }}'
+    create: true
+    state: present
+    mode: '0644'
+  loop: '{{ vm_alpine_repositories }}'
+  delegate_to: '{{ vm_ip }}'
+  become: true
+
+- name: Update and upgrade Alpine packages
+  ansible.builtin.command: apk update && apk upgrade
+  delegate_to: '{{ vm_ip }}'
+  changed_when: false
+  become: true
+
+- name: Install required packages
+  ansible.builtin.package:
+    name:
+      - openssh
+      - ansible
+    state: present
+    update_cache: true
+  delegate_to: '{{ vm_ip }}'
+  become: true
+
+- name: Enable and start sshd
+  ansible.builtin.command: rc-service sshd start
+  delegate_to: '{{ vm_ip }}'
+  changed_when: false
+  become: true
+
+- name: Add sshd to default runlevel
+  ansible.builtin.command: rc-update add sshd
+  delegate_to: '{{ vm_ip }}'
+  changed_when: false
+  become: true

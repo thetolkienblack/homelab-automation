@@ -1,0 +1,42 @@
+---
+- name: Include security vars
+  ansible.builtin.include_vars: "{{ role_path }}/defaults/security.yml"
+
+- name: Check if UFW binary exists
+  ansible.builtin.stat:
+    path: /usr/sbin/ufw
+  register: ufw_exists
+  changed_when: false
+  failed_when: false
+
+- name: Set ufw_installed
+  ansible.builtin.set_fact:
+    ufw_installed: ufw_exists.stat.exists
+  changed_when: false
+  failed_when: false
+
+- name: Configure UFW defaults
+  community.general.ufw:
+    default: "{{ item.policy }}"
+    direction: "{{ item.direction }}"
+  with_items:
+    - { policy: 'deny', direction: 'incoming' }
+    - { policy: 'allow', direction: 'outgoing' }
+  become: true
+  when: ufw_installed
+
+- name: Allow necessary ufw rules
+  community.general.ufw:
+    rule: allow
+    direction: out
+    proto: "{{ item.proto }}"
+    port: "{{ item.port }}"
+  with_items: "{{ default_ufw_rules }}"
+  become: true
+  when: ufw_installed
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  become: true
+  when: ufw_installed

@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for common
+- name: Include Common tasks
+  ansible.builtin.include_tasks: "common/main.yml"
+
+- name: Include Security tasks
+  ansible.builtin.include_tasks: "security/main.yml"
+
+- name: Include Archive tasks
+  ansible.builtin.include_tasks: "archive_tools/main.yml"
+
+- name: Include Diagnostic tasks
+  ansible.builtin.include_tasks: "diagnostic_tools/main.yml"
+  when:
+    - install_diagnostic_tools is defined
+    - install_diagnostic_tools
+
+- name: Include Network tasks
+  ansible.builtin.include_tasks: "network_tools/main.yml"
+  when:
+    - install_network_tools is defined
+    - install_network_tools
+
+- name: Check for NVIDIA GPU
+  ansible.builtin.command: lspci
+  register: lspci_output
+  changed_when: false
+
+- name: Set fact if NVIDIA GPU is present
+  ansible.builtin.set_fact:
+    has_nvidia_gpu: true
+  when: "'NVIDIA' in lspci_output.stdout"
+
+- name: Include Nvidia tasks
+  ansible.builtin.include_tasks: "nvidia/main.yml"
+  when:
+    - install_nvidia is defined
+    - install_nvidia
+    - has_nvidia_gpu
+
+- name: Include Starship tasks
+  ansible.builtin.include_tasks: "starship/main.yml"
+  when:
+    - install_starship is defined
+    - install_starship

@@ -1,0 +1,14 @@
+# roles/lxd/tasks/debian.yml
+---
+- name: Install LXD
+  ansible.builtin.apt:
+    name:
+      - lxd
+      - lxd-tools
+      - lxd-agent
+      - lxd-client
+      - lxd-migrate
+    state: present
+  when: install_lxd
+  notify: Update apt cache
+  become: true

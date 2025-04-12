@@ -1,0 +1,5 @@
+---
+- name: Check if Docker is installed
+  ansible.builtin.stat:
+    path: /usr/bin/docker
+  register: docker_binary

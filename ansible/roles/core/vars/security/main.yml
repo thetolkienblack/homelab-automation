@@ -1,0 +1,34 @@
+---
+default_ufw_rules:
+  - { port: '5201', proto: 'tcp', comment: 'iperf3 server' }
+  - { port: '5201', proto: 'udp', comment: 'iperf3 UDP testing' }
+  - { port: '8080', proto: 'tcp', comment: 'Wireshark remote capture' }
+  - { port: '53', proto: 'udp', comment: 'DNS client queries' }
+  - { proto: 'tcp', port: '80' } # HTTP for web servers
+  - { proto: 'tcp', port: '443' }  # HTTPS for web servers
+  - { proto: 'udp', port: '53' } # DNS for name resolution
+  - { proto: 'tcp', port: '22' } # SSH server
+  - { proto: 'tcp', port: '23' } # Telnet server
+  - { proto: 'tcp', port: '137' } # Netbios (Samba)
+  - { proto: 'tcp', port: '138' } # Netbios-DGM (Samba)
+  - { proto: 'tcp', port: '139' } # Netbios-NS (Samba)
+
+diagnostic_tools_ufw_rules:
+  - { port: '5201', proto: 'tcp', comment: 'iperf3 server' }
+  - { port: '5201', proto: 'udp', comment: 'iperf3 UDP testing' }
+  - { port: '8080', proto: 'tcp', comment: 'Wireshark remote capture' }
+  - { port: '53', proto: 'udp', comment: 'DNS client queries' }
+
+# Tools that need special AppArmor permissions
+default_apparmor_profiles: []
+
+diagnostic_tools_apparmor_profiles:
+  - s-tui
+  - nmap
+  - htop
+
+network_tools_apparmor_profiles:
+  - wireshark
+  - nmap
+  - traceroute
+  - tcpdump

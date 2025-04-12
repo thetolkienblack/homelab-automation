@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: Include Libvirt tasks
+  ansible.builtin.include_tasks: "libvirt/main.yml"
+  when: install_libvirt
+
+- name: Include LXC tasks
+  ansible.builtin.include_tasks: "lxc/main.yml"
+  when: install_lxc
+
+- name: Include LXD tasks
+  ansible.builtin.include_tasks: "lxd/main.yml"
+  when: install_lxd
+
+- name: Include Vagrant tasks
+  ansible.builtin.include_tasks: "vagrant/main.yml"
+  when: install_vagrant

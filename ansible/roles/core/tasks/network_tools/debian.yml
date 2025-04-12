@@ -1,0 +1,17 @@
+- name: Install network tools
+  ansible.builtin.apt:
+    name:
+      - nmap
+      - dnsutils
+      - wireshark
+      - speedtest-cli
+      - curl
+      - wget
+      - iptables
+      - iputils-ping
+      - nmap
+      - traceroute
+      - dnsutils
+    state: present
+    update_cache: true
+  become: true

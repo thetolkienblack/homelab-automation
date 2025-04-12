@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for install_cockpit
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name
+
+- name: Include Redis tasks
+  ansible.builtin.include_tasks: "redis.yml"
+
+- name: Include DNSMasq tasks
+  ansible.builtin.include_tasks: "dnsmasq.yml"
+
+- name: Include UFW tasks
+  ansible.builtin.include_tasks: "security/ufw.yml"
+
+- name: Enable and start multiple systemd services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop: "{{ cockpit_services }}"
+  become: true
+
+- name: Configure UFW rules for Cockpit and related services
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  with_items: "{{ cockpit_ufw_rules }}"
+  become: true
+  when: ufw_installed
+  notify:
+    - Reload UFW
+    - Restart cockpit
+    - Restart dnsmasq
+    - Restart redis
+
+- name: Create AppArmor profiles from templates
+  ansible.builtin.template:
+    src: "{{ item.template }}"
+    dest: "/etc/apparmor.d/{{ item.profile }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ cockpit_apparmor_profiles }}"
+  loop_control:
+    label: "{{ item.profile }}"
+  become: true
+  notify:
+    - Load multiple custom AppArmor profiles
+    - Restart cockpit
+    - Restart dnsmasq
+    - Restart redis
+  vars:
+    apparmor_custom_profile: "{{ cockpit_apparmor_profiles }}"
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - item.profile not in aa_status.stdout

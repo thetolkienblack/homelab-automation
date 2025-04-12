@@ -1,0 +1,14 @@
+---
+nvidia_ufw_rules:
+  - port: 5000
+    proto: tcp
+    comment: "NVIDIA NVML exporter"
+  - port: 9835
+    proto: tcp
+    comment: "NVIDIA DCGM exporter"
+
+# AppArmor profiles for NVIDIA binaries
+nvidia_apparmor_profiles:
+  - nvidia-smi
+  - nvidia-settings
+  - nvidia-xconfig

@@ -1,0 +1,111 @@
+---
+- name: Remove existing bridge configurations
+  ansible.builtin.command: nmcli connection delete {{ libvirt_network_bridge }}
+  changed_when: true
+  become: true
+
+- name: Remove existing enp14s0 configuration
+  ansible.builtin.command: nmcli connection delete {{ libvirt_network_name }}
+  changed_when: true
+  become: true
+
+- name: Create new bridge br0
+  ansible.builtin.command: nmcli connection add type bridge autoconnect yes con-name {{ libvirt_network_bridge }} ifname {{ libvirt_network_bridge }}
+  changed_when: true
+  become: true
+
+- name: Add enp14s0 as a slave to br0
+  ansible.builtin.command: nmcli connection add type bridge-slave
+    autoconnect yes con-name {{ libvirt_network_bridge }}-slave
+    ifname {{ libvirt_network_name }} master {{ libvirt_network_bridge }}
+  changed_when: true
+  become: true
+
+- name: Set static IP and DNS for br0
+  ansible.builtin.command: >
+    nmcli connection modify {{ libvirt_network_bridge }}
+    ipv4.addresses {{ libvirt_network_ipv4_address }}
+    ipv4.gateway {{ libvirt_network_ipv4_gw }}
+    ipv4.dns {{ libvirt_network_ipv4_dns }}
+    ipv4.method {{ libvirt_network_ipv4_type }}
+  become: true
+  changed_when: true
+  when: libvirt_network_ipv4_type == "manual"
+
+- name: Restart NetworkManager
+  ansible.builtin.service:
+    name: NetworkManager
+    state: restarted
+  become: true
+
+- name: Bring up br0
+  ansible.builtin.command: nmcli connection up {{ libvirt_network_bridge }}
+  changed_when: true
+  become: true
+
+- name: Bring up br0-slave
+  ansible.builtin.command: nmcli connection up {{ libvirt_network_bridge }}-slave
+  changed_when: true
+  become: true
+
+- name: Get all virsh VMs
+  ansible.builtin.command: virsh list --all --name
+  register: virsh_vms
+  changed_when: false
+  become: true
+
+- name: Destroy virsh vms
+  ansible.builtin.command: virsh destroy {{ item }}
+  loop: "{{ virsh_vms.stdout_lines }}"
+  changed_when: true
+  when: virsh_vms.stdout_lines | length > 0
+  become: true
+
+- name: Undefine virsh vms
+  ansible.builtin.command: virsh undefine {{ item }} --remove-all-storage
+  loop: "{{ virsh_vms.stdout_lines }}"
+  changed_when: true
+  when: virsh_vms.stdout_lines | length > 0
+  become: true
+
+- name: Get all virsh networks
+  ansible.builtin.command: virsh net-list --all --name
+  register: virsh_networks
+  changed_when: false
+  become: true
+
+- name: Destroy virsh networks
+  ansible.builtin.command: virsh net-destroy {{ item }}
+  loop: "{{ virsh_networks.stdout_lines }}"
+  changed_when: true
+  when: virsh_networks.stdout_lines | length > 0
+  become: true
+
+- name: Undefine virsh networks
+  ansible.builtin.command: virsh net-undefine {{ item }}
+  loop: "{{ virsh_networks.stdout_lines }}"
+  changed_when: true
+  when: virsh_networks.stdout_lines | length > 0
+  become: true
+
+- name: Configure Libvirt to use br0 as a bridge network
+  ansible.builtin.template:
+    src: libvirt_network_bridge.xml.j2
+    dest: /tmp/default.xml
+    mode: '0600'
+  become: true
+
+- name: Define the default network
+  ansible.builtin.command: virsh net-define /tmp/default.xml
+  changed_when: true
+  become: true
+
+- name: Start the default network
+  ansible.builtin.command: virsh net-start default
+  changed_when: true
+  become: true
+
+- name: Autostart the default network
+  ansible.builtin.command: virsh net-autostart default
+  changed_when: true
+  become: true

@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: MIT-0
+galaxy_info:
+  author: thetolkienblack
+  description: Common role used to provide shared functionalities to other roles.
+  company: Graylock
+  license: BSD-3-Clause
+
+  min_ansible_version: '2.9'
+
+  galaxy_tags:
+    - openssh
+    - openssl
+    - gnugpg
+    - jq
+    - vim
+    - yamllint
+    - stui
+    - tcpdump
+    - smem
+    - python
+    - htop
+    - ufw
+    - apparmor
+    - starship
+    - nvidia
+
+dependencies: []
+collections:
+  - community.general

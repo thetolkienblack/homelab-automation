@@ -1,0 +1,31 @@
+---
+- name: Restart fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: restarted
+  become: true
+  when:
+    - fail2ban_exists is defined
+    - fail2ban_exists
+
+- name: Reload UFW
+  community.general.ufw:
+    state: reloaded
+  become: true
+  changed_when: false
+  when:
+    - ufw_installed is defined
+    - ufw_installed
+
+- name: Get list of handler files from security debian directory
+  ansible.builtin.find:
+    paths: "{{ role_path }}/tasks/security/debian"
+    patterns: "*.yml"
+  register: security_debian_tasks
+  when: ansible_os_family == debian_family_name
+
+- name: Include all security debian handler files
+  ansible.builtin.include_tasks: "{{ item.path }}"
+  loop: "{{ security_debian_tasks.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"

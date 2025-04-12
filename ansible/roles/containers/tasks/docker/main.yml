@@ -1,0 +1,32 @@
+---
+- name: Include Debian tasks
+  ansible.builtin.include_tasks: "debian.yml"
+  when: ansible_os_family == debian_family_name
+
+- name: Ensure Docker service is enabled and started
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+  become: true
+  when: docker_binary.stat.exists
+
+- name: Login to Docker registry
+  community.docker.docker_login:
+    registry_url: "{{ docker_registry }}"
+    username: "{{ docker_username }}"
+    password: "{{ docker_password }}"
+  become: true
+  when:
+    - docker_binary.stat.exists
+    - docker_username != ''
+    - docker_password != ''
+
+- name: Allow Docker ports in UFW
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ docker_ports }}"
+  become: true
+  when: docker_binary.stat.exists

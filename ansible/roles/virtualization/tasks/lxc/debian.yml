@@ -1,0 +1,30 @@
+# roles/lxc/tasks/debian.yml
+---
+- name: Install LXC
+  ansible.builtin.apt:
+    name:
+      - lxc
+      - lxc-templates
+      - lxcfs
+      - lxctl
+    state: present
+  when: install_lxc
+  notify: Update apt cache
+  become: true
+
+- name: Check if AppArmor is installed
+  ansible.builtin.stat:
+    path: /etc/apparmor.d
+  register: apparmor_dir
+  become: true
+
+- name: Enable LXC AppArmor profile
+  ansible.builtin.command:
+    cmd: aa-complain /etc/apparmor.d/lxc-containers
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
+  changed_when: false
+  register: apparmor_lxc
+  failed_when: apparmor_lxc.rc != 0 and "No such file or directory" not in apparmor_lxc.stderr

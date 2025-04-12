@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT-0
+---
+debian_family_name: Debian
+install_network_tools: true
+install_diagnostic_tools: true
+install_nvidia: true
+install_starship: true
+install_cockpit: true
+default_shell: "/bin/bash"

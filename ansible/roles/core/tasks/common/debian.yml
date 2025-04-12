@@ -1,0 +1,53 @@
+- name: Enable sources.list
+  ansible.builtin.template:
+    src: common/sources.list.j2
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Ugrade apt packages
+  become: true
+
+- name: Install prerequisite packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - openssh-client
+      - cron
+      - plocate
+      - locales
+      - bash-completion
+      - libncursesw5-dev
+      - tk-dev
+      - libxml2-dev
+      - libxmlsec1-dev
+      - libffi-dev
+      - gnupg2
+      - openssl
+      - software-properties-common
+      - build-essential
+      - libreadline-dev
+      - apt-transport-https
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install development tools
+  ansible.builtin.apt:
+    name:
+      - jq
+      - git
+      - vim
+      - vim-nox
+      - yq
+      - yamllint
+    state: present
+    update_cache: true
+  become: true
+
+- name: Ensure /etc/apt/keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  become: true

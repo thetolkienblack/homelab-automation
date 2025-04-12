@@ -1,0 +1,12 @@
+---
+- name: Include Common handlers
+  ansible.builtin.include_tasks: "common/main.yml"
+
+- name: Include Starship handlers
+  ansible.builtin.include_tasks: "starship/main.yml"
+
+- name: Include Cockpit handlers
+  ansible.builtin.include_tasks: "cockpit/main.yml"
+
+- name: Include Nvidia handlers
+  ansible.builtin.include_tasks: "nvidia/main.yml"

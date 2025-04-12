@@ -1,7 +1,0 @@
-# SPDX-License-Identifier: MIT-0
----
-- name: Testing starship role
-  hosts: localhost
-  remote_user: root
-  roles:
-    - starship

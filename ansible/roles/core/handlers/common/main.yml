@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: MIT-0
+---
+# handlers file for common
+- name: Restart bash
+  ansible.builtin.systemd:
+    name: bash
+    state: restarted
+  become: true
+
+- name: Update grub
+  ansible.builtin.command: update-grub
+  become: true
+  changed_when: false
+
+- name: Reload sysctl
+  ansible.builtin.command: sysctl --system
+  become: true
+  changed_when: false
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
+
+- name: Include Security tasks
+  ansible.builtin.include_tasks: "security/main.yml"
+
+- name: Include Debian-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == debian_family_name

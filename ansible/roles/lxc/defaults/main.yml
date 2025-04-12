@@ -1,9 +1,0 @@
-# SPDX-License-Identifier: MIT-0
----
-# LXC network settings
-install_lxc: true
-lxc_bridge_network: "10.0.3.0/24"  # Default LXC bridge network
-lxc_network_ports:
-  - { port: '67', proto: 'udp', comment: 'DHCP server for LXC containers' }
-  - { port: '68', proto: 'udp', comment: 'DHCP client for LXC containers' }
-  - { port: '53', proto: 'udp', comment: 'DNS for LXC containers' }

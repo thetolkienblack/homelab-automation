@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: Include LXC Debian-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+
+- name: Include LXC-specific vars
+  ansible.builtin.include_vars: "{{ role_path }}/vars/lxc.yml"
+
+- name: Configure UFW rules for LXC
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  with_items: "{{ lxc_network_ports }}"
+  become: true
+  when: ufw_installed
+  notify: Reload UFW
+
+- name: Allow traffic from LXC bridge network
+  community.general.ufw:
+    rule: allow
+    from: "{{ lxc_bridge_network }}"
+  become: true
+  when: ufw_installed
+  notify: Reload UFW
+
+- name: Start and enable LXC service
+  ansible.builtin.systemd:
+    name: lxc
+    state: started
+    enabled: true
+  when: install_lxc
+  become: true

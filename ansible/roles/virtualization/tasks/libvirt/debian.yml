@@ -1,0 +1,61 @@
+# roles/libvirt/tasks/debian.yml
+---
+- name: Install libvirt packages
+  ansible.builtin.apt:
+    name:
+      - qemu-kvm
+      - libvirt-daemon-system
+      - libvirt-clients
+      - libvirt-daemon
+      - libvirt-daemon-system-systemd
+      - libvirt-daemon-config-network
+      - libvirt-login-shell
+      - libvirt-wireshark
+    state: present
+  notify: Update apt cache
+  become: true
+
+- name: Check if UFW is installed
+  ansible.builtin.command:
+    cmd: dpkg -s ufw
+  register: ufw_installed
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: Check if AppArmor is installed
+  ansible.builtin.stat:
+    path: /etc/apparmor.d
+  register: apparmor_dir
+  become: true
+
+- name: Enable AppArmor profiles for libvirt and QEMU
+  ansible.builtin.file:
+    path: "/etc/apparmor.d/{{ item }}"
+    state: link
+    src: "/etc/apparmor.d/disable/{{ item }}"
+    force: true
+  with_items:
+    - usr.sbin.libvirtd
+    - usr.lib.libvirt.virt-aa-helper
+    - usr.bin.qemu-system-x86_64
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
+  register: apparmor_enabled
+  failed_when: false
+
+- name: Reload AppArmor profiles for libvirt and QEMU
+  ansible.builtin.command:
+    cmd: "apparmor_parser -r /etc/apparmor.d/{{ item }}"
+  with_items:
+    - usr.sbin.libvirtd
+    - usr.lib.libvirt.virt-aa-helper
+    - usr.bin.qemu-system-x86_64
+  become: true
+  when:
+    - apparmor_dir.stat.exists
+    - apparmor_dir.stat.isdir
+    - apparmor_enabled is not failed
+  changed_when: true

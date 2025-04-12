@@ -1,0 +1,41 @@
+---
+libvirt_tcp_port: 16509
+libvirt_tls_port: 16514
+spice_port_range: "5900:5999"
+migration_port_range: "49152:49215"
+
+# UFW rules for libvirt
+libvirt_ufw_rules:
+  - { port: "{{ libvirt_tcp_port }}", proto: 'tcp', comment: 'Libvirt TCP connections' }
+  - { port: "{{ libvirt_tls_port }}", proto: 'tcp', comment: 'Libvirt TLS connections' }
+  - { port: "{{ spice_port_range }}", proto: 'tcp', comment: 'SPICE client connections' }
+  - { port: "{{ migration_port_range }}", proto: 'tcp', comment: 'VM migration ports' }
+
+vm_os_variant: alpinelinux3.17
+vm_name: dns_alpine_linux
+vm_hostname: dns.graylock.eu
+vm_disk_path: /var/lib/libvirt/images/dns_alpine_linux.qcow2
+vm_iso_path: /var/lib/libvirt/images/alpine-extended-3.20.3-x86_64.iso
+vm_bridge_if: br0
+vm_ram_mb: 1024
+vm_vcpus: 1
+vm_disk_size: 10G
+dns_servers: "192.168.50.54 192.168.50.1 45.90.28.252"
+ssh_key_source: /home/sidney/.ssh/id_ed25519.pub
+vm_ssh_user: root
+vm_fstab_src: /media/sidney/NAS/Homelab
+vm_fstab_dst: /mnt/data
+vm_fstab_type: nfs
+vm_alpine_repositories:
+  - "https://dl-cdn.alpinelinux.org/alpine/v3.20/main"
+  - "https://dl-cdn.alpinelinux.org/alpine/v3.20/community"
+  - "https://dl-cdn.alpinelinux.org/alpine/latest-stable/main"
+  - "https://dl-cdn.alpinelinux.org/alpine/latest-stable/community"
+libvirt_network_name: enp14s0
+libvirt_network_bridge: br0
+libvirt_network_ipv4_address: "192.168.50.54/24"
+libvirt_network_ipv4_gw: 192.168.50.1
+libvirt_network_ipv4_dns: "192.168.50.54,192.168.50.1,45.90.28.252"
+libvirt_network_ipv4_type: manual
+libvirt_storage_pool_name: default
+libvirt_storage_pool_path: /mnt/storage/libvirt
