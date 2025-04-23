@@ -6,7 +6,7 @@
   when: ansible_os_family == debian_family_name
 
 - name: Include security vars
-  ansible.builtin.include_vars: "{{ role_path }}/vars/security.yml"
+  ansible.builtin.include_vars: "{{ role_path }}/vars/security/main.yml"
 
 - name: Configure UFW rules for network tools
   community.general.ufw:

@@ -1,6 +1,4 @@
-# SPDX-License-Identifier: MIT-0
 ---
-# handlers file for common
 - name: Restart bash
   ansible.builtin.systemd:
     name: bash
@@ -25,6 +23,6 @@
 - name: Include Security tasks
   ansible.builtin.include_tasks: "security/main.yml"
 
-- name: Include Debian-specific tasks
+- name: Include Debian-specific handlers
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
   when: ansible_os_family == debian_family_name

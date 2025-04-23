@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for common
+- name: Ensure ansible_user variable is defined
+  ansible.builtin.fail:
+    msg: "The variable 'ansible_user' is not defined. Please provide it in your inventory or playbook."
+  when: ansible_user is not defined
+
+- name: Include OS-based tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+
+- name: Set Bash as the default shell for the user
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    shell: "{{ default_shell | default('/bin/bash') }}"
+  register: shell_change
+  when: ansible_env.SHELL != (default_shell | default('/bin/bash'))
+
+- name: Ensure commands use bash shell
+  ansible.builtin.shell:
+    cmd: echo "Default shell set to {{ default_shell }}"
+  changed_when: false
+  failed_when: false
+  when: shell_change.changed
+
+- name: Grab just the shell name
+  set_fact:
+    shell_name: "{{ ansible_env.SHELL | basename }}"
+
+- name: Copy bashrc file
+  ansible.builtin.template:
+    src: common/{{ shell_name }}.j2
+    dest: /home/{{ ansible_user }}/.{{ shell_name }}rc
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  become: false
+  when: shell_change.changed

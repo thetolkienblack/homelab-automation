@@ -1,5 +1,5 @@
 ---
-- name: Setup ACG server
+- name: Testing the roles
   hosts: all
   vars_files:
     - ../../group_vars/all/vars.yml

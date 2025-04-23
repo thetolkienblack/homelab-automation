@@ -12,6 +12,8 @@ galaxy_info:
 dependencies:
   - common
   - mongodb
-  - openjdk
+  - role: development_tools
+    vars:
+      install_openjdk: true
 collections:
   - ansible.posix

@@ -1,6 +1,6 @@
 ---
 - name: Include security vars
-  ansible.builtin.include_vars: "{{ role_path }}/defaults/security.yml"
+  ansible.builtin.include_vars: "{{ role_path }}/vars/security/main.yml"
 
 - name: Check if UFW binary exists
   ansible.builtin.stat:
@@ -11,7 +11,7 @@
 
 - name: Set ufw_installed
   ansible.builtin.set_fact:
-    ufw_installed: ufw_exists.stat.exists
+    ufw_installed: "{{ ufw_exists.stat.exists }}"
   changed_when: false
   failed_when: false
 

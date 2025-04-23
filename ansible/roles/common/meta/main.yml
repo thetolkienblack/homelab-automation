@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT-0
+galaxy_info:
+  author: thetolkienblack
+  description: This role installs the required system prerequisites
+  company: Graylock
+  license: MIT
+  min_ansible_version: "2.1"
+  galaxy_tags:
+    - openssh
+    - openssl
+    - gnugpg
+    - jq
+    - vim
+    - yamllint
+    - ufw
+    - apparmor
+dependencies: []

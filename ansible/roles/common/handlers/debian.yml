@@ -4,7 +4,7 @@
     update_cache: true
   become: true
 
-- name: Ugrade apt packages
+- name: Upgrade apt packages
   ansible.builtin.apt:
     update_cache: true
     upgrade: dist
