@@ -3,7 +3,7 @@
   ansible.builtin.include_vars: "{{ role_path }}/vars/security/main.yml"
 
 - name: Include all Debian security tasks
-  include_tasks: "{{ item }}"
+  ansible.builtin.include_tasks: "{{ item }}"
   with_fileglob:
     - security/debian/*.yml
   register: security_debian_tasks
