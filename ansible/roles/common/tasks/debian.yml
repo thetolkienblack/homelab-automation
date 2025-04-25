@@ -1,6 +1,6 @@
 - name: Enable sources.list
   ansible.builtin.template:
-    src: common/sources.list.j2
+    src: sources.list.j2
     dest: /etc/apt/sources.list
     owner: root
     group: root

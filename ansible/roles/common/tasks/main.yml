@@ -29,7 +29,7 @@
 
 - name: Copy bashrc file
   ansible.builtin.template:
-    src: common/{{ shell_name }}.j2
+    src: "{{ shell_name }}.j2"
     dest: /home/{{ ansible_user }}/.{{ shell_name }}rc
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"

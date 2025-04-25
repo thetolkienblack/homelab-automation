@@ -15,28 +15,37 @@
   changed_when: false
   failed_when: false
 
-- name: Configure UFW defaults
+- name: Allow traffic from approved subnets / hosts
   community.general.ufw:
-    default: "{{ item.policy }}"
-    direction: "{{ item.direction }}"
-  with_items:
-    - { policy: 'deny', direction: 'incoming' }
-    - { policy: 'allow', direction: 'outgoing' }
+    rule: allow
+    direction: in
+    from_ip: "{{ item }}"
+    comment: "Allow from {{ item }}"
+  loop: "{{ ufw_allowed_sources }}"
   become: true
   when: ufw_installed
 
-- name: Allow necessary ufw rules
+- name: Allow necessary incoming ufw rules
   community.general.ufw:
     rule: allow
-    direction: out
+    direction: in
     proto: "{{ item.proto }}"
     port: "{{ item.port }}"
   with_items: "{{ default_ufw_rules }}"
   become: true
   when: ufw_installed
 
-- name: Enable UFW
+- name: Allow all outbound traffic
   community.general.ufw:
-    state: enabled
+    default: allow
+    direction: outgoing
+  become: true
+  when: ufw_installed
+
+- name: Enable UFW + deny all unsolicited inbound traffic
+  community.general.ufw:
+    state: enabled          # enable service + reload rules on every change
+    default: deny           # default policy
+    direction: incoming
   become: true
   when: ufw_installed

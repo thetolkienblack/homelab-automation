@@ -4,20 +4,26 @@ default_ufw_rules:
   - { port: '5201', proto: 'udp', comment: 'iperf3 UDP testing' }
   - { port: '8080', proto: 'tcp', comment: 'Wireshark remote capture' }
   - { port: '53', proto: 'udp', comment: 'DNS client queries' }
-  - { proto: 'tcp', port: '80' } # HTTP for web servers
-  - { proto: 'tcp', port: '443' }  # HTTPS for web servers
   - { proto: 'udp', port: '53' } # DNS for name resolution
-  - { proto: 'tcp', port: '22' } # SSH server
   - { proto: 'tcp', port: '23' } # Telnet server
   - { proto: 'tcp', port: '137' } # Netbios (Samba)
   - { proto: 'tcp', port: '138' } # Netbios-DGM (Samba)
   - { proto: 'tcp', port: '139' } # Netbios-NS (Samba)
+  - { proto: 'tcp', port: '80' } # HTTP for web servers
+  - { proto: 'tcp', port: '443' }  # HTTPS for web servers
 
 diagnostic_tools_ufw_rules:
   - { port: '5201', proto: 'tcp', comment: 'iperf3 server' }
   - { port: '5201', proto: 'udp', comment: 'iperf3 UDP testing' }
   - { port: '8080', proto: 'tcp', comment: 'Wireshark remote capture' }
   - { port: '53', proto: 'udp', comment: 'DNS client queries' }
+
+ufw_allowed_sources:
+  - 192.168.0.0/24     # whole LAN
+  - 194.59.28.86
+  - 100.86.72.119 #ts-graylock
+  - 100.67.7.113 #ts-amun-ra
+  - 100.123.191.38 #ts-skynet
 
 # Tools that need special AppArmor permissions
 default_apparmor_profiles: []

@@ -25,4 +25,3 @@
 
 - name: Include Debian-specific handlers
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
-  when: ansible_os_family == debian_family_name
