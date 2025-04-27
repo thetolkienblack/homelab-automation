@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: MIT-0
+---
+# defaults file for virsh_vm
+virsh_vm_disk_capacity: 40G
+virsh_vm_disk_format: qcow2
+virsh_vm_storage_pool_name: default
+virsh_vm_name: default_vm
+virsh_vm_hostname: "{{ virsh_vm_name }}"
+virsh_vm_ip: "192.168.50.122"
+virsh_vm_ipv4_address: "{{ virsh_vm_ip }}/24"
+virsh_vm_gw: "{{ host_ipv4_gw }}"
+virsh_vm_dns: "{{ default_dns }}"
+virsh_vm_fstab_root: /media/sidney/NAS/Homelab
+virsh_vm_fstab_dst: /data
+virsh_vm_fstab_type: nfs
+virsh_vm_ssh_user: vm_user
+virsh_vm_vcpus: 4
+virsh_vm_memory: 10240 # 10GB
+virsh_vm_os_arch: x86_64
+virsh_vm_os_type: hvm
+virsh_vm_network_bridge: "{{ host_bridge_name }}"
+virsh_vm_storage_pool_path: /mnt/storage/libvirt
+virsh_vm_alpine_repositories:
+  - "https://dl-cdn.alpinelinux.org/alpine/v3.20/main"
+  - "https://dl-cdn.alpinelinux.org/alpine/v3.20/community"
+  - "https://dl-cdn.alpinelinux.org/alpine/latest-stable/main"
+  - "https://dl-cdn.alpinelinux.org/alpine/latest-stable/community"
+virsh_vm_cloud_init_tpl:
+  - user-data.j2
+  - meta-data.j2
+  - network-config.j2
+virsh_vm_inventory_file: libvirt.ini
+virsh_vm_playbook_file: libvirt_playbook.yml

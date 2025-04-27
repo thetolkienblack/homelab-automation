@@ -1,0 +1,36 @@
+---
+- name: 'Wazuh | Agent | Install Wazuh agent'
+  block:
+
+    - name: 'Wazuh | Agent | Import Wazuh signing key'
+      ansible.builtin.shell: |
+        set -o pipefail
+        curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH \
+          | gpg --no-default-keyring \
+                --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import
+      args:
+        creates: /usr/share/keyrings/wazuh.gpg
+
+    - name: 'Wazuh | Agent | Fix key permissions (APT needs world-read)'
+      ansible.builtin.file:
+        path: /usr/share/keyrings/wazuh.gpg
+        mode: "0644"
+
+    - name: 'Wazuh | Agent | Add Wazuh APT repo'
+      ansible.builtin.template:
+        src: wazuh.list.j2
+        dest: /etc/apt/sources.list.d/wazuh.list
+        mode: "0644"
+      notify: 'Update apt cache'
+
+
+    - name: 'Wazuh | Agent | Install wazuh-agent (enroll with manager)'
+      ansible.builtin.apt:
+        name: wazuh-agent
+        state: present
+      environment:                       # Deployment vars
+        WAZUH_MANAGER: "{{ wazuh_manager_ip }}"      # e.g. 10.0.0.2
+        WAZUH_AGENT_NAME: "{{ wazuh_agent_fqdn }}"
+        WAZUH_AGENT_GROUP: "{{ wazuh_agent_group }}"
+        WAZUH_REGISTRATION_PASSWORD: "{{ wazuh_reg_password }}"
+      notify: 'Enable wazuh-server password enrollment'

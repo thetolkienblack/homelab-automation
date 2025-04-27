@@ -1,12 +1,12 @@
 ---
-- name: Check if NVIDIA module is loaded
+- name: 'Core | Handlers | Nvidia | Check if NVIDIA module is loaded'
   ansible.builtin.shell: "lsmod | grep -q '^nvidia'"
   register: nvidia_module_loaded
   ignore_errors: true
   changed_when: false
   become: true
 
-- name: Try loading NVIDIA module
+- name: 'Core | Handlers | Nvidia | Try loading NVIDIA module'
   ansible.builtin.command: modprobe nvidia
   register: nvidia_module_loaded
   failed_when: false

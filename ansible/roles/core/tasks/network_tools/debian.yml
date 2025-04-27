@@ -1,4 +1,4 @@
-- name: Install network tools
+- name: 'Core | Network Tools | Debian | Install network tools'
   ansible.builtin.apt:
     name:
       - nmap

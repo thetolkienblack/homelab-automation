@@ -1,24 +1,26 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_template
-- name: Check if Podman is installed
+- name: 'Containers | Check if Podman is installed'
   ansible.builtin.stat:
     path: /usr/bin/podman
   register: podman_binary
 
-- name: Check if Docker is installed
+- name: 'Containers | Check if Docker is installed'
   ansible.builtin.stat:
     path: /usr/bin/docker
   register: docker_binary
 
-- name: Include Podman tasks
+- name: 'Containers | Include Podman tasks'
   ansible.builtin.include_tasks: "podman/main.yml"
   when:
-    - install_podman
+    - containers_install_podman
     - not podman_binary.stat.exists
 
-- name: Include Docker tasks
+- name: 'Containers | Include Docker tasks'
   ansible.builtin.include_tasks: "docker/main.yml"
   when:
-    - install_docker
+    - containers_install_docker
     - not docker_binary.stat.exists
+    - ufw_installed is defined
+    - ufw_installed

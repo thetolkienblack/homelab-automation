@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: 'Trivy | Include OS-specific tasks'
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"

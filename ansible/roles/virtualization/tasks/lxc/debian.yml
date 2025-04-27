@@ -1,6 +1,6 @@
 # roles/lxc/tasks/debian.yml
 ---
-- name: Install LXC
+- name: 'Virtualization | LXC | Debian | Install LXC'
   ansible.builtin.apt:
     name:
       - lxc
@@ -12,13 +12,13 @@
   notify: Update apt cache
   become: true
 
-- name: Check if AppArmor is installed
+- name: 'Virtualization | LXC | Debian | Check if AppArmor is installed'
   ansible.builtin.stat:
     path: /etc/apparmor.d
   register: apparmor_dir
   become: true
 
-- name: Enable LXC AppArmor profile
+- name: 'Virtualization | LXC | Debian | Enable LXC AppArmor profile'
   ansible.builtin.command:
     cmd: aa-complain /etc/apparmor.d/lxc-containers
   become: true

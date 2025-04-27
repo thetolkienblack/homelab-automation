@@ -1,0 +1,11 @@
+---
+- name: Install bouncers
+  ansible.builtin.shell: |
+    cscli bouncers install {{ item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ crowdsec_bouncers }}"
+  loop_control:
+    label: "{{ item }}"
+  register: bouncer_results
+  changed_when: "'already installed' not in bouncer_results.stdout"

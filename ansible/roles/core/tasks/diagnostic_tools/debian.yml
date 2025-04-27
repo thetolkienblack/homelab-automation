@@ -1,4 +1,4 @@
-- name: Install system tools
+- name: 'Core | Diagnostic | Debian | Install system tools'
   ansible.builtin.apt:
     name:
       - s-tui
@@ -13,7 +13,7 @@
   become: true
 
 # AppArmor profiles for diagnostic tools that need it
-- name: Create AppArmor profile for tcpdump
+- name: 'Core | Diagnostic | Debian | Create AppArmor profile for tcpdump'
   ansible.builtin.template:
     src: tcpdump-apparmor.j2
     dest: /etc/apparmor.d/usr.sbin.tcpdump

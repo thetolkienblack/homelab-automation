@@ -1,4 +1,4 @@
-- name: Create fail2ban jail.local from template
+- name: 'Core | Security | Fail2ban | Create fail2ban jail.local from template'
   ansible.builtin.template:
     src: security/jail.local.j2
     dest: /etc/fail2ban/jail.local
@@ -8,18 +8,18 @@
   become: true
   notify: Restart fail2ban
 
-- name: Check if Fail2ban binary exists
+- name: 'Core | Security | Fail2ban | Check if Fail2ban binary exists'
   ansible.builtin.stat:
     path: /usr/bin/fail2ban-client
   register: fail2ban_binary
 
-- name: Set fail2ban exists variable
+- name: 'Core | Security | Fail2ban | Set fail2ban exists variable'
   ansible.builtin.set_fact:
     fail2ban_exists: fail2ban_binary.stat.exists
   changed_when: false
   failed_when: false
 
-- name: Ensure Fail2ban service is enabled and started
+- name: 'Core | Security | Fail2ban | Ensure Fail2ban service is enabled and started'
   ansible.builtin.systemd:
     name: fail2ban
     state: started

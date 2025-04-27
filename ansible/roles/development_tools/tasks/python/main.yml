@@ -1,6 +1,39 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_init
-- name: Include Debian-specific tasks
+- name: 'Development Tools | Python | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
-  when: ansible_os_family == debian_family_name
+
+- name: 'Development Tools | Python | Ensure ansible_user variable is defined'
+  ansible.builtin.fail:
+    msg: "The variable 'ansible_user' is not defined. Please provide it in your inventory or playbook."
+  when: ansible_user is not defined
+
+- name: 'Development Tools | Python | Create a directory for the virtual environment'
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/python-venv
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  become: false
+
+- name: 'Development Tools | Python | Set up Python virtual environment'
+  ansible.builtin.command:
+    cmd: python3 -m venv /home/{{ ansible_user }}/python-venv
+  args:
+    creates: /home/{{ ansible_user }}/python-venv/bin/activate
+  become: false
+
+- name: 'Development Tools | Python | Add venv activation to .bashrc'
+  ansible.builtin.lineinfile:
+    path: /home/{{ ansible_user }}/.bashrc
+    line: |
+      # Activate Python virtual environment
+      source /home/{{ ansible_user }}/python-venv/bin/activate
+    insertafter: EOF
+    create: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+  become: false

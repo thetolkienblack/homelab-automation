@@ -1,0 +1,11 @@
+---
+- name: Configure blocklists
+  ansible.builtin.shell: |
+    cscli blocklist add {{ item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ crowdsec_blocklists }}"
+  loop_control:
+    label: "{{ item }}"
+  register: blocklist_results
+  changed_when: "'already exists' not in blocklist_results.stdout"

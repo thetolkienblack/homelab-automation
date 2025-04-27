@@ -1,0 +1,33 @@
+<domain type='kvm'>
+    <name>{{ virsh_vm_name }}</name>
+
+    <memory unit='MiB'>{{ virsh_vm_memory | default(10240) | int }}</memory>  <!-- 10 GiB -->
+    <vcpu>{{ virsh_vm_vcpus | default(4) }}</vcpu>
+
+    <os>
+        <type arch='{{ virsh_vm_os_arch }}'>{{ virsh_vm_os_type }}</type>
+        <boot dev='hd'/>
+    </os>
+
+    <devices>
+        <!-- Root disk -->
+        <disk type='file' device='disk'>
+            <driver name='qemu' type='{{ disk_format }}'/>
+            <source file='{{ disk_path }}'/>
+            <target dev='vda' bus='virtio'/>
+        </disk>
+
+        <!-- Cloud-Init ISO -->
+        <disk type='file' device='cdrom'>
+            <source file='{{ cidata_iso }}'/>
+            <target dev='sda' bus='sata'/>
+            <readonly/>
+        </disk>
+
+        <!-- Bridge to br0 -->
+        <interface type='bridge'>
+            <source bridge='{{ virsh_vm_network_bridge }}'/>
+            <model type='virtio'/>
+        </interface>
+    </devices>
+</domain>

@@ -1,51 +1,51 @@
 ---
-- name: Include security vars
+- name: 'Core | Security | UFW | Include security vars'
   ansible.builtin.include_vars: "{{ role_path }}/vars/security/main.yml"
 
-- name: Check if UFW binary exists
+- name: 'Core | Security | UFW | Check if UFW binary exists'
   ansible.builtin.stat:
     path: /usr/sbin/ufw
   register: ufw_exists
   changed_when: false
   failed_when: false
 
-- name: Set ufw_installed
+- name: 'Core | Security | UFW | Set ufw_installed'
   ansible.builtin.set_fact:
     ufw_installed: "{{ ufw_exists.stat.exists }}"
   changed_when: false
   failed_when: false
 
-- name: Allow traffic from approved subnets / hosts
+- name: 'Core | Security | UFW | Allow traffic from approved subnets / hosts'
   community.general.ufw:
     rule: allow
     direction: in
     from_ip: "{{ item }}"
     comment: "Allow from {{ item }}"
-  loop: "{{ ufw_allowed_sources }}"
+  loop: "{{ core_ufw_allowed_sources }}"
   become: true
   when: ufw_installed
 
-- name: Allow necessary incoming ufw rules
+- name: 'Core | Security | UFW | Allow necessary incoming ufw rules'
   community.general.ufw:
     rule: allow
     direction: in
     proto: "{{ item.proto }}"
     port: "{{ item.port }}"
-  with_items: "{{ default_ufw_rules }}"
+  with_items: "{{ core_default_ufw_rules }}"
   become: true
   when: ufw_installed
 
-- name: Allow all outbound traffic
+- name: 'Core | Security | UFW | Allow all outbound traffic'
   community.general.ufw:
     default: allow
     direction: outgoing
   become: true
   when: ufw_installed
 
-- name: Enable UFW + deny all unsolicited inbound traffic
+- name: 'Core | Security | UFW | Enable UFW + deny all unsolicited inbound traffic'
   community.general.ufw:
-    state: enabled          # enable service + reload rules on every change
-    default: deny           # default policy
+    state: enabled # enable service + reload rules on every change
+    default: deny # default policy
     direction: incoming
   become: true
   when: ufw_installed

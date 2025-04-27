@@ -1,0 +1,9 @@
+---
+- name: Install collections inside container
+  ansible.builtin.shell: |
+    docker exec {{ crowdsec_docker_container_name }} cscli collections install {{ item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ crowdsec_docker_collections }}"
+  loop_control:
+    label: "{{ item }}"

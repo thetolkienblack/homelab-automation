@@ -1,0 +1,9 @@
+---
+- name: Install CrowdSec local API credentials (placeholder, if needed)
+  ansible.builtin.debug:
+    msg: 'API credentials installation is manual or via vault. Skipping.'
+
+- name: Register agent/server if needed (placeholder)
+  ansible.builtin.command:
+    cmd: cscli capi register
+  when: crowdsec_install_server or crowdsec_install_agent

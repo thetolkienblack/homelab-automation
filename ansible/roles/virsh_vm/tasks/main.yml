@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for virsh_vm
+
+- name: 'Virsh | Get list of all domains'
+  ansible.builtin.command:
+    cmd: virsh list --all --name
+  register: all_domains
+  changed_when: false
+
+- name: 'Virsh | Fail if VM already exists'
+  ansible.builtin.assert:
+    that: "'{{ virsh_vm_name }}' not in all_domains.stdout_lines"
+    fail_msg: "VM '{{ virsh_vm_name }}' already exists. Exiting…"
+
+# Gather pool info up-front
+- name: 'Virsh | Get storage-pool info'
+  community.libvirt.virt_pool:
+    command: info
+    name: "{{ virsh_vm_storage_pool_name }}"
+  register: poolinfo
+
+- name: 'Virsh | Set disk and ISO paths'
+  ansible.builtin.set_fact:
+    disk_path: "{{ poolinfo.pools[0].target.path }}/{{ virsh_vm_name }}.{{ disk_format }}"
+    cidata_iso: "/tmp/{{ virsh_vm_name }}-cidata.iso"
+
+- name: 'Virsh | Create qcow2 disk if it does not exist'
+  ansible.builtin.command:
+    cmd: qemu-img create -f {{ disk_format }} "{{ disk_path }}" "{{ virsh_vm_disk_capacity }}"
+    creates: "{{ disk_path }}"
+
+- name: 'Virsh | Render cloud-init seed files'
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "/tmp/{{ virsh_vm_name }}-{{ item | basename | regex_replace('.j2$', '') }}"
+    mode: "0644"
+  loop: "{{ virsh_vm_cloud_init_tpl }}"
+
+- name: 'Virsh | Build seed ISO'
+  ansible.builtin.command:
+    cmd: >-
+      genisoimage -output {{ cidata_iso }}
+                  -volid cidata
+                  -joliet -rock
+                  /tmp/{{ virsh_vm_name }}-user-data
+                  /tmp/{{ virsh_vm_name }}-meta-data
+                  /tmp/{{ virsh_vm_name }}-network-config
+    creates: "{{ cidata_iso }}"
+
+- name: 'Virsh | Render libvirt domain XML'
+  ansible.builtin.template:
+    src: domain.xml.j2
+    dest: "/tmp/{{ virsh_vm_name }}.xml"
+    mode: "0644"
+
+- name: 'Virsh | Define and start the VM'
+  community.libvirt.virt:
+    command: define
+    xml: "{{ lookup('ansible.builtin.file', '/tmp/' ~ virsh_vm_name ~ '.xml') }}"
+
+- name: 'Virsh | Start the VM'
+  community.libvirt.virt:
+    name: "{{ virsh_vm_name }}"
+    state: running
+
+- name: 'Virsh | Wait for SSH to answer'
+  ansible.builtin.wait_for:
+    host: "{{ virsh_vm_ip | default('192.168.50.122') }}"
+    port: 22
+    timeout: 300
+
+- name: Include guest provisioning tasks
+  ansible.builtin.include_tasks: delegate.yml

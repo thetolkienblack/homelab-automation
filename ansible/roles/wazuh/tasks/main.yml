@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for wazuh
+- name: 'Wazuh | Include AIO tasks'
+  ansible.builtin.include_tasks: 'aio.yml'
+  when: wazuh_install_aio
+
+- name: 'Wazuh | Include Agent tasks'
+  ansible.builtin.include_tasks: 'agent/{{ ansible_os_family | lower }}.yml'
+  when: wazuh_install_agent
+
+- name: 'Wazuh | Enable wazuh-agent'
+  ansible.builtin.systemd:
+    name: wazuh-agent
+    enabled: true
+    state: started
+  when: wazuh_install_agent

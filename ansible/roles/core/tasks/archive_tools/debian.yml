@@ -1,4 +1,4 @@
-- name: Install archive tools
+- name: 'Core | Debian | Archive | Install archive tools'
   ansible.builtin.apt:
     name:
       - atool

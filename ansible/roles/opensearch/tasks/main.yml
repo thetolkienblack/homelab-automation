@@ -2,30 +2,24 @@
 ---
 # tasks file for ansible_role_template
 # OpenSearch
-- name: Check if OpenSearch binary exists
+- name: 'OpenSearch | Check if OpenSearch binary exists'
   ansible.builtin.stat:
     path: /usr/share/opensearch/bin/opensearch
   register: opensearch_binary
   changed_when: false
 
-- name: Include Debian-specific tasks for OpenSearch
+- name: 'OpenSearch | Include tasks for OpenSearch'
   ansible.builtin.include_tasks: opensearch/main.yml
   when: not opensearch_binary.stat.exists
 
 # OpenSearch Dashboards
-- name: Check if OpenSearch Dashboards executable exists
+- name: 'OpenSearch | Dashboard | Check if OpenSearch Dashboards executable exists'
   ansible.builtin.stat:
     path: /usr/share/opensearch-dashboards/bin/opensearch-dashboards
   register: opensearch_dashboards_executable
 
-- name: Include Debian-specific tasks for OpenSearch
+- name: 'OpenSearch | Dashboard | Include tasks for OpenSearch'
   ansible.builtin.include_tasks: opensearch_dashboards/main.yml
   when:
     - opensearch_binary.stat.exists
     - not opensearch_dashboards_executable.stat.exists
-
-
-
-
-
-

@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_init
-- name: Include Debian-specific tasks
+- name: 'Core | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
-  when: ansible_os_family == debian_family_name

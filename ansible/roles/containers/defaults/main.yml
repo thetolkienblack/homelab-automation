@@ -1,7 +1,12 @@
 # SPDX-License-Identifier: MIT-0
 ---
-install_podman: true
-install_docker: true
-docker_registry: docker.io
-docker_username: ''
-docker_password: ''
+containers_install_podman: true
+containers_install_docker: true
+containers_docker_ports:
+  - port: 2375
+    proto: tcp
+    comment: Docker API (unencrypted)
+  - port: 2376
+    proto: tcp
+    comment: Docker API (encrypted)-
+containers_podman_profile_name: default

@@ -1,0 +1,9 @@
+---
+- name: 'Containers | Allow Docker ports in UFW'
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ containers_docker_ports }}"
+  become: true
+  notify: Reload UFW

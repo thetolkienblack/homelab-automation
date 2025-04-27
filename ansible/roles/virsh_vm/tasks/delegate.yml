@@ -1,0 +1,110 @@
+---
+- name: "Virsh | Delegate | Define target host for delegation"
+  ansible.builtin.set_fact:
+    target_host: "{{ virsh_vm_ip | default('192.168.50.122') }}"
+
+- name: "Virsh | Delegate | Remove stale SSH host key for the VM"
+  ansible.builtin.known_hosts:
+    name: "{{ target_host }}"
+    state: absent
+
+- name: "Virsh | Delegate | Ensure hostname is set correctly"
+  ansible.builtin.hostname:
+    name: "{{ virsh_vm_hostname }}"
+  delegate_to: "{{ target_host }}"
+  become: true
+
+- name: "Virsh | Delegate | Make sure mount point exists"
+  ansible.builtin.file:
+    path: "{{ virsh_vm_fstab_dst }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  delegate_to: "{{ target_host }}"
+  become: true
+
+- name: "Virsh | Delegate | Ensure fstab entry is present"
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: "{{ virsh_vm_fstab_root }} {{ virsh_vm_fstab_dst }} {{ virsh_vm_fstab_type }} defaults 0 0"
+    regexp: "^{{ virsh_vm_fstab_root | regex_escape }}\\s+{{ virsh_vm_fstab_dst | regex_escape }}\\s+"
+    state: present
+    mode: "0644"
+    create: true
+  delegate_to: "{{ target_host }}"
+  become: true
+
+- name: "Virsh | Delegate | Mount storage"
+  ansible.posix.mount:
+    src: "{{ virsh_vm_fstab_root }}"
+    path: "{{ virsh_vm_fstab_dst }}"
+    fstype: "{{ virsh_vm_fstab_type }}"
+    state: mounted
+  delegate_to: "{{ target_host }}"
+  become: true
+
+- name: "Virsh | Delegate | Set the ssh user fact"
+  ansible.builtin.set_fact:
+    ssh_user: "{{ virsh_vm_ssh_user }}"
+  changed_when: false
+  failed_when: false
+
+- name: "Virsh | Delegate | Ensure .ssh directory exists"
+  ansible.builtin.file:
+    path: "/home/{{ ssh_user }}/.ssh"
+    state: directory
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"
+    mode: "0700"
+  delegate_to: "{{ target_host }}"
+  become: true
+
+- name: "Virsh | Delegate | Install authorized SSH key"
+  ansible.builtin.copy:
+    dest: "/home/{{ ssh_user }}/.ssh/authorized_keys"
+    content: "{{ lookup('ansible.builtin.file', ssh_key_source) }}"
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"
+    mode: "0600"
+  delegate_to: "{{ target_host }}"
+  become: true
+
+- name: "Virsh | Delegate | Ensure Alpine repositories are present"
+  ansible.builtin.lineinfile:
+    path: /etc/apk/repositories
+    line: "{{ item }}"
+    state: present
+    create: true
+    mode: "0644"
+  loop: "{{ virsh_vm_alpine_repositories }}"
+  delegate_to: "{{ target_host }}"
+  become: true
+
+- name: "Virsh | Delegate | Update and upgrade Alpine packages"
+  ansible.builtin.command: apk update && apk upgrade
+  delegate_to: "{{ target_host }}"
+  become: true
+  changed_when: false
+
+- name: "Virsh | Delegate | Install required packages"
+  ansible.builtin.package:
+    name:
+      - openssh
+      - ansible
+    state: present
+    update_cache: true
+  delegate_to: "{{ target_host }}"
+  become: true
+
+- name: "Virsh | Delegate | Start sshd service"
+  ansible.builtin.command: rc-service sshd start
+  delegate_to: "{{ target_host }}"
+  become: true
+  changed_when: false
+
+- name: "Virsh | Delegate | Add sshd to default runlevel"
+  ansible.builtin.command: rc-update add sshd
+  delegate_to: "{{ target_host }}"
+  become: true
+  changed_when: false

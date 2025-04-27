@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT-0
 ---
-- name: Test ansible_role_template role
+- name: Test gde_remove role
   hosts: localhost
   remote_user: root
   roles:
-    - ansible_role_template
+    - gde_remove

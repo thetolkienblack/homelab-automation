@@ -1,0 +1,4 @@
+---
+- name: WAF Installation Placeholder
+  ansible.builtin.debug:
+    msg: 'WAF setup inside container should be done via reverse proxy or dedicated sidecar.'

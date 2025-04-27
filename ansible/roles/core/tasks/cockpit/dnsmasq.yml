@@ -1,11 +1,11 @@
 ---
-- name: Check if dnsmasq is configured with the correct port
+- name: 'Core | Cockpit | DNSMASQ | Check if dnsmasq is configured with the correct port'
   ansible.builtin.command: grep -q '^port={{ dnsmasq_port }}' /etc/dnsmasq.conf
   register: dnsmasq_port_output
   changed_when: false
   failed_when: false
 
-- name: Configure dnsmasq to run on port 3265
+- name: 'Core | Cockpit | DNSMASQ | Configure dnsmasq to run on port 3265'
   ansible.builtin.lineinfile:
     path: /etc/dnsmasq.conf
     regexp: "^port="
@@ -18,7 +18,7 @@
   become: true
   when: dnsmasq_port_output.rc != 0
 
-- name: Ensure dnsmasq service is running
+- name: 'Core | Cockpit | DNSMASQ | Ensure dnsmasq service is running'
   ansible.builtin.service:
     name: dnsmasq
     state: started

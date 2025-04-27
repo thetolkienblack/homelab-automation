@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT-0
+galaxy_info:
+  author: thetolkienblack
+  description: The role to install and setup trivy
+  company: Graylock
+  license: MIT
+  min_ansible_version: "2.9"
+  galaxy_tags: []
+dependencies:
+  - common
+  - containers

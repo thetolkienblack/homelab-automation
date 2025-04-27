@@ -1,0 +1,48 @@
+# roles/qemu/tasks/debian.yml
+---
+- name: 'Trivy | Debian | Add Trivy APT repository GPG key'
+  ansible.builtin.apt_key:
+    url: "{{ trivy_repo_key_url }}"
+    state: present
+
+- name: 'Trivy | Debian | Add Trivy APT repository'
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/trivy.gpg] {{ trivy_repo_url }} {{ trivy_repo_distribution }} main"
+    filename: 'trivy'
+    state: present
+
+- name: 'Trivy | Debian | Install Trivy'
+  ansible.builtin.apt:
+    name: "{{ trivy_packages }}"
+    state: present
+    update_cache: true
+
+- name: 'Trivy | Debian | Ensure /etc/trivy exists'
+  ansible.builtin.file:
+    path: /etc/trivy
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: 'Trivy | Debian | Create Trivy filesystem scan cron job'
+  ansible.builtin.cron:
+    name: 'trivy filesystem scan'
+    user: "{{ ansible_user_id }}"
+    minute: "{{ trivy_filesystem_scan_cron_schedule.split()[0] }}"
+    hour: "{{ trivy_filesystem_scan_cron_schedule.split()[1] }}"
+    day: "{{ trivy_filesystem_scan_cron_schedule.split()[2] }}"
+    month: "{{ trivy_filesystem_scan_cron_schedule.split()[3] }}"
+    weekday: "{{ trivy_filesystem_scan_cron_schedule.split()[4] }}"
+    job: "for dir in {{ trivy_scan_directories | join(' ') }}; do trivy fs \"$dir\" --exit-code 1 || true; done"
+
+- name: 'Trivy | Debian | Create Trivy Docker image scan cron job'
+  ansible.builtin.cron:
+    name: 'trivy docker image scan'
+    user: "{{ ansible_user_id }}"
+    minute: "{{ trivy_docker_scan_cron_schedule.split()[0] }}"
+    hour: "{{ trivy_docker_scan_cron_schedule.split()[1] }}"
+    day: "{{ trivy_docker_scan_cron_schedule.split()[2] }}"
+    month: "{{ trivy_docker_scan_cron_schedule.split()[3] }}"
+    weekday: "{{ trivy_docker_scan_cron_schedule.split()[4] }}"
+    job: \"docker images --format '{{ '{{' }}.Repository{{ '}}' }}:{{ '{{' }}.Tag{{ '}}' }}' | xargs -n1 trivy image --exit-code 1 || true\"

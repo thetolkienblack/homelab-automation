@@ -1,24 +1,24 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for virt_tools
-- name: Include Libvirt tasks
+- name: 'Virtualization | Libvirt | Include Libvirt tasks'
   ansible.builtin.include_vars: "{{ role_path }}/vars/libvirt.yml"
 
-- name: Include Debian-specific tasks
+- name: 'Virtualization | Libvirt | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
 
-- name: Check if libvirt is installed
+- name: 'Virtualization | Libvirt | Check if libvirt is installed'
   ansible.builtin.command: dpkg -l | grep libvirt-daemon-system
   register: libvirt_installed
   changed_when: false
 
-- name: Check if virsh is installed
+- name: 'Virtualization | Libvirt | Check if virsh is installed'
   ansible.builtin.command: which virsh
   register: virsh_installed
   changed_when: false
   when: libvirt_installed.rc == 0
 
-- name: Configure UFW rules for libvirt and QEMU
+- name: 'Virtualization | Libvirt | Configure UFW rules for libvirt and QEMU'
   community.general.ufw:
     rule: allow
     port: "{{ item.port }}"
@@ -30,14 +30,10 @@
     - virsh_installed.rc == 0
   notify: Reload UFW
 
-- name: Include Libvirt setup tasks
-  ansible.builtin.include_tasks: "libvirt_vm_setup.yml"
-  when: libvirt_installed.rc == 0
-
-- name: Include Libvirt network tasks
+- name: 'Virtualization | Libvirt | Include Libvirt network tasks'
   ansible.builtin.include_tasks: "libvirt_network_setup.yml"
   when: libvirt_installed.rc == 0
 
-- name: Include Libvirt Vagrant Storage tasks
+- name: 'Virtualization | Libvirt | Include Libvirt Vagrant Storage tasks'
   ansible.builtin.include_tasks: "libvirt_vagrant_storage_pool.yml"
   when: libvirt_installed.rc == 0

@@ -1,0 +1,8 @@
+version: 2
+ethernets:
+    eth0:
+        dhcp4: false
+        addresses: [{{ virsh_vm_ipv4_address }}]
+        gateway4: {{ virsh_vm_gw }}
+        nameservers:
+            addresses: [{{ virsh_vm_dns | join(',') }}]

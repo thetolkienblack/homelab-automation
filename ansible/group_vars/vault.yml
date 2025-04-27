@@ -1,0 +1,34 @@
+ansible_user: sidney
+ansible_password: "sinX=cosY*cotagX/2"
+ansible_become_password: "{{ ansible_password }}"
+
+# Smtp
+smtp_server: default
+smtp_from: default
+smtp_to: default
+smtp_password: default
+
+# Git
+git_access_token: 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
+
+# Wazuh
+wazuh_reg_password: "T5y0S!!69Zuo9o7QNAxTpi"
+
+# Docker
+docker_username: 'sidneyelagib'
+docker_password: 'dckr_pat_SY3Q27R2z28HLZUCSY-R9ZBILcI'
+
+# Graylog
+graylog_password_secret: "zVwu18V2exj5790S*7tu4$"
+graylog_root_password: "GBYQChmpkU01sOkE^N%O00"
+graylog_root_password_sha2: 4006bf28d660281319b525c8fb88836b5b5cb481e5be1878894567d5de1be006
+http_tls_key_password: "HkcYLCIsVyFKUaN7"
+gl_mongo_username: admin
+gl_mongo_password: "PvU*k57N8vML#bo1z02!Yp"
+
+# OpenSearch
+opensearch_admin_password: "La@q54@jLjmIb5%%lpC8tI"
+
+# Libvirt
+vm_username: cloud-libvirt
+vm_password: n0tsh3ll2011

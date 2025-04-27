@@ -1,0 +1,11 @@
+---
+- name: Install collections
+  ansible.builtin.shell: |
+    cscli collections install {{ item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ crowdsec_collections }}"
+  loop_control:
+    label: "{{ item }}"
+  register: collection_results
+  changed_when: "'already installed' not in collection_results.stdout"

@@ -1,16 +1,15 @@
 ---
-- name: Include security vars
+- name: 'Core | Security | Include security vars'
   ansible.builtin.include_vars: "{{ role_path }}/vars/security/main.yml"
 
-- name: Include all Debian security tasks
+- name: 'Core | Security | Include all OS security tasks'
   ansible.builtin.include_tasks: "{{ item }}"
   with_fileglob:
-    - security/debian/*.yml
+    - "security/{{ ansible_os_family | lower }}/*.yml"
   register: security_debian_tasks
-  when: ansible_os_family == debian_family_name
 
-- name: Include UFW Security tasks
+- name: 'Core | Security | Include UFW Security tasks'
   ansible.builtin.include_tasks: "ufw.yml"
 
-- name: Include Fail2ban Security tasks
+- name: 'Core | Security | Include Fail2ban Security tasks'
   ansible.builtin.include_tasks: "fail2ban.yml"

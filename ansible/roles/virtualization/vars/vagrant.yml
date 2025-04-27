@@ -1,2 +1,2 @@
 ---
-install_vagrant_alpine: true
+virtualization_install_vagrant_alpine: true

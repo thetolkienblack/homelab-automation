@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: Include OS-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+
+- name: Deploy CrowdSec in Docker
+  ansible.builtin.include_tasks: docker.yml
+
+- name: Configure CrowdSec inside container
+  ansible.builtin.include_tasks: configure.yml
+
+- name: Install collections inside container
+  ansible.builtin.include_tasks: collections.yml
+
+- name: Install parsers inside container
+  ansible.builtin.include_tasks: parsers.yml
+
+- name: Install scenarios inside container
+  ansible.builtin.include_tasks: scenarios.yml
+
+- name: Install bouncers inside container
+  ansible.builtin.include_tasks: bouncers.yml
+
+- name: Install WAF inside container
+  when: crowdsec_docker_install_waf
+  ansible.builtin.include_tasks: waf.yml

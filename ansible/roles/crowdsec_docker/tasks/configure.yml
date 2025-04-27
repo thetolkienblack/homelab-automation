@@ -1,0 +1,9 @@
+---
+- name: Install blocklists inside container
+  ansible.builtin.shell: |
+    docker exec {{ crowdsec_docker_container_name }} cscli blocklist add {{ item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ crowdsec_docker_blocklists }}"
+  loop_control:
+    label: "{{ item }}"

@@ -1,12 +1,11 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_template
-- name: Include Debian-specific tasks
+- name: 'Mongodb | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
-  when: ansible_os_family == debian_family_name
 
 # MongoDB
-- name: Create MongoDB keyfile
+- name: 'Mongodb | Create MongoDB keyfile'
   ansible.builtin.copy:
     content: "{{ mongodb_keyfile_content }}"
     dest: "{{ mongodb_keyfile }}"
@@ -16,14 +15,14 @@
   become: true
   notify: Restart MongoDB
 
-- name: Ensure mongodb user exists (if not using a package manager)
+- name: 'Mongodb | Ensure mongodb user exists (if not using a package manager)'
   ansible.builtin.user:
     name: mongodb
     system: true
     shell: /usr/sbin/nologin
   become: true
 
-- name: Configure MongoDB
+- name: 'Mongodb | Configure MongoDB'
   ansible.builtin.template:
     src: mongod.conf.j2
     dest: /etc/mongod.conf
@@ -34,14 +33,14 @@
   notify: Restart MongoDB
 
 
-- name: Ensure MongoDB is started and enabled
+- name: 'Mongodb | Ensure MongoDB is started and enabled'
   ansible.builtin.systemd:
     name: mongod
     enabled: true
     state: started
   become: true
 
-- name: Enable apparmor for MongoDB from template
+- name: 'Mongodb | Enable apparmor for MongoDB from template'
   ansible.builtin.template:
     src: mongodb.apparmor.j2
     dest: /etc/apparmor.d/usr.sbin.mongod
@@ -50,15 +49,15 @@
     mode: '0644'
   become: true
 
-- name: Parse and load the MongoDB AppArmor profile in complain mode
+- name: 'Mongodb | Parse and load the MongoDB AppArmor profile in complain mode'
   ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/usr.sbin.mongod
   changed_when: false
 
-- name: Switch to enforce mode once tested for MongoDB
+- name: 'Mongodb | Switch to enforce mode once tested for MongoDB'
   ansible.builtin.command: aa-enforce /usr/bin/mongod
   changed_when: false
 
-- name: Allow MongoDB access from trusted host
+- name: 'Mongodb | Allow MongoDB access from trusted host'
   community.general.ufw:
     rule: allow
     port: "{{ mongodb_port | default(27017) }}"

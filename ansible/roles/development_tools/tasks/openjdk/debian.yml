@@ -1,5 +1,5 @@
 ---
-- name: Install OpenJDK
+- name: 'Development Tools | OpenJDK | Debian | Install OpenJDK'
   ansible.builtin.apt:
     name:
       - openjdk-{{ openjdk_version }}-jdk
@@ -8,7 +8,7 @@
     update_cache: true
   become: true
 
-- name: Install jenv dependencies
+- name: 'Development Tools | OpenJDK | Debian | Install jenv dependencies'
   ansible.builtin.apt:
     name:
       - git
@@ -17,7 +17,7 @@
     update_cache: true
   become: true
 
-- name: Install jenv dependencies
+- name: 'Development Tools | OpenJDK | Debian | Install jenv dependencies'
   ansible.builtin.apt:
     name:
       - git

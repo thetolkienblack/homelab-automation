@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_template
-- name: Include OpenJDK tasks
+- name: 'Development Tools | Include OpenJDK tasks'
   ansible.builtin.include_tasks: "openjdk/main.yml"
-  when: install_openjdk
+  when: development_tools_install_openjdk
 
-- name: Include NodeJS tasks
+- name: 'Development Tools | Include NodeJS tasks'
   ansible.builtin.include_tasks: "nodejs/main.yml"
-  when: install_nodejs
+  when: development_tools_install_nodejs
 
-- name: Include Python tasks
+- name: 'Development Tools | Include Python tasks'
   ansible.builtin.include_tasks: "python/main.yml"
-  when: install_python
+  when: development_tools_install_python

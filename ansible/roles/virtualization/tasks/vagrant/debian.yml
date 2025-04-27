@@ -1,6 +1,6 @@
 # roles/qemu/tasks/debian.yml
 ---
-- name: Install Vagrant
+- name: 'Virtualization | Vagrant | Debian | Install Vagrant'
   ansible.builtin.apt:
     name:
       - vagrant

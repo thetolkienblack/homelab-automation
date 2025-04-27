@@ -1,5 +1,5 @@
 ---
-- name: Install UFW and Fail2ban packages
+- name: 'Core | Security | Debian | Fail2ban | Install UFW and Fail2ban packages'
   ansible.builtin.apt:
     name:
       - ufw

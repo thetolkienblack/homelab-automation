@@ -1,24 +1,24 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_init
-- name: Include Firacode tasks
+- name: 'Core | Starship | Include Firacode tasks'
   ansible.builtin.include_tasks: "firacode.yml"
 
-- name: Check if Starship binary exists
+- name: 'Core | Starship | Check if Starship binary exists'
   ansible.builtin.stat:
     path: /usr/local/bin/starship
   register: starship_binary
   changed_when: false
   failed_when: false
 
-- name: Download Starship installer
+- name: 'Core | Starship | Download Starship installer'
   ansible.builtin.get_url:
     url: https://starship.rs/install.sh
     dest: /tmp/install_starship.sh
     mode: '0755'
   when: not starship_binary.stat.exists
 
-- name: Run Starship installer
+- name: 'Core | Starship | Run Starship installer'
   ansible.builtin.command: /bin/bash /tmp/install_starship.sh -y
   args:
     creates: /usr/local/bin/starship
@@ -26,7 +26,7 @@
   notify: Re-Check if Starship binary exists
   when: not starship_binary.stat.exists
 
-- name: Add Starship exports to shell rc file
+- name: 'Core | Starship | Add Starship exports to shell rc file'
   ansible.builtin.lineinfile:
     path: "/home/{{ ansible_user }}/.{{ ansible_env.SHELL }}rc"
     line: |

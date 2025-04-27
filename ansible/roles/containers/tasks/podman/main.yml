@@ -1,24 +1,23 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for podman_container
-- name: Include Podman vars
+- name: 'Containers | Podman | Include Podman vars'
   ansible.builtin.include_vars: "{{ role_path }}/vars/podman.yml"
 
-- name: Include Debian-specific tasks
+- name: 'Containers | Podman | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
-  when: ansible_os_family == debian_family_name
 
-- name: Check if Podman machine is created
+- name: 'Containers | Podman | Check if Podman machine is created'
   ansible.builtin.command: podman machine list --format json
   register: podman_machine_list
   changed_when: false
   failed_when: false
 
-- name: Set fact if Podman machine is created
+- name: 'Containers | Podman | Set fact if Podman machine is created'
   ansible.builtin.set_fact:
     podman_machine_created: "{{ (podman_machine_list.stdout | from_json) | length > 0 }}"
 
-- name: Create a default Podman machine
+- name: 'Containers | Podman | Create a default Podman machine'
   ansible.builtin.command:
     cmd: podman machine init
   args:
@@ -26,14 +25,14 @@
   become: false
   when: not podman_machine_created
 
-- name: Check Podman machine status
+- name: 'Containers | Podman | Check Podman machine status'
   ansible.builtin.command:
     cmd: podman machine list --format=json
   register: podman_machine_status
   changed_when: false
   become: false
 
-- name: Start the default Podman machine
+- name: 'Containers | Podman | Start the default Podman machine'
   ansible.builtin.command:
     cmd: podman machine start
   when: "'running' not in podman_machine_status.stdout"
@@ -41,7 +40,7 @@
   changed_when: "'running' not in podman_machine_status.stdout"
   become: false
 
-- name: Check if already logged in to Docker registry
+- name: 'Containers | Podman | Check if already logged in to Docker registry'
   ansible.builtin.command:
     cmd: podman login --get-login {{ docker_registry }}
   register: podman_login_status
@@ -49,7 +48,7 @@
   changed_when: false
   become: false
 
-- name: Log in to Docker registry
+- name: 'Containers | Podman | Log in to Docker registry'
   ansible.builtin.command:
     cmd: podman login --username={{ docker_username }} --password={{ docker_password }} {{ docker_registry }}
   when:
@@ -63,15 +62,8 @@
     - docker_password == ''
   become: false
 
-- name: Configure UFW rules for Podman services
-  community.general.ufw:
-    rule: allow
-    port: "{{ item.port }}"
-    proto: "{{ item.proto }}"
-    comment: "{{ item.comment }}"
-  loop: "{{ podman_ufw_rules }}"
-  become: true
+- name: 'Containers | Podman | Apply UFW rules'
+  ansible.builtin.include_tasks: "ufw.yml"
   when:
-    - ufw_installed is defined
-    - ufw_installed
-  notify: Reload UFW
+    - docker_binary.stat.exists and containers_docker_ports | length > 0
+    - ufw_installed is defined and ufw_installed

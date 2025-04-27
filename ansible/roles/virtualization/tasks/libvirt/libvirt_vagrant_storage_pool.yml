@@ -1,39 +1,39 @@
 ---
-- name: Create storage directory
+- name: 'Virtualization | Libvirt | Storage | Create storage directory'
   ansible.builtin.file:
     path: /mnt/storage/vagrant
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
   become: true
 
-- name: Create libvirt storage pool
+- name: 'Virtualization | Libvirt | Storage | Create libvirt storage pool'
   ansible.builtin.command: >
-    virsh pool-define-as --name {{ libvirt_storage_pool_name }} --type dir
+    virsh pool-define-as --name {{ virtualization_libvirt_storage_pool_name }} --type dir
     --target {{ libvirt_storage_pool_path }}
   register: pool_define
   changed_when: "'Pool already exists' not in pool_define.stdout"
   failed_when: "'Pool already exists' not in pool_define.stdout"
-  when: libvirt_storage_pool_name is defined and libvirt_storage_pool_path is defined
+  when: virtualization_libvirt_storage_pool_name is defined and libvirt_storage_pool_path is defined
 
-- name: Build storage pool
-  ansible.builtin.command: virsh pool-build {{ libvirt_storage_pool_name }}
+- name: 'Virtualization | Libvirt | Storage | Build storage pool'
+  ansible.builtin.command: virsh pool-build {{ virtualization_libvirt_storage_pool_name }}
   register: pool_build
   changed_when: "'Pool already exists' not in pool_build.stdout"
   failed_when: "'Pool already exists' not in pool_build.stdout"
-  when: libvirt_storage_pool_name is defined and libvirt_storage_pool_path is defined
+  when: virtualization_libvirt_storage_pool_name is defined and libvirt_storage_pool_path is defined
 
-- name: Start storage pool
-  ansible.builtin.command: virsh pool-start {{ libvirt_storage_pool_name }}
+- name: 'Virtualization | Libvirt | Storage | Start storage pool'
+  ansible.builtin.command: virsh pool-start {{ virtualization_libvirt_storage_pool_name }}
   register: pool_start
   changed_when: "'Pool already exists' not in pool_start.stdout"
   failed_when: "'Pool already exists' not in pool_start.stdout"
-  when: libvirt_storage_pool_name is defined and libvirt_storage_pool_path is defined
+  when: virtualization_libvirt_storage_pool_name is defined and libvirt_storage_pool_path is defined
 
-- name: Autostart storage pool
-  ansible.builtin.command: virsh pool-autostart {{ libvirt_storage_pool_name }}
+- name: 'Virtualization | Libvirt | Storage | Autostart storage pool'
+  ansible.builtin.command: virsh pool-autostart {{ virtualization_libvirt_storage_pool_name }}
   register: pool_autostart
   changed_when: "'Pool already exists' not in pool_autostart.stdout"
   failed_when: "'Pool already exists' not in pool_autostart.stdout"
-  when: libvirt_storage_pool_name is defined and libvirt_storage_pool_path is defined
+  when: virtualization_libvirt_storage_pool_name is defined and libvirt_storage_pool_path is defined

@@ -1,12 +1,11 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_template
-- name: Include Debian-specific tasks
+- name: 'Graylog | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
-  when: ansible_os_family == debian_family_name
 
 # Graylog Server
-- name: Ensure certificate directory exists
+- name: 'Graylog | Ensure certificate directory exists'
   ansible.builtin.file:
     path: /etc/graylog/server
     state: directory
@@ -15,7 +14,7 @@
     group: graylog
   become: true
 
-- name: Generate private key for Graylog
+- name: 'Graylog | Generate private key for Graylog'
   community.crypto.openssl_privatekey:
     path: /etc/graylog/server/graylog-key.pem
     size: 4096
@@ -24,7 +23,7 @@
     group: graylog
   become: true
 
-- name: Generate self-signed certificate for Graylog
+- name: 'Graylog | Generate self-signed certificate for Graylog'
   community.crypto.x509_certificate:
     path: /etc/graylog/server/graylog-cert.pem
     privatekey_path: /etc/graylog/server/graylog-key.pem
@@ -40,14 +39,14 @@
     group: graylog
   become: true
 
-- name: Enable and start Graylog service
+- name: 'Graylog | Enable and start Graylog service'
   ansible.builtin.systemd:
     name: graylog-server
     enabled: true
     state: started
   become: true
 
-- name: Configure Graylog server
+- name: 'Graylog | Configure Graylog server'
   ansible.builtin.template:
     src: server.conf.j2
     dest: /etc/graylog/server/server.conf

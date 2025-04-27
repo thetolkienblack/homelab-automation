@@ -1,19 +1,19 @@
 ---
-- name: Download MongoDB GPG key
+- name: 'Mongodb | Debian | Download MongoDB GPG key'
   ansible.builtin.get_url:
     url: https://pgp.mongodb.com/server-{{ mongodb_repo_version }}.asc
     dest: /tmp/mongodb-server-{{ mongodb_repo_version }}.asc
     mode: '0644'
   become: true
 
-- name: Convert MongoDB GPG key to dearmored format
+- name: 'Mongodb | Debian | Convert MongoDB GPG key to dearmored format'
   ansible.builtin.command: >
     gpg --dearmor -o /usr/share/keyrings/mongodb-server-{{ mongodb_repo_version }}.gpg /tmp/mongodb-server-{{ mongodb_repo_version }}.asc
   args:
     creates: /usr/share/keyrings/mongodb-server-{{ mongodb_repo_version }}.gpg
   become: true
 
-- name: Copy mongo repository template
+- name: 'Mongodb | Debian | Copy mongo repository template'
   ansible.builtin.template:
     src: mongodb.list.j2
     dest: /etc/apt/sources.list.d/mongodb.list
@@ -23,7 +23,7 @@
   become: true
   notify: Update apt cache
 
-- name: Ensure MongoDB is installed
+- name: 'Mongodb | Debian | Ensure MongoDB is installed'
   ansible.builtin.apt:
     name: "mongodb-org"
     state: present

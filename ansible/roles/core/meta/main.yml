@@ -3,7 +3,7 @@ galaxy_info:
   author: thetolkienblack
   description: Common role used to provide shared functionalities to other roles.
   company: Graylock
-  license: BSD-3-Clause
+  license: MIT
 
   min_ansible_version: '2.9'
 

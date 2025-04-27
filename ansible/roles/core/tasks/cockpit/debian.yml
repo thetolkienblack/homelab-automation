@@ -1,4 +1,4 @@
-- name: Install Cockpit and related packages
+- name: 'Core | Cockpit | Debian | Install Cockpit and related packages'
   ansible.builtin.apt:
     name:
       - cockpit

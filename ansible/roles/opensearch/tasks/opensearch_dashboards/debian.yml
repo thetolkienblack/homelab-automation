@@ -1,19 +1,19 @@
 ---
-- name: Check if OpenSearch GPG exists
+- name: "OpenSearch | Dashboard | Debian | Check if OpenSearch GPG exists"
   ansible.builtin.stat:
     path: /usr/share/keyrings/opensearch.gpg
   register: opensearch_gpg
   changed_when: false
 
-- name: Download Opensearch GPG key
+- name: "OpenSearch | Dashboard | Debian | Download Opensearch GPG key"
   ansible.builtin.get_url:
     url: https://artifacts.opensearch.org/publickeys/opensearch.pgp
     dest: /tmp/opensearch-key.gpg
-    mode: '0644'
+    mode: "0644"
   become: true
   when: not opensearch_gpg.stat.exists
 
-- name: Import OpenSearch GPG key
+- name: "OpenSearch | Dashboard | Debian | Import OpenSearch GPG key"
   ansible.builtin.command: >
     gpg --dearmor --batch --yes -o /usr/share/keyrings/opensearch.gpg /tmp/opensearch-key.gpg
   args:
@@ -21,42 +21,42 @@
   become: true
   when: not opensearch_gpg.stat.exists
 
-- name: Set permissions for OpenSearch GPG keyring
+- name: "OpenSearch | Dashboard | Debian | Set permissions for OpenSearch GPG keyring"
   ansible.builtin.file:
     path: /usr/share/keyrings/opensearch.gpg
-    mode: '0644'
+    mode: "0644"
   become: true
   when: not opensearch_gpg.stat.exists
 
-- name: Check if OpenSearch repo exists
+- name: "OpenSearch | Dashboard | Debian | Check if OpenSearch repo exists"
   ansible.builtin.stat:
     path: /etc/apt/sources.list.d/opensearch.list
   register: opensearch_repo
   changed_when: false
 
-- name: Copy opensearch repository template
+- name: "OpenSearch | Dashboard | Debian | Copy opensearch repository template"
   ansible.builtin.template:
     src: opensearch.list.j2
     dest: /etc/apt/sources.list.d/opensearch.list
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   become: true
   notify: Update apt cache
   when: opensearch_repo.stat.exists
 
-- name: Copy opensearch repository template
+- name: "OpenSearch | Dashboard | Debian | Copy opensearch repository template"
   ansible.builtin.template:
     src: opensearch-dashboards.list.j2
     dest: /etc/apt/sources.list.d/opensearch-dashboards.list
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   become: true
   notify: Update apt cache
   when: opensearch_repo.stat.exists
 
-- name: Ensure OpenSearch and OpenSearch Dashboard is installed
+- name: "OpenSearch | Dashboard | Debian | Ensure OpenSearch and OpenSearch Dashboard is installed"
   ansible.builtin.apt:
     name:
       - opensearch-dashboards
@@ -69,12 +69,12 @@
     - not opensearch_dashboards_executable.stat.exists
     - opensearch_binary.stat.exists
 
-- name: Check if OpenSearch Dashboards executable exists
+- name: "OpenSearch | Dashboard | Debian | Check if OpenSearch Dashboards executable exists"
   ansible.builtin.stat:
     path: /usr/share/opensearch-dashboards/bin/opensearch-dashboards
   register: opensearch_dashboards_executable
 
-- name: Allow OpenSearch Dashboards from anywhere UFW
+- name: "OpenSearch | Dashboard | Debian | Allow OpenSearch Dashboards from anywhere UFW"
   community.general.ufw:
     rule: allow
     port: 5601

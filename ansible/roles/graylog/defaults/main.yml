@@ -2,17 +2,13 @@
 ---
 # graylog defaults
 graylog_repo_version: "graylog-6.1-repository_latest"
-graylog_password_secret: "{{ lookup('password', '/dev/null length=96 chars=ascii_letters,digits') }}"
-graylog_root_password_sha2: "{{ lookup('pipe', 'echo -n ' ~ graylog_root_password | shasum -a 256 | awk '{print $1}') }}"
 graylog_port: 12201
 graylog_datanode_http_port: 12202
-is_master_node: true
-master_node_server: "192.168.50.1:12201"
-http_external_uri: "https://graylog.graylock.eu"
-http_tls_key_password: "{{ lookup('password', '/dev/null length=96 chars=ascii_letters,digits') }}"
-trusted_proxies: ""
-mongodb_uri: "mongodb://{{ gl_mongo_username }}:{{ gl_mongo_password }}@{{ ansible_hostname }}:27017/graylog"
-smtp_graylock_password: ""
-transport_email_enabled: true
-prometheus_exporter_enabled: true
-prometheus_exporter_bind_address: "127.0.0.1:9833"
+graylog_is_master_node: true
+graylog_master_node_server: "192.168.50.1:12201"
+graylog_http_external_uri: "https://graylog.graylock.eu"
+graylog_trusted_proxies: ""
+graylog_mongodb_uri: "mongodb://{{ gl_mongo_username }}:{{ gl_mongo_password }}@{{ ansible_hostname }}:27017/graylog"
+graylog_transport_email_enabled: true
+graylog_prometheus_exporter_enabled: true
+graylog_prometheus_exporter_bind_address: "127.0.0.1:9833"

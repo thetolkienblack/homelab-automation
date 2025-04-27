@@ -1,5 +1,5 @@
 ---
-- name: Install firacode
+- name: 'Core | Starship | Debian | Install firacode'
   ansible.builtin.apt:
     name: fonts-firacode
     state: present

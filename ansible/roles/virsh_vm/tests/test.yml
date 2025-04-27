@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT-0
+---
+- name: Testing virsh_vm
+  hosts: localhost
+  remote_user: root
+  roles:
+    - virsh_vm

@@ -1,6 +1,6 @@
 ---
-lxd_api_port: 8443
-lxd_subnet: 10.0.0.0/24
-lxd_network_ports:
-  - { port: "{{ lxd_api_port }}", proto: 'tcp', comment: 'LXD REST API' }
-  - { port: '8443-8445', proto: 'tcp', comment: 'LXD cluster communications' }
+virtualization_lxd_api_port: 8443
+virtualization_lxd_subnet: 10.0.0.0/24
+virtualization_lxd_network_ports:
+  - { port: "{{ virtualization_lxd_api_port }}", proto: "tcp", comment: "LXD REST API" }
+  - { port: "8443-8445", proto: "tcp", comment: "LXD cluster communications" }

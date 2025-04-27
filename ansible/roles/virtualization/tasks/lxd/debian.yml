@@ -1,6 +1,6 @@
 # roles/lxd/tasks/debian.yml
 ---
-- name: Install LXD
+- name: 'Virtualization | LXD | Debian | Install LXD'
   ansible.builtin.apt:
     name:
       - lxd

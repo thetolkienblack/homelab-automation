@@ -53,3 +53,10 @@ opensearch_dashboards_plugins:
   - queryWorkbenchDashboards
   - reportsDashboards
   - securityDashboards
+opensearch_ufw_ports:
+  - 9000
+  - 9200
+  - 9300
+  - 9600
+  - 443
+  - 80

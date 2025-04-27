@@ -1,0 +1,100 @@
+---
+- name: 'Wazuh | AIO | Install AIO'
+  become: true
+  block:
+    - name: 'Wazuh | AIO | Install AIO | Download installer'
+      ansible.builtin.get_url:
+        url: "{{ wazuh_installer_url }}"
+        dest: /tmp/wazuh-install.sh
+        mode: '0755'
+
+    - name: 'Wazuh | AIO | Install AIO | Run installer'
+      ansible.builtin.command:
+        cmd: /bin/bash /tmp/wazuh-install.sh -a
+        creates: /etc/ossec-init.conf
+      register: wazuh_install
+
+    - name: 'Wazuh | AIO | Install AIO | Extract dashboard admin password'
+      ansible.builtin.set_fact:
+        wazuh_admin_username: "{{ wazuh_install.stdout
+                                             | regex_search('Username:\\s+(\\S+)', '\\1') }}"
+      when: wazuh_install is not skipped
+
+    - name: 'Wazuh | AIO | Install AIO | Extract dashboard admin password'
+      ansible.builtin.set_fact:
+        wazuh_admin_password: "{{ wazuh_install.stdout
+                                             | regex_search('Password:\\s+(\\S+)', '\\1') }}"
+      when: wazuh_install is not skipped
+
+    - name: 'Wazuh | AIO | Install AIO | Copy root CA from indexer to dashboard'
+      ansible.builtin.copy:
+        src: /etc/wazuh-indexer/certs/root-ca.pem
+        dest: /etc/wazuh-dashboard/certs/root-ca.pem
+        owner: wazuh-dashboard
+        group: wazuh-dashboard
+        mode: "0644"
+        remote_src: true
+
+    - name: 'Wazuh | AIO | Install AIO | Server | Create wazuh group'
+      block:
+        - name: 'Wazuh | AIO | Install AIO | Server | Create group folder'
+          ansible.builtin.file:
+            owner: root
+            group: wazuh
+            state: directory
+            mode: '0750'
+            path: "/var/ossec/etc/shared/{{ wazuh_agent_group }}"
+
+        - name: 'Wazuh | AIO | Install AIO | Server | Create group folder'
+          ansible.builtin.file:
+            owner: root
+            group: wazuh
+            state: touch
+            mode: '0644'
+            path: "/var/ossec/etc/shared/{{ wazuh_agent_group }}/agent.conf"
+
+- name: 'Wazuh | AIO | Configure opensearch auth and TLS in opensearch_dashboards.yml'
+  become: true
+  block:
+    - name: 'Wazuh | AIO | Opensearch | Set opensearch.username'
+      ansible.builtin.lineinfile:
+        path: /etc/wazuh-dashboard/opensearch_dashboards.yml
+        regexp: '^opensearch\.username:'
+        line: "opensearch.username: \"{{ wazuh_admin_username }}\""
+        create: true
+        mode: '0644'
+        owner: root
+        group: wazuh
+
+    - name: 'Wazuh | AIO | Opensearch | Set opensearch.password'
+      ansible.builtin.lineinfile:
+        path: /etc/wazuh-dashboard/opensearch_dashboards.yml
+        regexp: '^opensearch\.password:'
+        line: "opensearch.password: \"{{ wazuh_admin_password }}\""
+        create: true
+        mode: '0644'
+        owner: root
+        group: wazuh
+
+    - name: 'Wazuh | AIO | Opensearch | Set certificateAuthorities'
+      ansible.builtin.lineinfile:
+        path: /etc/wazuh-dashboard/opensearch_dashboards.yml
+        regexp: '^opensearch\.ssl\.certificateAuthorities:'
+        line: "opensearch.ssl.certificateAuthorities: [/etc/wazuh-dashboard/certs/root-ca.pem]"
+        mode: '0644'
+        owner: root
+        group: wazuh
+
+      notify:
+        - 'Restart wazuh-dashboard'
+        - 'Enable wazuh-server password enrollment'
+
+- name: 'Wazuh | AIO | Enable and start core Wazuh services'
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop: "{{ wazuh_services }}"
+  environment:
+    WAZUH_AGENT_GROUP: "{{ wazuh_agent_group }}"
+  become: true

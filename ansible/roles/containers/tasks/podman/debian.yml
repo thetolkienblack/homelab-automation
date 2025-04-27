@@ -1,27 +1,17 @@
-- name: Ensure required packages are installed
-  ansible.builtin.apt:
-    name:
-      - software-properties-common
-      - curl
-      - gnupg
-    state: present
-    update_cache: true
-  become: true
-
-- name: Add Podman official repository key
+- name: 'Containers | Podman | Debian | Add Podman official repository key'
   ansible.builtin.apt_key:
     url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_{{ ansible_distribution_version }}/Release.key
     state: present
   become: true
 
-- name: Add Podman repository
+- name: 'Containers | Podman | Debian | Add Podman repository'
   ansible.builtin.apt_repository:
     repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_{{ ansible_distribution_version }}/ /"
     state: present
   notify: Update apt cache
   become: true
 
-- name: Install Podman and Podman Compose
+- name: 'Containers | Podman | Debian | Install Podman and Podman Compose'
   ansible.builtin.apt:
     name:
       - podman
@@ -31,28 +21,28 @@
     state: present
   become: true
 
-- name: Install NVIDIA Container Toolkit
+- name: 'Containers | Podman | Debian | Install NVIDIA Container Toolkit'
   ansible.builtin.apt:
     name: nvidia-container-toolkit
     state: present
   when: nvidia_module_loaded.rc == 0
   become: true
 
-- name: Check if Cockpit is installed
+- name: 'Containers | Podman | Debian | Check if Cockpit is installed'
   ansible.builtin.shell: dpkg -l | grep -q cockpit
   register: cockpit_installed
   ignore_errors: true
   changed_when: false
   become: true
 
-- name: Install Cockpit Podman
+- name: 'Containers | Podman | Debian | Install Cockpit Podman'
   ansible.builtin.apt:
     name: cockpit-podman
     state: present
   when: cockpit_installed.rc == 0
   become: true
 
-- name: Configure AppArmor profiles for Podman
+- name: 'Containers | Podman | Debian | Configure AppArmor profiles for Podman'
   ansible.builtin.template:
     src: podman/podman_apparmor.j2
     dest: /etc/apparmor.d/local/usr.bin.podman

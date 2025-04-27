@@ -1,4 +1,4 @@
-- name: Install Node.js and npm
+- name: 'Development Tools | NodeJS | Debian | Install Node.js and npm'
   ansible.builtin.apt:
     name:
       - nodejs

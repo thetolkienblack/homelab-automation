@@ -1,0 +1,95 @@
+# SPDX-License-Identifier: MIT-0
+---
+crowdsec_docker_container_name: crowdsec
+crowdsec_docker_container_image: crowdsecurity/crowdsec:latest
+crowdsec_docker_install_server: true
+crowdsec_docker_install_agent: false
+crowdsec_docker_install_waf: true
+crowdsec_docker_api_credentials:
+  login: !vault |
+    # vault encrypted login
+  password: !vault |
+    # vault encrypted password
+
+crowdsec_docker_blocklists:
+  - "https://app.crowdsec.net/blocklists/65a56c0b0469607d9badb812"
+  - "https://app.crowdsec.net/blocklists/65a55718ff8363f6556e9d4b"
+  - "https://app.crowdsec.net/blocklists/65a567bdec04bcd4f51670bd"
+
+crowdsec_docker_collections:
+  - "crowdsecurity/linux-lpe"
+  - "crowdsecurity/modsecurity"
+  - "crowdsecurity/nginx"
+  - "crowdsecurity/nextcloud"
+  - "bouddha-fr/opensearch-dashboard"
+  - "crowdsecurity/plex"
+  - "crowdsecurity/sshd"
+  - "crowdsecurity/stirling-pdf"
+  - "crowdsecurity/traefik"
+  - "timokoessler/uptime-kuma"
+  - "crowdsecurity/wireguard"
+  - "crowdsecurity/linux"
+  - "gauth-fr/immich"
+  - "crowdsecurity/http-dos"
+  - "crowdsecurity/http-cve"
+  - "crowdsecurity/home-assistant"
+  - "LePresidente/grafana"
+  - "LearningSpot/dockge"
+  - "xs539/bookstack"
+  - "crowdsecurity/base-http-scenarios"
+  - "crowdsecurity/appsec-virtual-patching"
+  - "crowdsecurity/appsec-generic-rules"
+  - "LePresidente/adguardhome"
+
+crowdsec_docker_parsers:
+  - "bouddha-fr/opensearch-dashboard-logs"
+  - "crowdsecurity/plex-allowlist"
+  - "crowdsecurity/smb-logs"
+  - "crowdsecurity/sshd-logs"
+  - "crowdsecurity/sshd-success-logs"
+  - "crowdsecurity/stirling-pdf-logs"
+  - "crowdsecurity/syslog-logs"
+  - "crowdsecurity/sysmon-logs"
+  - "crowdsecurity/tcpdump-logs"
+  - "timokoessler/uptime-kuma-logs"
+  - "crowdsecurity/whitelists"
+  - "crowdsecurity/modsecurity"
+  - "crowdsecurity/k8s-audit"
+  - "crowdsecurity/iptables-logs"
+  - "gauth-fr/immich-logs"
+  - "crowdsecurity/http-logs"
+  - "crowdsecurity/home-assistant-logs"
+  - "LearningSpot/dockge-logs"
+  - "crowdsecurity/docker-logs"
+  - "crowdsecurity/appsec-logs"
+  - "LePresidente/adguardhome-logs"
+
+crowdsec_docker_scenarios:
+  - "LePresidente/adguardhome-bf"
+  - "crowdsecurity/appsec-native"
+  - "xs539/bookstack-bf"
+  - "crowdsecurity/crowdsec-appsec-inband"
+  - "crowdsecurity/crowdsec-appsec-outofband"
+  - "LePresidente/grafana-bf"
+  - "crowdsecurity/home-assistant-bf"
+  - "crowdsecurity/http-apiscp-bf"
+  - "crowdsecurity/http-backdoors-attempts"
+  - "crowdsecurity/http-bad-user-agent"
+  - "crowdsecurity/http-dos-bypass-cache"
+  - "crowdsecurity/http-dos-invalid-http-versions"
+  - "crowdsecurity/http-dos-random-uri"
+  - "crowdsecurity/http-generic-bf"
+  - "crowdsecurity/http-path-traversal-probing"
+  - "crowdsecurity/http-sensitive-files"
+  - "crowdsecurity/k8s-audit-anonymous-access"
+  - "crowdsecurity/k8s-audit-api-server-bruteforce"
+  - "crowdsecurity/k8s-audit-pod-exec"
+  - "crowdsecurity/k8s-audit-pod-host-network"
+  - "crowdsecurity/k8s-audit-privileged-pod-creation"
+  - "crowdsecurity/k8s-audit-service-account-access-denied"
+  - "crowdsecurity/modsecurity"
+
+crowdsec_docker_bouncers:
+  - "cs-firewall-bouncer"
+  - "cs-cloudflare-bouncer"
+  - "cs-cloudflare-worker-bouncer"

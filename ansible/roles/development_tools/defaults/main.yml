@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT-0
 ---
-install_openjdk: true
-install_python: true
-install_nodejs: true
+development_tools_install_openjdk: true
+development_tools_install_python: true
+development_tools_install_nodejs: true

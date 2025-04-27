@@ -1,0 +1,11 @@
+---
+- name: Install parsers
+  ansible.builtin.shell: |
+    cscli parsers install {{ item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ crowdsec_parsers }}"
+  loop_control:
+    label: "{{ item }}"
+  register: parser_results
+  changed_when: "'already installed' not in parser_results.stdout"

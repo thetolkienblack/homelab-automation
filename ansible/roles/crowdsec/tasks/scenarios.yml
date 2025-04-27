@@ -1,0 +1,11 @@
+---
+- name: Install scenarios
+  ansible.builtin.shell: |
+    cscli scenarios install {{ item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ crowdsec_scenarios }}"
+  loop_control:
+    label: "{{ item }}"
+  register: scenario_results
+  changed_when: "'already installed' not in scenario_results.stdout"

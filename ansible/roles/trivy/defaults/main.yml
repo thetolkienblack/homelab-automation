@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT-0
+---
+trivy_repo_url: 'https://aquasecurity.github.io/trivy-repo/deb'
+trivy_repo_key_url: 'https://aquasecurity.github.io/trivy-repo/deb/public.key'
+trivy_repo_distribution: 'bookworm'
+trivy_packages:
+  - trivy
+trivy_scan_directories:
+  - '~/Developer/homelab-automation'
+trivy_docker_scan_cron_schedule: '0 * * * *'  # every hour
+trivy_filesystem_scan_cron_schedule: '30 * * * *'  # every hour at 30 minutes

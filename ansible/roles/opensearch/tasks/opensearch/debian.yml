@@ -1,19 +1,19 @@
 ---
-- name: Check if OpenSearch GPG exists
+- name: "OpenSearch | Debian | Check if OpenSearch GPG exists"
   ansible.builtin.stat:
     path: /usr/share/keyrings/opensearch.gpg
   register: opensearch_gpg
   changed_when: false
 
-- name: Download Opensearch GPG key
+- name: "OpenSearch | Debian | Download Opensearch GPG key"
   ansible.builtin.get_url:
     url: https://artifacts.opensearch.org/publickeys/opensearch.pgp
     dest: /tmp/opensearch-key.gpg
-    mode: '0644'
+    mode: "0644"
   become: true
   when: not opensearch_gpg.stat.exists
 
-- name: Import OpenSearch GPG key
+- name: "OpenSearch | Debian | Import OpenSearch GPG key"
   ansible.builtin.command: >
     gpg --dearmor --batch --yes -o /usr/share/keyrings/opensearch.gpg /tmp/opensearch-key.gpg
   args:
@@ -21,42 +21,42 @@
   become: true
   when: not opensearch_gpg.stat.exists
 
-- name: Set permissions for OpenSearch GPG keyring
+- name: "OpenSearch | Debian | Set permissions for OpenSearch GPG keyring"
   ansible.builtin.file:
     path: /usr/share/keyrings/opensearch.gpg
-    mode: '0644'
+    mode: "0644"
   become: true
   when: not opensearch_gpg.stat.exists
 
-- name: Check if OpenSearch repo exists
+- name: "OpenSearch | Debian | Check if OpenSearch repo exists"
   ansible.builtin.stat:
     path: /etc/apt/sources.list.d/opensearch.list
   register: opensearch_repo
   changed_when: false
 
-- name: Copy opensearch repository template
+- name: "OpenSearch | Debian | Copy opensearch repository template"
   ansible.builtin.template:
     src: opensearch.list.j2
     dest: /etc/apt/sources.list.d/opensearch.list
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   become: true
   notify: Update apt cache
   when: opensearch_repo.stat.exists
 
-- name: Copy opensearch repository template
+- name: "OpenSearch | Debian | Copy opensearch repository template"
   ansible.builtin.template:
     src: opensearch-dashboards.list.j2
     dest: /etc/apt/sources.list.d/opensearch-dashboards.list
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   become: true
   notify: Update apt cache
   when: opensearch_repo.stat.exists
 
-- name: Ensure OpenSearch and OpenSearch Dashboard is installed
+- name: "OpenSearch | Debian | Ensure OpenSearch and OpenSearch Dashboard is installed"
   ansible.builtin.apt:
     name:
       - opensearch
@@ -67,46 +67,40 @@
   become: true
   when: not opensearch_binary.stat.exists
 
-- name: Re-check if OpenSearch is now installed
+- name: "OpenSearch | Debian | Re-check if OpenSearch is now installed"
   ansible.builtin.stat:
     path: /usr/share/opensearch/bin/opensearch
   register: opensearch_binary
 
-- name: Check if AppArmor profile for OpenSearch exists
+- name: "OpenSearch | Debian | Check if AppArmor profile for OpenSearch exists"
   ansible.builtin.command: aa-status
   register: aa_status
   changed_when: false
 
-- name: Enable apparmor for OpenSearch from template
+- name: "OpenSearch | Debian | Enable apparmor for OpenSearch from template"
   ansible.builtin.template:
     src: opensearch.apparmor.j2
     dest: /etc/apparmor.d/usr.sbin.opensearch
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   become: true
   when: "'/usr/share/opensearch/bin/opensearch' not in aa_status.stdout"
 
-- name: Parse and load the OpenSearch AppArmor profile in complain mode
+- name: "OpenSearch | Debian | Parse and load the OpenSearch AppArmor profile in complain mode"
   ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/usr.sbin.opensearch
   changed_when: false
   when: "'/usr/share/opensearch/bin/opensearch' not in aa_status.stdout"
 
-- name: Switch to enforce mode once tested for OpenSearch
+- name: "OpenSearch | Debian | Switch to enforce mode once tested for OpenSearch"
   ansible.builtin.command: aa-enforce /usr/bin/opensearch
   changed_when: false
   when: "'/usr/share/opensearch/bin/opensearch' not in aa_status.stdout"
 
-- name: Allow OpenSearch from anywhere UFW
+- name: "OpenSearch | Debian | Allow OpenSearch from anywhere UFW"
   community.general.ufw:
     rule: allow
     port: "{{ item }}"
-    loop:
-      - 9000
-      - 9200
-      - 9300
-      - 9600
-      - 443
-      - 80
     proto: tcp
+  loop: "{{ opensearch_ufw_ports }}"
   become: true

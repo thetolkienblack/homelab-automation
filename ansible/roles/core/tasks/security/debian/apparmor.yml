@@ -1,5 +1,5 @@
 ---
-- name: Install AppArmor packages
+- name: 'Core | Security | Debian | AppArmor | Install AppArmor packages'
   ansible.builtin.apt:
     name:
       - apparmor
@@ -10,25 +10,25 @@
     update_cache: true
   become: true
 
-- name: Check if AppArmor binary exists
+- name: 'Core | Security | Debian | AppArmor | Check if AppArmor binary exists'
   ansible.builtin.stat:
     path: /usr/sbin/aa-status
   register: apparmor_binary
 
-- name: Check if AppArmor is installed
+- name: 'Core | Security | Debian | AppArmor | Check if AppArmor is installed'
   ansible.builtin.stat:
     path: /etc/apparmor.d
   register: apparmor_dir
   become: true
   when: apparmor_binary.stat.exists
 
-- name: Set Apparmor is installed
+- name: 'Core | Security | Debian | AppArmor | Set Apparmor is installed'
   ansible.builtin.set_fact:
     apparmor_installed: apparmor_binary.stat.exists and apparmor_dir.stat.exists and apparmor_dir.stat.isdir
   changed_when: false
   failed_when: false
 
-- name: Ensure AppArmor service is enabled and started
+- name: 'Core | Security | Debian | AppArmor | Ensure AppArmor service is enabled and started'
   ansible.builtin.systemd:
     name: apparmor
     state: started
@@ -38,7 +38,7 @@
   notify: Reload apparmor profiles
   when: apparmor_installed
 
-- name: Update kernel boot parameters for AppArmor
+- name: 'Core | Security | Debian | AppArmor | Update kernel boot parameters for AppArmor'
   ansible.builtin.lineinfile:
     path: /etc/default/grub
     regexp: '^GRUB_CMDLINE_LINUX="((?!apparmor=1|security=apparmor).)*"$'

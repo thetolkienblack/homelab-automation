@@ -1,0 +1,23 @@
+---
+# tasks/docker.yml
+
+- name: Pull CrowdSec Docker image
+  community.docker.docker_image:
+    name: "{{ crowdsec_docker_container_image }}"
+    source: pull
+
+- name: Run CrowdSec container
+  community.docker.docker_container:
+    name: "{{ crowdsec_docker_container_name }}"
+    image: "{{ crowdsec_docker_container_image }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "8080:8080"  # expose local API if needed
+    volumes:
+      - /etc/crowdsec:/etc/crowdsec
+      - /var/lib/crowdsec:/var/lib/crowdsec
+      - /var/log:/var/log
+    env:
+      GID: "{{ default_gid }}"
+      UID: "{{ default_uid }}"

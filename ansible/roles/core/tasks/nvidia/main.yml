@@ -1,22 +1,31 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for nvidia_drivers
-- name: Include nvidia vars
+- name: 'Core | Nvidia | Check for NVIDIA GPU'
+  ansible.builtin.command: lspci
+  register: lspci_output
+  changed_when: false
+
+- name: 'Core | Nvidia | Set fact if NVIDIA GPU is present'
+  ansible.builtin.set_fact:
+    has_nvidia_gpu: true
+  when: "'NVIDIA' in lspci_output.stdout"
+
+- name: 'Core | Nvidia | Include nvidia vars'
   ansible.builtin.include_vars: "{{ role_path }}/vars/nvidia.yml"
 
-- name: Include Debian-specific tasks
+- name: 'Core | Nvidia | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
   when:
     - nvidia_module_loaded.rc != 0
-    - ansible_os_family == debian_family_name
 
-- name: Configure UFW rules for NVIDIA services
+- name: 'Core | Nvidia | UFW | Configure UFW rules for NVIDIA services'
   community.general.ufw:
     rule: allow
     port: "{{ item.port }}"
     proto: "{{ item.proto }}"
     comment: "{{ item.comment }}"
-  with_items: "{{ nvidia_ufw_rules }}"
+  with_items: "{{ core_nvidia_ufw_rules }}"
   become: true
   when:
     - ufw_installed is defined
@@ -24,12 +33,12 @@
     - nvidia_module_loaded.rc != 0
   notify: Reload UFW
 
-- name: Configure AppArmor profiles for NVIDIA tools
+- name: 'Core | Nvidia | AppArmor | Configure AppArmor profiles for NVIDIA tools'
   ansible.builtin.template:
     src: nvidia/nvidia_apparmor.j2
     dest: "/etc/apparmor.d/local/usr.bin.{{ item }}"
     mode: '0644'
-  with_items: "{{ nvidia_apparmor_profiles }}"
+  with_items: "{{ core_nvidia_apparmor_profiles }}"
   become: true
   when:
     - apparmor_installed is defined
@@ -37,14 +46,14 @@
     - nvidia_module_loaded.rc != 0
   notify: Reload AppArmor profiles
 
-- name: Check if /dev/nvidia0 exists
+- name: 'Core | Nvidia | Check if /dev/nvidia0 exists'
   ansible.builtin.stat:
     path: /dev/nvidia0
   register: nvidia_device
   become: true
   when: nvidia_module_loaded.rc != 0
 
-- name: Display warning if NVIDIA device is missing
+- name: 'Core | Nvidia | Display warning if NVIDIA device is missing'
   ansible.builtin.debug:
     msg: >
       NVIDIA device nodes not found. Kernel module may not be loaded or
@@ -54,7 +63,7 @@
     - nvidia_device is defined and not nvidia_device.stat.exists
   become: true
 
-- name: Reboot if NVIDIA device node is missing
+- name: 'Core | Nvidia | Reboot if NVIDIA device node is missing'
   ansible.builtin.reboot:
   when:
     - nvidia_module_loaded.rc != 0

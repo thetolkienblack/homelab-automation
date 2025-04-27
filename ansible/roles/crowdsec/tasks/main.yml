@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: Include OS-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+
+- name: Include install tasks
+  ansible.builtin.include_tasks: install.yml
+
+- name: Include configure tasks
+  ansible.builtin.include_tasks: configure.yml
+
+- name: Install collections
+  ansible.builtin.include_tasks: collections.yml
+
+- name: Install parsers
+  ansible.builtin.include_tasks: parsers.yml
+
+- name: Install scenarios
+  ansible.builtin.include_tasks: scenarios.yml
+
+- name: Install bouncers
+  ansible.builtin.include_tasks: bouncers.yml
+
+- name: Install WAF
+  when: crowdsec_install_waf
+  ansible.builtin.include_tasks: waf.yml

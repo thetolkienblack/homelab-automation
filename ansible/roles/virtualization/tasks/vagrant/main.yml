@@ -1,27 +1,26 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_template
-- name: Include Debian-specific tasks
+- name: 'Virtualization | Vagrant | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
-  when: ansible_os_family == debian_family_name
 
-- name: Check if Vagrant is installed
+- name: 'Virtualization | Vagrant | Check if Vagrant is installed'
   ansible.builtin.stat:
     path: /usr/bin/vagrant
   register: vagrant_binary
   changed_when: false
 
-- name: Set Vagrant installed variable
+- name: 'Virtualization | Vagrant | Set Vagrant installed variable'
   ansible.builtin.set_fact:
     vagrant_installed: "{{ vagrant_binary.stat.exists }}"
 
-- name: Include Vagrant Alpine vars
+- name: 'Virtualization | Vagrant | Include Vagrant Alpine vars'
   ansible.builtin.include_vars: "{{ role_path }}/vars/vagrant_alpine.yml"
   when:
     - vagrant_installed
     - install_vagrant_alpine
 
-- name: Include Vagrant Alpine tasks
+- name: 'Virtualization | Vagrant | Include Vagrant Alpine tasks'
   ansible.builtin.include_tasks: "images/vagrant_alpine.yml"
   when:
     - vagrant_installed

@@ -1,0 +1,35 @@
+#cloud-config
+hostname: {{ virsh_vm_hostname | default(virsh_vm_name) }}
+manage_etc_hosts: true
+timezone: {{ timezone | default('Europe/Amsterdam') }}
+users:
+    - name: {{ vm_username }}
+        gecos: "Automation User"
+        groups: wheel,adm,docker,sudoers,docker,podman
+        shell: /bin/bash
+        sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+        ssh_authorized_keys:
+            - "{{ lookup('file', ssh_key_source) }}"
+        lock_passwd: false
+
+package_update: true
+package_upgrade: true
+packages:
+    - qemu-guest-agent
+    - sudo
+    - openssh-server
+    - python3
+    - ansible
+
+runcmd:
+    - rc-update add sshd default || true
+    - rc-service sshd restart || systemctl restart sshd || true
+    - which qemu-ga && rc-service qemu-guest-agent start || systemctl start qemu-guest-agent || true
+    - which qemu-ga && rc-update add qemu-guest-agent default || true
+    - git clone https://github.com/thetolkienblack/homelab-automation.git
+    - cd homelab-automation/ansible
+    - ansible-playbook -i inventories/{{ virsh_vm_inventory_file }} playbooks/{{ virsh_vm_playbook_file }}
+
+disable_root: true
+ssh_pwauth: false
+chpasswd: { expire: False }

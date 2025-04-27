@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: MIT-0
+---
+# handlers file for wazuh
+- name: 'Wazuh | Handlers | Restart wazuh-dashboard'
+  ansible.builtin.systemd:
+    name: wazuh-dashboard
+    state: restarted
+
+- name: 'Wazuh | Handlers | Restart wazuh-server'
+  ansible.builtin.systemd:
+    name: wazuh-server
+    state: restarted
+
+- name: 'Wazuh | Handlers | Enable wazuh-server password enrollment'
+  block:
+    - name: 'Wazuh | Handlers | Server | Enable password in ossec.conf'
+      ansible.builtin.lineinfile:
+        path: /var/ossec/etc/ossec.conf
+        regexp: '^<use_password>'
+        line: "<use_password>\"{{ wazuh_reg_password }}\"</use_password>"
+        create: true
+        mode: '0644'
+        owner: root
+        group: wazuh
+
+    - name: 'Wazuh | Handlers | Server | Add password in a file'
+      ansible.builtin.copy:
+        dest: /var/ossec/etc/authd.pass
+        content: "{{ wazuh_reg_password }}"
+        mode: "0644"
+        owner: root
+        group: wazuh

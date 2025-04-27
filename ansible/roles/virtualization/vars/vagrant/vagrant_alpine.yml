@@ -1,17 +1,14 @@
 ---
-disk_size: 10GB
-ram_memory: 1024
-cpu_cores: 1
-storage_pool_name: default
-storage_default_prefix: vagrant
-vm_name: alpine
-vm_hostname: alpine
-network_name: public_network
-bridge_interface: br0
-synced_host_folder_dir: /mnt/data
-synced_guest_folder_dir: /mnt/data
-host_ssh_file: ~/.ssh/id_rsa
-nameservers:
-  - 192.168.50.54
-  - 192.168.50.1
-  - 45.90.28.252
+virtualization_disk_size: 10GB
+virtualization_ram_memory: 1024
+virtualization_cpu_cores: 1
+virtualization_storage_pool_name: default
+virtualization_storage_default_prefix: vagrant
+virtualization_vm_name: alpine
+virtualization_vm_hostname: alpine
+virtualization_network_name: public_network
+virtualization_bridge_interface: "{{ host_bridge_name }}"
+virtualization_synced_host_folder_dir: /mnt/data
+virtualization_synced_guest_folder_dir: /mnt/data
+virtualization_host_ssh_file: "{{ ssh_key_source }}"
+virtualization_nameservers: "{{ default_dns }}"

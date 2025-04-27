@@ -1,0 +1,9 @@
+---
+- name: Install scenarios inside container
+  ansible.builtin.shell: |
+    docker exec {{ crowdsec_docker_container_name }} cscli scenarios install {{ item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ crowdsec_docker_scenarios }}"
+  loop_control:
+    label: "{{ item }}"
