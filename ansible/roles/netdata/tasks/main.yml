@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: 'Netdata | Install Netdata using official script with custom options'
+  ansible.builtin.shell: |
+    bash <(curl -Ss https://my-netdata.io/kickstart.sh) \
+      --native-only \
+      --non-interactive \
+      --auto-update \
+      --release-channel '{{ netdata_release_channel }}' \
+      --claim-token '{{ netdata_claim_token }}' \
+      --claim-rooms '{{ netdata_room_id }}' \
+      --claim-url '{{ netdata_claim_url }}'
+  args:
+    creates: /usr/sbin/netdata
+  environment:
+    NETDATA_CLAIM_TOKEN: '{{ netdata_claim_token | default("") }}'
+    NETDATA_CLAIM_ROOMS: '{{ netdata_room_id | default("") }}'
+    NETDATA_CLAIM_URL: '{{ netdata_claim_url | default("https://app.netdata.cloud") }}'
+  when:
+    - netdata_claim_token != ''
+    - netdata_room_id != ''
+    - netdata_claim_url != ''
+
+- name: 'Netdata | Ensure Netdata service is enabled and started'
+  ansible.builtin.service:
+    name: netdata
+    state: started
+    enabled: true

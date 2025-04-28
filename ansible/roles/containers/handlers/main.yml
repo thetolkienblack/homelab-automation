@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # handlers file for ansible_role_template
-- name: 'Containers | Handlers | Include Docker handlers'
+- name: 'Include Docker handlers'
   ansible.builtin.import_tasks: "{{ role_path }}/handlers/docker/main.yml"

@@ -28,6 +28,7 @@
       - build-essential
       - libreadline-dev
       - apt-transport-https
+      - gdebi-core
     state: present
     update_cache: true
   become: true
@@ -50,4 +51,12 @@
     path: /etc/apt/keyrings
     state: directory
     mode: "0755"
+  become: true
+
+- name: Install required Python packages for certificate generation
+  ansible.builtin.apt:
+    name:
+      - python3-cryptography
+      - python3-openssl
+    state: present
   become: true

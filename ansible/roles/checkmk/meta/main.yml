@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT-0
+galaxy_info:
+  author: thetolkienblack
+  description: Role to install checkmk
+  company: Graylock
+  license: MIT
+  min_ansible_version: "2.9"
+  galaxy_tags:
+    - monitoring
+    - checkmk
+dependencies:
+  - common

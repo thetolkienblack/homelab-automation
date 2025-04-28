@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # handlers file for ansible_role_template
-- name: 'Graylog | Handlers | Restart Graylog'
+- name: 'Restart Graylog'
   ansible.builtin.systemd:
     name: graylog-server
     state: restarted

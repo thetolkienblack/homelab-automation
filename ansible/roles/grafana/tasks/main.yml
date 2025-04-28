@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: 'Grafana | Include OS-specific tasks'
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+
+- name: 'Grafana | Generate Grafana certificates'
+  ansible.builtin.include_tasks: certs.yml
+
+- name: 'Grafana | Configure Grafana'
+  ansible.builtin.template:
+    src: grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+    owner: root
+    group: grafana
+    mode: '0640'
+  notify: Restart Grafana
+
+- name: 'Grafana | Ensure Grafana service is enabled and started'
+  ansible.builtin.service:
+    name: grafana-server
+    enabled: true
+    state: started

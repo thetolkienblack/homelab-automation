@@ -1,0 +1,29 @@
+# roles/qemu/tasks/debian.yml
+---
+- name: 'ElasticSearch | Debian | Install Python libraries for crypto operations'
+  ansible.builtin.apt:
+    name:
+      - python3-cryptography
+      - python3-openssl
+    state: present
+  become: true
+
+- name: 'ElasticSearch | Debian | Add Elastic GPG Key'
+  ansible.builtin.apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  become: true
+
+- name: 'ElasticSearch | Debian | Add Elastic APT repository'
+  ansible.builtin.apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/{{ elasticsearch_version }}/apt stable main'
+    state: present
+    filename: "elastic-{{ elasticsearch_version }}"
+  become: true
+
+- name: 'ElasticSearch | Debian | Install Elasticsearch'
+  ansible.builtin.apt:
+    name: elasticsearch
+    state: present
+    update_cache: true
+  become: true

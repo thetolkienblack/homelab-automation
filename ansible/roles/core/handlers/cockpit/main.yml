@@ -1,17 +1,17 @@
 ---
-- name: 'Core | Handlers | Restart dnsmasq'
+- name: 'Restart dnsmasq'
   ansible.builtin.service:
     name: dnsmasq
     state: restarted
   become: true
 
-- name: 'Core | Handlers | Restart cockpit'
+- name: 'Restart cockpit'
   ansible.builtin.service:
     name: cockpit
     state: restarted
   become: true
 
-- name: 'Core | Handlers | Restart redis'
+- name: 'Restart redis'
   ansible.builtin.service:
     name: redis-server
     state: restarted

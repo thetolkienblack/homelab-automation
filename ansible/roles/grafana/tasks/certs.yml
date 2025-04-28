@@ -1,0 +1,40 @@
+---
+- name: 'Grafana | Certs | Ensure certs directory exists'
+  ansible.builtin.file:
+    path: '{{ grafana_certs_path }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: 'Grafana | Certs | Generate CA private key (only if not exists)'
+  community.crypto.openssl_privatekey:
+    path: '{{ grafana_certs_path }}/ca.key'
+  when: not lookup('ansible.builtin.file', grafana_certs_path + '/ca.key', errors='ignore')
+
+- name: 'Grafana | Certs | Generate CA certificate (only if not exists)'
+  community.crypto.x509_certificate:
+    path: '{{ grafana_certs_path }}/ca.crt'
+    privatekey_path: '{{ grafana_certs_path }}/ca.key'
+    provider: selfsigned
+    selfsigned_not_after: '+3650d'
+  when: not lookup('ansible.builtin.file', grafana_certs_path + '/ca.crt', errors='ignore')
+
+- name: 'Grafana | Certs | Generate Grafana private key'
+  community.crypto.openssl_privatekey:
+    path: '{{ grafana_certs_path }}/grafana.key'
+
+- name: 'Grafana | Certs | Generate Grafana CSR'
+  community.crypto.openssl_csr:
+    path: '{{ grafana_certs_path }}/grafana.csr'
+    privatekey_path: '{{ grafana_certs_path }}/grafana.key'
+    common_name: 'grafana'
+
+- name: 'Grafana | Certs | Sign Grafana certificate'
+  community.crypto.x509_certificate:
+    path: '{{ grafana_certs_path }}/grafana.crt'
+    csr_path: '{{ grafana_certs_path }}/grafana.csr'
+    ownca_path: '{{ grafana_certs_path }}/ca.crt'
+    ownca_privatekey_path: '{{ grafana_certs_path }}/ca.key'
+    provider: ownca
+    ownca_not_after: '+3650d'

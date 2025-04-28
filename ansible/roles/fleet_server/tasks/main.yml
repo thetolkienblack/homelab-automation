@@ -1,0 +1,90 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: Wait until Kibana is ready
+  ansible.builtin.uri:
+    url: "{{ fleet_server_kibana_host }}/api/status"
+    method: GET
+    user: elastic
+    password: "{{ elastic_password }}"
+    validate_certs: false
+  register: kibana_status
+  until: kibana_status.status == 200
+  retries: 20
+  delay: 10
+
+- name: Setup Fleet
+  ansible.builtin.uri:
+    url: "{{ fleet_server_kibana_host }}/api/fleet/setup"
+    method: POST
+    user: elastic
+    password: "{{ elastic_password }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true
+    validate_certs: false
+  register: fleet_setup_response
+  until: fleet_setup_response.status == 200
+  retries: 10
+  delay: 5
+
+- name: Create Fleet Server Agent Policy
+  ansible.builtin.uri:
+    url: "{{ fleet_server_kibana_host }}/api/fleet/agent_policies"
+    method: POST
+    user: elastic
+    password: "{{ elastic_password }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true
+    validate_certs: false
+    body:
+      name: "Fleet Server Policy"
+      namespace: "default"
+      is_default_fleet_server: true
+  register: fleet_server_policy_response
+  until: fleet_server_policy_response.status == 200
+  retries: 10
+  delay: 5
+
+- name: Extract Fleet Server Policy ID
+  ansible.builtin.set_fact:
+    fleet_server_policy_id: "{{ fleet_server_policy_response.json.item.id }}"
+
+- name: Create Fleet Server Service Token
+  ansible.builtin.uri:
+    url: "{{ fleet_server_kibana_host }}/api/fleet/service_tokens"
+    method: POST
+    user: elastic
+    password: "{{ elastic_password }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true
+    validate_certs: false
+  register: fleet_service_token_response
+  until: fleet_service_token_response.status == 200
+  retries: 10
+  delay: 5
+
+- name: Extract Fleet Service Token
+  ansible.builtin.set_fact:
+    fleet_service_token: "{{ fleet_service_token_response.json.value }}"
+
+- name: Enroll Elastic Agent into Fleet Server
+  ansible.builtin.command:
+    cmd: >-
+      elastic-agent install
+      --url {{ fleet_server_elasticsearch_host }}
+      --fleet-server-es={{ fleet_server_elasticsearch_host }}
+      --fleet-server-service-token {{ fleet_service_token }}
+      --fleet-server-policy {{ fleet_server_policy_id }}
+      --certificate-authorities {{ fleet_server_certs_path }}/ca.crt
+    creates: /opt/Elastic/Agent
+  register: enroll_result
+  changed_when: "'Successfully installed Elastic Agent' in enroll_result.stdout"
+
+- name: Ensure Elastic Agent service is enabled and started
+  ansible.builtin.service:
+    name: elastic-agent
+    enabled: true
+    state: started

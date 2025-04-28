@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible_role_template
+- name: 'Checkmk | Download Checkmk package'
+  ansible.builtin.get_url:
+    url: '{{ checkmk_download_url }}'
+    dest: '{{ checkmk_package_path }}'
+    mode: '0644'
+
+- name: 'Checkmk | Include OS-specific tasks'
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+
+- name: 'Checkmk | Create Checkmk site'
+  ansible.builtin.command: omd create {{ checkmk_site_name }}
+  args:
+    creates: '/omd/sites/{{ checkmk_site_name }}'
+
+- name: 'Checkmk | Start Checkmk site'
+  ansible.builtin.command: omd start {{ checkmk_site_name }}
+  changed_when: false

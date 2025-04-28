@@ -1,0 +1,9 @@
+[server]
+protocol = https
+http_port = {{ grafana_http_port }}
+cert_file = {{ grafana_certs_path }}/grafana.crt
+cert_key = {{ grafana_certs_path }}/grafana.key
+
+[security]
+admin_user = {{ grafana_admin_user }}
+admin_password = {{ grafana_admin_password }}

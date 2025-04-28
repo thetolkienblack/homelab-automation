@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT-0
+---
+checkmk_version: '2.3.0p30'
+checkmk_release: 'bookworm'
+checkmk_download_url: 'https://download.checkmk.com/checkmk/{{ checkmk_version }}/check-mk-raw-{{ checkmk_version }}_0.{{ checkmk_release }}_amd64.deb'
+checkmk_package_path: '/tmp/checkmk.deb'
+checkmk_site_name: 'monitor'

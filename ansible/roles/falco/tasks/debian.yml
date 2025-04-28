@@ -1,0 +1,21 @@
+# roles/qemu/tasks/debian.yml
+---
+- name: 'Falco | Debian | Add Falco GPG key'
+  ansible.builtin.apt_key:
+    url: "{{ falco_key_url }}"
+    state: present
+  become: yes
+
+- name: 'Falco | Debian | Add Falco APT repository'
+  ansible.builtin.apt_repository:
+    repo: "deb https://dl.bintray.com/falcosecurity/deb {{ falco_release }} main"
+    state: present
+    filename: "falco"
+  become: yes
+  notify: Update apt cache
+
+- name: 'Falco | Debian | Install Falco package'
+  ansible.builtin.apt:
+    name: "{{ falco_package_name }}"
+    state: present
+  become: yes

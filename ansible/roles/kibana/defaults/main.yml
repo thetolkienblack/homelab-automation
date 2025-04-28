@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT-0
+---
+kibana_certs_path: /etc/ssl/kibana
+kibana_host: 0.0.0.0
+kibana_ssl_enabled: true
+kibana_version: '8.x'
+kibana_elasticsearch_host: 'https://localhost:9200'
+kibana_repo_filename: elastic-8.x

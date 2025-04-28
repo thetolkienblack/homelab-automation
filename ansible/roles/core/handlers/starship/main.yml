@@ -1,12 +1,12 @@
 ---
-- name: 'Core | Handlers | Starship | Re-Check if Starship binary exists'
+- name: 'Re-Check if Starship binary exists'
   ansible.builtin.stat:
     path: /usr/local/bin/starship
   register: starship_binary
   changed_when: false
   failed_when: false
 
-- name: 'Core | Handlers | Starship | Re-Check if FiraCode font is installed'
+- name: 'Re-Check if FiraCode font is installed'
   ansible.builtin.shell: fc-list | grep -i 'FiraCode'
   register: firacode_check
   changed_when: false

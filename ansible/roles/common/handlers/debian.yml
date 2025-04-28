@@ -1,10 +1,10 @@
 ---
-- name: 'Common | Handlers | Debian | Update apt cache'
+- name: 'Update apt cache'
   ansible.builtin.apt:
     update_cache: true
   become: true
 
-- name: 'Common | Handlers | Debian | Upgrade apt packages'
+- name: 'Upgrade apt packages'
   ansible.builtin.apt:
     update_cache: true
     upgrade: dist

@@ -1,0 +1,14 @@
+server.host: {{ kibana_host }}
+
+server.ssl.enabled: {{ kibana_ssl_enabled }}
+<% if kibana_ssl_enabled %>
+server.ssl.certificate: '{{ kibana_certs_path }}/kibana.crt'
+server.ssl.key: '{{ kibana_certs_path }}/kibana.key'
+<% endif %>
+
+elasticsearch.hosts: [ '{{ kibana_elasticsearch_host }}' ]
+elasticsearch.ssl.certificateAuthorities: [ '{{ kibana_certs_path }}/ca.crt' ]
+
+xpack.encryptedSavedObjects.encryptionKey: '{{ kibana_encryption_key }}'
+xpack.security.encryptionKey: '{{ kibana_encryption_key }}'
+xpack.reporting.encryptionKey: '{{ kibana_encryption_key }}'

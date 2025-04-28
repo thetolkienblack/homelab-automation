@@ -1,0 +1,5 @@
+# roles/qemu/tasks/debian.yml
+---
+- name: 'Checkmk | Install Checkmk package'
+  ansible.builtin.apt:
+    deb: '{{ checkmk_package_path }}'

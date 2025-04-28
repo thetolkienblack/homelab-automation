@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MIT-0
+---
+elasticsearch_certs_path: '/etc/elasticsearch/certs'
+elasticsearch_cluster_name: 'es-cluster'
+elasticsearch_port: 9200
+elasticsearch_host: 0.0.0.0
+elasticsearch_security_enabled: true
+elasticsearch_security_ssl_enabled: true
+elasticsearch_http_ssl_enabled: true
+elasticsearch_version: '8.x'

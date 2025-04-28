@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT-0
+---
+falco_repo_url: "https://download.falco.org/packages/deb"
+falco_distribution: "$(. /etc/os-release && echo $ID)"
+falco_release: "$(. /etc/os-release && echo $VERSION_CODENAME)"
+falco_key_url: "https://falco.org/repo/falcosecurity-packages.asc"
+falco_package_name: "falco"

@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: MIT-0
+---
+netdata_release_channel: stable
+netdata_claim_url: https://app.netdata.cloud

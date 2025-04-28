@@ -1,0 +1,18 @@
+# roles/qemu/tasks/debian.yml
+---
+- name: Add Elastic GPG Key
+  ansible.builtin.apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Add Elastic APT repository
+  ansible.builtin.apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/{{ fleet_server_es_version }}/apt stable main'
+    state: present
+    filename: "elastic-{{ fleet_server_es_version }}"
+
+- name: Install Elastic Agent
+  ansible.builtin.apt:
+    name: elastic-agent
+    state: present
+    update_cache: true
