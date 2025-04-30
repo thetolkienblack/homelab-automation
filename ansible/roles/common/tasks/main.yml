@@ -15,7 +15,7 @@
     shell: "{{ default_shell | default('/bin/bash') }}"
   register: shell_change
   when: ansible_env.SHELL != (default_shell | default('/bin/bash'))
-  notify: 'Ensure commands use bash shell'
+  notify: Ensure commands use bash shell
 
 - name: 'Common | Set variables based on system environments'
   ansible.builtin.set_fact:

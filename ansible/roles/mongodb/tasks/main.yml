@@ -39,13 +39,13 @@
     state: started
   become: true
 
-- name: 'Mongodb | Initialize MongoDB replica set if needed'
-  ansible.builtin.command: mongosh --quiet --eval 'rs.initiate()'
-  register: rs_init
-  failed_when: rs_init.rc != 0 and "'already initialized'" not in rs_init.stdout
-  changed_when: false
-  when: mongodb_authorization == 'enabled'
-  notify: Restart MongoDB
+#- name: 'Mongodb | Initialize MongoDB replica set if needed'
+#  ansible.builtin.command: mongosh --quiet --eval 'rs.initiate()'
+#  register: rs_init
+#  failed_when: rs_init.rc != 0 and "'already initialized'" not in rs_init.stdout
+#  changed_when: false
+#  when: mongodb_authorization == 'enabled'
+#  notify: Restart MongoDB
 
 - name: 'Mongodb | Allow MongoDB access from trusted host'
   community.general.ufw:
