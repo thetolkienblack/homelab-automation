@@ -8,6 +8,7 @@
       - python3-pip
       - python3-venv
       - htop
+      - strace
     state: present
     update_cache: true
   become: true
@@ -15,7 +16,7 @@
 # AppArmor profiles for diagnostic tools that need it
 - name: 'Core | Diagnostic | Debian | Create AppArmor profile for tcpdump'
   ansible.builtin.template:
-    src: tcpdump-apparmor.j2
+    src: diagnostic_tools/tcpdump-apparmor.j2
     dest: /etc/apparmor.d/usr.sbin.tcpdump
     owner: root
     group: root

@@ -23,3 +23,10 @@
     enabled: true
     state: started
   become: true
+
+- name: Set elastic password with elasticsearch-reset-password (8.x)
+  ansible.builtin.command: >
+    /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic -b -s --password {{ elastic_password }}
+  when: ansible_facts['distribution_version'] is version('12', '==')
+  register: reset_password_result
+  changed_when: "'Password for the user [elastic] successfully reset' in reset_password_result.stdout"

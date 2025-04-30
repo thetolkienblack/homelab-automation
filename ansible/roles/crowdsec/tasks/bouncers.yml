@@ -1,5 +1,5 @@
 ---
-- name: Install bouncers
+- name: 'Crowdsec | Bouncers | Install bouncers'
   ansible.builtin.shell: |
     cscli bouncers install {{ item }}
   args:

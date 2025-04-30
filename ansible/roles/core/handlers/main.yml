@@ -7,3 +7,6 @@
 
 - name: 'Include Nvidia handlers'
   ansible.builtin.import_tasks: "{{ role_path }}/handlers/nvidia/main.yml"
+
+- name: 'Include Security handlers'
+  ansible.builtin.import_tasks: "{{ role_path }}/handlers/security/main.yml"

@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # handlers file for ansible_role_template
-- name: 'Restart MongoDB'
+- name: Restart MongoDB
   ansible.builtin.systemd:
     name: mongod
     state: restarted
   become: true
+
+- name: 'MongoDB | Handlers | Include common handlers'
+  ansible.builtin.import_tasks: '../common/handlers/main.yml'

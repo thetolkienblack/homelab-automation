@@ -1,16 +1,12 @@
 # SPDX-License-Identifier: MIT-0
 ---
-# tasks file for ansible_role_init
-- name: 'Development Tools | OpenJDK | Include OpenJDK vars'
-  ansible.builtin.include_vars: "openjdk/main.yml"
-
 - name: 'Development Tools | OpenJDK | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
 
 - name: 'Development Tools | OpenJDK | Clone jenv repository'
   ansible.builtin.git:
     repo: https://github.com/jenv/jenv.git
-    dest: /home/{{ ansible_user }}/.jenv
+    dest: "{{ home_dir }}/.jenv"
     update: true
     version: master
   become: false
@@ -18,10 +14,10 @@
 
 - name: 'Development Tools | OpenJDK | Add jenv initialization to .bashrc'
   ansible.builtin.lineinfile:
-    path: /home/{{ ansible_user }}/.bashrc
+    path: "{{ home_dir }}/.{{ shell_name }}rc"
     line: |
       # jenv initialization
-      export PATH="$HOME/.jenv/bin:$PATH"
+      export PATH="{{ home_dir }}/.jenv/bin:$PATH"
       eval "$(jenv init -)"
     insertafter: EOF
     create: true
@@ -35,6 +31,6 @@
   become: false
   become_user: "{{ ansible_user }}"
   environment:
-    PATH: "/home/{{ ansible_user }}/.jenv/bin:{{ ansible_env.PATH }}"
+    PATH: "{{ home_dir }}/.jenv/bin:{{ ansible_env.PATH }}"
   args:
-    creates: /home/{{ ansible_user }}/.jenv/version
+    creates: "{{ home_dir }}/.jenv/version"

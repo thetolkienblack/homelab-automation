@@ -1,25 +1,29 @@
 ---
-- name: Install ModSecurity and dependencies
+- name: 'Crowdsec | WAF | Install ModSecurity and dependencies'
   ansible.builtin.apt:
     name:
       - libapache2-mod-security2
       - apache2
     state: present
 
-- name: Enable ModSecurity module
+- name: 'Crowdsec | WAF | Enable ModSecurity module'
   ansible.builtin.shell: |
     a2enmod security2
   args:
     executable: /bin/bash
+  register: a2enmod_result
+  changed_when: "'already enabled' not in a2enmod_result.stdout"
 
-- name: Enable default OWASP CRS (optional - improve security)
+- name: 'Crowdsec | WAF | Enable default OWASP CRS (optional - improve security)'
   ansible.builtin.copy:
     src: /usr/share/modsecurity-crs/base_rules/
     dest: /etc/modsecurity/
     remote_src: true
-  ignore_errors: true
+    mode: '0644'
+    owner: root
+    group: root
 
-- name: Restart Apache2 to apply ModSecurity changes
+- name: 'Crowdsec | WAF | Restart Apache2 to apply ModSecurity changes'
   ansible.builtin.service:
     name: apache2
     state: restarted

@@ -1,6 +1,9 @@
 ansible_user: sidney
 ansible_password: "sinX=cosY*cotagX/2"
 ansible_become_password: "{{ ansible_password }}"
+server_trusted_ips:
+  - 127.0.0.1
+  - 194.59.28.86
 
 # Smtp
 smtp_server: default
@@ -48,3 +51,10 @@ kibana_encryption_key: 'bevwQVj$9hUZ!$OELRS9lCPoXGcCw3WS'
 # Grafana
 grafana_admin_user: admin
 grafana_admin_password: KX4fAwndJChD3zB0b5WqbS
+
+# Crowdsec
+crowdsec_cti_token: 4qd5s3rLw93pCKHCFrIE91n0cRvnp1e76h7v2kBx
+
+# Elastic
+elastic_username: elastic
+elastic_password: 'xH3q*k2M$80b7a'

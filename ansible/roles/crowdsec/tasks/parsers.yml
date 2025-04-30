@@ -1,5 +1,5 @@
 ---
-- name: Install parsers
+- name: 'Crowdsec | Parsers | Install parsers'
   ansible.builtin.shell: |
     cscli parsers install {{ item }}
   args:

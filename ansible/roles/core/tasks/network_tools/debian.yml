@@ -9,7 +9,6 @@
       - wget
       - iptables
       - iputils-ping
-      - nmap
       - traceroute
       - dnsutils
     state: present

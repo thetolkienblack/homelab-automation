@@ -1,5 +1,5 @@
 ---
-- name: Install scenarios
+- name: 'Crowdsec | Scenarios | Install scenarios'
   ansible.builtin.shell: |
     cscli scenarios install {{ item }}
   args:

@@ -1,25 +1,35 @@
 #include <tunables/global>
 
-profile /usr/bin/mongod flags=(complain) {
-    # Allow execution
-    /usr/bin/mongod px,
+profile /usr/bin/mongod {
+# Allow execution
+/usr/bin/mongod px,
 
-    # Basic library and file access
-    /usr/lib/** r,
-    /etc/mongod.conf r,
-    /var/lib/mongodb/** rwk,
-    /var/log/mongodb/** rwk,
+# Allow mmap (m) for dynamic libs including libcurl
+/usr/lib/** rm,
+/lib/** rm,
+/usr/lib/x86_64-linux-gnu/libcurl.so.* rm,
 
-    # Needed for reading system info
-    /proc/** r,
-    /sys/** r,
-    /dev/** r,
+# Config and data
+/etc/mongod.conf r,
+/var/lib/mongodb/** rwk,
+/var/log/mongodb/** rwk,
+/etc/mongodb-keyfile r,
 
-    # Networking
-    network inet stream,
-    network inet6 stream,
+# System info
+/proc/** r,
+/sys/** r,
+/dev/** r,
 
-    # Deny everything else
-    deny @{PROC}/* w,
-    deny /etc/shadow r,
+# Networking
+network inet stream,
+network inet6 stream,
+
+# Capabilities (optional but good to have)
+capability setuid,
+capability setgid,
+capability sys_resource,
+
+# Deny sensitive stuff explicitly
+deny @{PROC}/* w,
+deny /etc/shadow r,
 }

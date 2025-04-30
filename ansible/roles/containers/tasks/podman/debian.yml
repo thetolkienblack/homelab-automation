@@ -1,15 +1,15 @@
-- name: 'Containers | Podman | Debian | Add Podman official repository key'
-  ansible.builtin.apt_key:
-    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_{{ ansible_distribution_version }}/Release.key
-    state: present
-  become: true
-
-- name: 'Containers | Podman | Debian | Add Podman repository'
-  ansible.builtin.apt_repository:
-    repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_{{ ansible_distribution_version }}/ /"
-    state: present
-  notify: Update apt cache
-  become: true
+#- name: 'Containers | Podman | Debian | Add Podman official repository key'
+#  ansible.builtin.apt_key:
+#    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_{{ ansible_distribution_version }}/Release.key
+#    state: present
+#  become: true
+#
+#- name: 'Containers | Podman | Debian | Add Podman repository'
+#  ansible.builtin.apt_repository:
+#    repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_{{ ansible_distribution_version }}/ /"
+#    state: present
+#  notify: Update apt cache
+#  become: true
 
 - name: 'Containers | Podman | Debian | Install Podman and Podman Compose'
   ansible.builtin.apt:

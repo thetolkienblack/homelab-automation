@@ -1,5 +1,5 @@
 ---
-- name: Configure blocklists
+- name: 'Crowdsec | Configure | Configure blocklists'
   ansible.builtin.shell: |
     cscli blocklist add {{ item }}
   args:

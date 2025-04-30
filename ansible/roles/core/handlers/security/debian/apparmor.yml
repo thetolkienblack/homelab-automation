@@ -1,4 +1,4 @@
-- name: 'Reload apparmor profiles'
+- name: Reload AppArmor profiles
   ansible.builtin.command:
     cmd: aa-enforce /etc/apparmor.d/*
   become: true
@@ -7,7 +7,7 @@
   failed_when: apparmor_enforce.rc != 0 and "No such file or directory" not in apparmor_enforce.stderr
   when: apparmor_installed
 
-- name: 'Load AppArmor profile'
+- name: Load AppArmor profile
   ansible.builtin.command: "apparmor_parser -r /etc/apparmor.d/{{ apparmor_profile }}"
   become: true
   changed_when: false
@@ -15,7 +15,7 @@
   failed_when: apparmor_reload.rc != 0 and 'No such file or directory' not in apparmor_reload.stderr
   when: apparmor_installed
 
-- name: 'Load multiple custom AppArmor profiles'
+- name: Load multiple custom AppArmor profiles
   ansible.builtin.command: "apparmor_parser -r /etc/apparmor.d/{{ item }}"
   loop: "{{ apparmor_custom_profile | map(attribute='profile') | list }}"
   become: true
@@ -24,7 +24,7 @@
   failed_when: apparmor_reload.rc != 0 and 'No such file or directory' not in apparmor_reload.stderr
   when: apparmor_installed
 
-- name: 'Get apparmor status'
+- name: Get apparmor status
   ansible.builtin.command: aa-status
   register: aa_status
   changed_when: false

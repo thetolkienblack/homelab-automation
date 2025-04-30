@@ -30,3 +30,20 @@
     update_cache: true
   become: true
   notify: Update apt cache
+
+- name: 'Mongodb | Enable apparmor for MongoDB from template'
+  ansible.builtin.template:
+    src: mongodb.apparmor.j2
+    dest: /etc/apparmor.d/usr.bin.mongod
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: 'Mongodb | Parse and load the MongoDB AppArmor profile in complain mode'
+  ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/usr.bin.mongod
+  changed_when: false
+
+- name: 'Mongodb | Switch to enforce mode once tested for MongoDB'
+  ansible.builtin.command: aa-enforce /usr/bin/mongod
+  changed_when: false

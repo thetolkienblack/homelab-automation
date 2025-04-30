@@ -10,3 +10,4 @@ containers_docker_ports:
     proto: tcp
     comment: Docker API (encrypted)-
 containers_podman_profile_name: default
+containers_docker_registry: docker.io

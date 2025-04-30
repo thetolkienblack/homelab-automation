@@ -17,15 +17,35 @@
   when: ansible_env.SHELL != (default_shell | default('/bin/bash'))
   notify: 'Ensure commands use bash shell'
 
-- name: 'Common | Grab just the shell name'
+- name: 'Common | Set variables based on system environments'
   ansible.builtin.set_fact:
     shell_name: "{{ ansible_env.SHELL | basename }}"
+    user_shell: "{{ ansible_env.SHELL }}"
+    home_dir: "{{ ansible_env.HOME }}"
+    is_bash: "{{ ansible_env.SHELL }} == '/bin/bash'"
 
 - name: 'Common | Copy bashrc file'
   ansible.builtin.template:
-    src: "{{ shell_name }}.j2"
-    dest: /home/{{ ansible_user }}/.{{ shell_name }}rc
+    src: "{{ shell_name }}rc.j2"
+    dest: "{{ home_dir }}/.{{ shell_name }}rc"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: '0644'
-  become: false
+  become_user: "{{ ansible_user }}"
+
+- name: 'Common | Ensure /etc/localtime is world-readable'
+  ansible.builtin.file:
+    path: /etc/localtime
+    mode: '0644'
+    owner: root
+    group: root
+  become: true
+
+- name: 'Common | Ensure /usr/lib/ssl/openssl.cnf is world-readable'
+  ansible.builtin.file:
+    path: /usr/lib/ssl/openssl.cnf
+    mode: '0644'
+    owner: root
+    group: root
+  become: true
+

@@ -1,27 +1,27 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_template
-- name: Include OS-specific tasks
+- name: 'Crowdsec | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
 
-- name: Include install tasks
+- name: 'Crowdsec | Include install tasks'
   ansible.builtin.include_tasks: install.yml
 
-- name: Include configure tasks
+- name: 'Crowdsec | Include configure tasks'
   ansible.builtin.include_tasks: configure.yml
 
-- name: Install collections
+- name: 'Crowdsec | Install collections'
   ansible.builtin.include_tasks: collections.yml
 
-- name: Install parsers
+- name: 'Crowdsec | Install parsers'
   ansible.builtin.include_tasks: parsers.yml
 
-- name: Install scenarios
+- name: 'Crowdsec | Install scenarios'
   ansible.builtin.include_tasks: scenarios.yml
 
-- name: Install bouncers
+- name: 'Crowdsec | Install bouncers'
   ansible.builtin.include_tasks: bouncers.yml
 
-- name: Install WAF
+- name: 'Crowdsec | Install WAF'
   when: crowdsec_install_waf
   ansible.builtin.include_tasks: waf.yml

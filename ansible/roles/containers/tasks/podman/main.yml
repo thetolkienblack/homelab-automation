@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: MIT-0
 ---
-# tasks file for podman_container
-- name: 'Containers | Podman | Include Podman vars'
-  ansible.builtin.include_vars: "{{ role_path }}/vars/podman.yml"
+- name: 'Check if NVIDIA module is loaded'
+  ansible.builtin.shell: "lsmod | grep -q '^nvidia'"
+  register: nvidia_module_loaded
+  ignore_errors: true
+  changed_when: false
+  become: true
 
 - name: 'Containers | Podman | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
@@ -42,7 +45,7 @@
 
 - name: 'Containers | Podman | Check if already logged in to Docker registry'
   ansible.builtin.command:
-    cmd: podman login --get-login {{ docker_registry }}
+    cmd: podman login --get-login {{ container_docker_registry }}
   register: podman_login_status
   ignore_errors: true
   changed_when: false
@@ -50,7 +53,7 @@
 
 - name: 'Containers | Podman | Log in to Docker registry'
   ansible.builtin.command:
-    cmd: podman login --username={{ docker_username }} --password={{ docker_password }} {{ docker_registry }}
+    cmd: podman login --username={{ docker_username }} --password={{ docker_password }} {{ containers_docker_registry }}
   when:
     - docker_username is defined
     - docker_password is defined

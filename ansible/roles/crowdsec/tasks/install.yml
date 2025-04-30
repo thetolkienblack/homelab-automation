@@ -1,9 +1,43 @@
 ---
-- name: Install CrowdSec local API credentials (placeholder, if needed)
+- name: 'Crowdsec | Install | Install CrowdSec local API credentials (placeholder, if needed)'
   ansible.builtin.debug:
     msg: 'API credentials installation is manual or via vault. Skipping.'
 
-- name: Register agent/server if needed (placeholder)
-  ansible.builtin.command:
-    cmd: cscli capi register
+- name: 'Crowdsec | Console | Enroll agent to CrowdSec Console'
+  ansible.builtin.command: >
+    cscli console enroll -e {{ crowdsec_context_id }}
+  args:
+    executable: /bin/bash
+  register: crowdsec_console_enroll
   when: crowdsec_install_server or crowdsec_install_agent
+  changed_when: "'already enrolled' not in crowdsec_console_enroll.stdout"
+
+- name: 'Crowdsec | Install | Deploy acquis.yaml'
+  ansible.builtin.template:
+    src: acquis.yaml.j2
+    dest: /etc/crowdsec/acquis.yaml
+    owner: root
+    group: root
+    mode: '0640'
+
+- name: 'Crowdsec | Install | Deploy config.yaml'
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /etc/crowdsec/config.yaml
+    owner: root
+    group: root
+    mode: '0640'
+
+- name: 'Crowdsec | Install | Create CTI credentials file'
+  ansible.builtin.template:
+    src: online_api_credentials.yaml.j2
+    dest: /etc/crowdsec/online_api_credentials.yaml
+    owner: root
+    group: root
+    mode: '0640'
+
+- name: 'Crowdsec | Install | Ensure crowdsec service is started and enabled'
+  ansible.builtin.service:
+    name: crowdsec
+    state: started
+    enabled: true

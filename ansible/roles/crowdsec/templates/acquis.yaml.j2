@@ -1,0 +1,151 @@
+# templates/acquis.yaml.j2
+# CrowdSec acquisition configuration
+# Automatically generated based on your installed apps and tools
+
+filenames:
+  # == Standard Linux logs ==
+  - /var/log/auth.log
+  - /var/log/syslog
+  - /var/log/faillog
+  - /var/log/wtmp
+  - /var/log/btmp
+  - /var/log/lastlog
+  - /var/log/kern.log
+  - /var/log/messages
+  - /var/log/dpkg.log
+
+  # == SSHD logs ==
+  - source: /var/log/auth.log
+    labels:
+      type: syslog
+      service: sshd
+
+  # == Docker logs ==
+  - source: /var/lib/docker/containers/*/*.log
+    labels:
+      type: docker
+
+  # == Podman logs ==
+  - source: /var/log/containers/*.log
+    labels:
+      type: docker
+
+  # == Falco logs ==
+  - source: /var/log/falco.log
+    labels:
+      type: falco
+
+  # == TCPDump capture logs ==
+  - source: /var/log/tcpdump.log
+    labels:
+      type: tcpdump
+
+  # == AppArmor audit logs ==
+  - source: /var/log/audit/audit.log
+    labels:
+      type: apparmor
+
+  # == UFW logs ==
+  - source: /var/log/ufw.log
+    labels:
+      type: firewall
+
+  # == Netdata logs ==
+  - source: /var/log/netdata/error.log
+    labels:
+      type: syslog
+      service: netdata
+
+  # == Graylog logs ==
+  - source: /var/log/graylog-server/server.log
+    labels:
+      type: graylog
+
+  # == Wazuh logs ==
+  - source: /var/ossec/logs/ossec.log
+    labels:
+      type: wazuh
+
+  # == ElasticSearch logs ==
+  - source: /var/log/elasticsearch/*.log
+    labels:
+      type: elasticsearch
+
+  # == OpenSearch logs ==
+  - source: /var/log/opensearch/*.log
+    labels:
+      type: opensearch
+
+  # == Fleet Server logs ==
+  - source: /var/log/fleet-server/fleet-server.log
+    labels:
+      type: syslog
+      service: fleet
+
+  # == Grafana logs ==
+  - source: /var/log/grafana/grafana.log
+    labels:
+      type: grafana
+
+  # == Kibana logs ==
+  - source: /var/log/kibana/*.log
+    labels:
+      type: kibana
+
+  # == MongoDB logs ==
+  - source: /var/log/mongodb/mongod.log
+    labels:
+      type: mongodb
+
+  # == Cockpit logs ==
+  - source: /var/log/cockpit/wsjournal.log
+    labels:
+      type: cockpit
+
+  # == Checkmk logs ==
+  - source: /var/log/check_mk/liveproxyd.log
+    labels:
+      type: checkmk
+
+  # == Trivy scans (Optional if you log scans) ==
+  - source: /var/log/trivy.log
+    labels:
+      type: trivy
+
+  # == S-tui monitoring (rarely logs, but placeholder) ==
+  - source: /var/log/s-tui.log
+    labels:
+      type: syslog
+      service: s-tui
+
+  # == Smem (memory usage) monitoring (rarely logs, placeholder) ==
+  - source: /var/log/smem.log
+    labels:
+      type: syslog
+      service: smem
+
+  # == Wireshark captures ==
+  - source: /var/log/wireshark.log
+    labels:
+      type: tcpdump
+
+  # == Nmap scans (if you save them) ==
+  - source: /var/log/nmap_scan.log
+    labels:
+      type: nmap
+
+  # == Speedtest-cli outputs (optional) ==
+  - source: /var/log/speedtest-cli.log
+    labels:
+      type: speedtest
+
+  # == Traceroute logs (if scripted) ==
+  - source: /var/log/traceroute.log
+    labels:
+      type: traceroute
+
+  # == DNSUtils logs (dig, etc.) (optional) ==
+  - source: /var/log/dnsutils.log
+    labels:
+      type: dns
+

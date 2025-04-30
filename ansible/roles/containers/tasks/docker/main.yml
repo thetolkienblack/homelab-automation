@@ -12,7 +12,7 @@
 
 - name: 'Containers | Docker | Login to Docker registry'
   community.docker.docker_login:
-    registry_url: "{{ docker_registry }}"
+    registry_url: "{{ containers_docker_registry }}"
     username: "{{ docker_username }}"
     password: "{{ docker_password }}"
   become: true

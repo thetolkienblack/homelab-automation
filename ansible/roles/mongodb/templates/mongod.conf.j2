@@ -6,16 +6,18 @@ systemLog:
 
 storage:
   dbPath: "{{ mongodb_db_path | default('/var/lib/mongodb') }}"
-  journal:
-    enabled: true
 
 net:
   bindIp: "{{ mongodb_bind_ip | default('127.0.0.1') }}"
   port: {{ mongodb_port | default(27017) }}
 
 # Security configuration
+{% if mongodb_authorization == 'enabled' %}
 security:
-  authorization: {{ mongodb_authorization | default('enabled') }}
-  {% if mongodb_keyfile is defined %}
+  authorization: "{{ mongodb_authorization | default('enabled') }}"
+{% if mongodb_keyfile is defined %}
   keyFile: "{{ mongodb_keyfile }}"
-  {% endif %}
+{% endif %}
+replication:
+    replSetName: "{{ replSetName }}"
+{% endif %}

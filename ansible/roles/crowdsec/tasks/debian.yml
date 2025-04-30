@@ -1,27 +1,21 @@
 # roles/qemu/tasks/debian.yml
 ---
-- name: Add CrowdSec repository key
+- name: 'Crowdsec | Debian | Add CrowdSec repository key'
   ansible.builtin.apt_key:
     url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
     state: present
 
-- name: Add CrowdSec repository
+- name: 'Crowdsec | Debian | Add CrowdSec repository'
   ansible.builtin.apt_repository:
     repo: deb https://packagecloud.io/crowdsec/crowdsec/debian/ bookworm main
     state: present
 
-- name: Install crowdsec package
+- name: 'Crowdsec | Debian | Install crowdsec package'
   ansible.builtin.apt:
     name: crowdsec
     state: present
 
-- name: Install crowdsec-firewall-bouncer-nftables
+- name: 'Crowdsec | Debian | Install crowdsec-firewall-bouncer-nftables'
   ansible.builtin.apt:
     name: crowdsec-firewall-bouncer-nftables
     state: present
-
-- name: Ensure crowdsec service is started and enabled
-  ansible.builtin.service:
-    name: crowdsec
-    state: started
-    enabled: true

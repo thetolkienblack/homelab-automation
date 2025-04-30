@@ -5,7 +5,7 @@
   ansible.builtin.uri:
     url: "{{ fleet_server_kibana_host }}/api/status"
     method: GET
-    user: elastic
+    user: "{{ elastic_username }}"
     password: "{{ elastic_password }}"
     validate_certs: false
   register: kibana_status

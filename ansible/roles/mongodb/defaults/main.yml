@@ -6,3 +6,4 @@ mongodb_port: 27017
 mongodb_authorization: enabled
 mongodb_keyfile: /etc/mongodb-keyfile
 mongodb_keyfile_content: "{{ lookup('password', '/dev/null length=96 chars=ascii_letters,digits') }}"
+replSetName: rs0

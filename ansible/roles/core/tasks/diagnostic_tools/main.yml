@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT-0
 ---
 - name: 'Core | Diagnostic | Load networking defaults'
-  ansible.builtin.include_vars: "{{ role_path }}/vars/security.yml"
+  ansible.builtin.include_vars: "{{ role_path }}/vars/security/main.yml"
 
 - name: 'Core | Diagnostic | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"

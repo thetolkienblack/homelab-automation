@@ -19,7 +19,7 @@
   when: not starship_binary.stat.exists
 
 - name: 'Core | Starship | Run Starship installer'
-  ansible.builtin.command: /bin/bash /tmp/install_starship.sh -y
+  ansible.builtin.command: sh /tmp/install_starship.sh -y
   args:
     creates: /usr/local/bin/starship
   become: true
@@ -28,19 +28,19 @@
 
 - name: 'Core | Starship | Add Starship exports to shell rc file'
   ansible.builtin.lineinfile:
-    path: "/home/{{ ansible_user }}/.{{ ansible_env.SHELL }}rc"
+    path: "{{ home_dir }}/.{{ shell_name }}rc"
     line: |
       # Starship
       export STARSHIP_LOG=error
       export STARSHIP_CONFIG="$HOME/.config/starship.toml"
       export ANSIBLE_VAULT_PASSWORD_FILE="$HOME/Developer/.vault.pwd"
-      eval "$(starship init {{ current_shell }})"
+      eval "$(starship init {{ user_shell }})"
     insertafter: EOF
     create: true
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: '0644'
-  notify: Restart {{ ansible_env.SHELL }}
+  notify: Restart {{ shell_name }}
   become: false
   when:
     - is_bash

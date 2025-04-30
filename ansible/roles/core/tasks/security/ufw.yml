@@ -23,7 +23,7 @@
     comment: "Allow from {{ item }}"
   loop: "{{ core_ufw_allowed_sources }}"
   become: true
-  when: ufw_installed
+  when: ufw_installed and core_ufw_allowed_sources is defined and core_ufw_allowed_sources | length > 0
 
 - name: 'Core | Security | UFW | Allow necessary incoming ufw rules'
   community.general.ufw:
@@ -33,7 +33,7 @@
     port: "{{ item.port }}"
   with_items: "{{ core_default_ufw_rules }}"
   become: true
-  when: ufw_installed
+  when: ufw_installed and core_default_ufw_rules is defined and core_default_ufw_rules | length > 0
 
 - name: 'Core | Security | UFW | Allow all outbound traffic'
   community.general.ufw:

@@ -1,5 +1,5 @@
 ---
-- name: Install collections
+- name: 'Crowdsec | Collections | Install collections'
   ansible.builtin.shell: |
     cscli collections install {{ item }}
   args:

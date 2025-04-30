@@ -2,12 +2,7 @@
 ---
 crowdsec_install_server: true
 crowdsec_install_agent: false
-crowdsec_install_waf: true
-crowdsec_api_credentials:
-  login: !vault |
-    # vault encrypted login
-  password: !vault |
-    # vault encrypted password
+crowdsec_install_waf: false
 crowdsec_blocklists:
   - "https://app.crowdsec.net/blocklists/65a56c0b0469607d9badb812"
   - "https://app.crowdsec.net/blocklists/65a55718ff8363f6556e9d4b"

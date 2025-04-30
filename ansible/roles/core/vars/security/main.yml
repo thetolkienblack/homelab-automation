@@ -33,3 +33,5 @@ core_network_tools_apparmor_profiles:
   - nmap
   - traceroute
   - tcpdump
+
+network_tools_ufw_rules: []

@@ -32,7 +32,6 @@
   become: true
   notify: Restart MongoDB
 
-
 - name: 'Mongodb | Ensure MongoDB is started and enabled'
   ansible.builtin.systemd:
     name: mongod
@@ -40,22 +39,13 @@
     state: started
   become: true
 
-- name: 'Mongodb | Enable apparmor for MongoDB from template'
-  ansible.builtin.template:
-    src: mongodb.apparmor.j2
-    dest: /etc/apparmor.d/usr.sbin.mongod
-    owner: root
-    group: root
-    mode: '0644'
-  become: true
-
-- name: 'Mongodb | Parse and load the MongoDB AppArmor profile in complain mode'
-  ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/usr.sbin.mongod
+- name: 'Mongodb | Initialize MongoDB replica set if needed'
+  ansible.builtin.command: mongosh --quiet --eval 'rs.initiate()'
+  register: rs_init
+  failed_when: rs_init.rc != 0 and "'already initialized'" not in rs_init.stdout
   changed_when: false
-
-- name: 'Mongodb | Switch to enforce mode once tested for MongoDB'
-  ansible.builtin.command: aa-enforce /usr/bin/mongod
-  changed_when: false
+  when: mongodb_authorization == 'enabled'
+  notify: Restart MongoDB
 
 - name: 'Mongodb | Allow MongoDB access from trusted host'
   community.general.ufw:

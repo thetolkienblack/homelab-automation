@@ -2,17 +2,8 @@
 - name: 'Development Tools | OpenJDK | Debian | Install OpenJDK'
   ansible.builtin.apt:
     name:
-      - openjdk-{{ openjdk_version }}-jdk
-      - openjdk-{{ openjdk_version }}-jre
-    state: present
-    update_cache: true
-  become: true
-
-- name: 'Development Tools | OpenJDK | Debian | Install jenv dependencies'
-  ansible.builtin.apt:
-    name:
-      - git
-      - curl
+      - openjdk-{{ development_tools_openjdk_version }}-jdk
+      - openjdk-{{ development_tools_openjdk_version }}-jre
     state: present
     update_cache: true
   become: true

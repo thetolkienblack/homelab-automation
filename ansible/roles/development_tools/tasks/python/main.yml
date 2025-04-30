@@ -11,26 +11,26 @@
 
 - name: 'Development Tools | Python | Create a directory for the virtual environment'
   ansible.builtin.file:
-    path: /home/{{ ansible_user }}/python-venv
+    path: "{{ home_dir }}/python-venv"
     state: directory
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: "0755"
-  become: false
+  become_user: "{{ ansible_user }}"
 
 - name: 'Development Tools | Python | Set up Python virtual environment'
   ansible.builtin.command:
-    cmd: python3 -m venv /home/{{ ansible_user }}/python-venv
+    cmd: python3 -m venv {{ home_dir }}/python-venv
   args:
-    creates: /home/{{ ansible_user }}/python-venv/bin/activate
+    creates: "{{ home_dir }}/python-venv/bin/activate"
   become: false
 
 - name: 'Development Tools | Python | Add venv activation to .bashrc'
   ansible.builtin.lineinfile:
-    path: /home/{{ ansible_user }}/.bashrc
+    path: "{{ home_dir }}/.{{ shell_name }}rc"
     line: |
       # Activate Python virtual environment
-      source /home/{{ ansible_user }}/python-venv/bin/activate
+      source {{ home_dir }}/python-venv/bin/activate
     insertafter: EOF
     create: true
     owner: "{{ ansible_user }}"

@@ -15,7 +15,7 @@
     comment: "{{ item.comment }}"
   with_items: "{{ network_tools_ufw_rules }}"
   become: true
-  when: ufw_installed
+  when: ufw_installed and network_tools_ufw_rules is defined and network_tools_ufw_rules | length > 0
   notify: Reload UFW
 
 - name: 'Core | Network Tools | Configure AppArmor profiles for network tools'

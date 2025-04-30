@@ -1,30 +1,30 @@
 ---
-- name: 'Restart bash'
-  ansible.builtin.systemd:
-    name: bash
-    state: restarted
-  become: true
+- name: Restart bash
+  ansible.builtin.shell: source {{ home_dir }}/.{{ shell_name }}rc
+  args:
+    executable: /bin/bash
+  become_user: "{{ ansible_user }}"
 
-- name: 'Update grub'
+- name: Update grub
   ansible.builtin.command: update-grub
   become: true
   changed_when: false
 
-- name: 'Reload sysctl'
+- name: Reload sysctl
   ansible.builtin.command: sysctl --system
   become: true
   changed_when: false
 
-- name: 'Reload systemd daemon'
+- name: Reload systemd daemon
   ansible.builtin.systemd:
     daemon_reload: true
   become: true
 
-- name: 'Ensure commands use bash shell'
+- name: Ensure commands use bash shell
   ansible.builtin.command:
     cmd: echo "Default shell set to {{ default_shell }}"
   changed_when: false
   failed_when: false
 
-- name: 'Include OS-specific handlers'
+- name: Include OS-specific handlers
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
