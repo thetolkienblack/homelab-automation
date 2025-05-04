@@ -15,25 +15,59 @@
   changed_when: false
   failed_when: false
 
+- name: 'Core | Security | UFW | Check if rule exists for allowed sources'
+  ansible.builtin.shell: |
+    ufw status numbered | grep -F "{{ item }}"
+  register: ufw_source_rule_check
+  changed_when: false
+  failed_when: false
+  loop: "{{ core_ufw_allowed_sources }}"
+  loop_control:
+    label: "{{ item }}"
+  when: ufw_installed
+
 - name: 'Core | Security | UFW | Allow traffic from approved subnets / hosts'
   community.general.ufw:
     rule: allow
     direction: in
-    from_ip: "{{ item }}"
-    comment: "Allow from {{ item }}"
-  loop: "{{ core_ufw_allowed_sources }}"
+    from_ip: "{{ item.0 }}"
+    comment: "Allow from {{ item.0 }}"
+  loop: "{{ core_ufw_allowed_sources | zip(ufw_source_rule_check.results) }}"
+  loop_control:
+    label: "{{ item.0 }}"
   become: true
-  when: ufw_installed and core_ufw_allowed_sources is defined and core_ufw_allowed_sources | length > 0
+  when:
+    - ufw_installed
+    - core_ufw_allowed_sources is defined
+    - core_ufw_allowed_sources | length > 0
+    - item.1.rc != 0
+
+- name: 'Core | Security | UFW | Check if rule exists for default port/proto rules'
+  ansible.builtin.shell: >
+    ufw status numbered | grep -i '{{ item.proto }}' | grep -F '{{ item.port }}'
+  register: ufw_port_rule_check
+  changed_when: false
+  failed_when: false
+  loop: "{{ core_default_ufw_rules }}"
+  loop_control:
+    label: "{{ item.port }}/{{ item.proto }}"
+  when: ufw_installed
 
 - name: 'Core | Security | UFW | Allow necessary incoming ufw rules'
   community.general.ufw:
     rule: allow
     direction: in
-    proto: "{{ item.proto }}"
-    port: "{{ item.port }}"
-  with_items: "{{ core_default_ufw_rules }}"
+    proto: "{{ item.0.proto }}"
+    port: "{{ item.0.port }}"
+  loop: "{{ core_default_ufw_rules | zip(ufw_port_rule_check.results) }}"
+  loop_control:
+    label: "{{ item.0.port }}/{{ item.0.proto }}"
   become: true
-  when: ufw_installed and core_default_ufw_rules is defined and core_default_ufw_rules | length > 0
+  when:
+    - ufw_installed
+    - core_default_ufw_rules is defined
+    - core_default_ufw_rules | length > 0
+    - item.1.rc != 0
 
 - name: 'Core | Security | UFW | Allow all outbound traffic'
   community.general.ufw:

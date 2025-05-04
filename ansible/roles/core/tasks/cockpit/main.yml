@@ -1,17 +1,20 @@
 # SPDX-License-Identifier: MIT-0
 ---
+- name: 'Core | Cockpit | Include cockpit vars'
+  ansible.builtin.include_vars: "{{ role_path }}/vars/cockpit/main.yml"
+
 # tasks file for install_cockpit
 - name: 'Core | Cockpit | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
 
-- name: 'Core | Cockpit | Include Redis tasks'
-  ansible.builtin.include_tasks: "redis.yml"
+#- name: 'Core | Cockpit | Include Redis tasks'
+#  ansible.builtin.include_tasks: "redis.yml"
+#
+#- name: 'Core | Cockpit | Include DNSMasq tasks'
+#  ansible.builtin.include_tasks: "dnsmasq.yml"
 
-- name: 'Core | Cockpit | Include DNSMasq tasks'
-  ansible.builtin.include_tasks: "dnsmasq.yml"
-
-- name: 'Core | Cockpit | Include UFW tasks'
-  ansible.builtin.include_tasks: "security/ufw.yml"
+- name: 'Core | Cockpit | Include Apparmor tasks'
+  ansible.builtin.include_tasks: "apparmor.yml"
 
 - name: 'Core | Cockpit | Enable and start multiple systemd services'
   ansible.builtin.systemd:
@@ -32,26 +35,5 @@
   notify:
     - Reload UFW
     - Restart cockpit
-    - Restart dnsmasq
-    - Restart redis
-
-- name: 'Core | Cockpit | Create AppArmor profiles from templates'
-  ansible.builtin.template:
-    src: "{{ item.template }}"
-    dest: "/etc/apparmor.d/{{ item.profile }}"
-    owner: root
-    group: root
-    mode: '0644'
-  loop: "{{ core_cockpit_apparmor_profiles }}"
-  loop_control:
-    label: "{{ item.profile }}"
-  become: true
-  notify:
-    - Load multiple custom AppArmor profiles
-    - Restart cockpit
-    - Restart dnsmasq
-    - Restart redis
-  when:
-    - apparmor_installed is defined
-    - apparmor_installed
-    - item.profile not in aa_status.stdout
+#    - Restart dnsmasq
+#    - Restart redis

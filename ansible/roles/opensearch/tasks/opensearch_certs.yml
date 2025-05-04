@@ -1,0 +1,48 @@
+- name: 'OpenSearch | Certs | Ensure shared group exists for TLS access'
+  ansible.builtin.group:
+    name: opensearch-tls
+    state: present
+    system: true
+
+- name: 'OpenSearch | Certs | Add opensearch user to opensearch-tls group'
+  ansible.builtin.user:
+    name: opensearch
+    groups: opensearch-tls
+    append: true
+
+- name: 'OpenSearch | Certs | Add opensearch-dashboards user to opensearch-tls group'
+  ansible.builtin.user:
+    name: opensearch-dashboards
+    groups: opensearch-tls
+    append: true
+
+- name: 'OpenSearch | Certs | Set group ownership of OpenSearch certs to opensearch-tls'
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: opensearch-tls
+    mode: '0640'
+  loop:
+    - /etc/opensearch/kirk.pem
+    - /etc/opensearch/kirk-key.pem
+    - /etc/opensearch/root-ca.pem
+
+- name: 'OpenSearch | Certs | Ensure /etc/opensearch is accessible to group'
+  ansible.builtin.file:
+    path: /etc/opensearch
+    owner: root
+    group: opensearch-tls
+    mode: '0750'
+    state: directory
+
+- name: 'OpenSearch | Certs | Restart OpenSearch service'
+  ansible.builtin.service:
+    name: opensearch
+    state: restarted
+  become: true
+
+- name: 'OpenSearch | Certs | Restart OpenSearch Dashboards service'
+  ansible.builtin.service:
+    name: opensearch-dashboards
+    state: restarted
+  become: true

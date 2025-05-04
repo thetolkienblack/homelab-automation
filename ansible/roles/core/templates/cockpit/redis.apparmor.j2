@@ -1,0 +1,42 @@
+#include <tunables/global>
+
+profile redis-server /usr/bin/redis-server flags=(attach_disconnected) {
+
+# Redis binary itself
+/usr/bin/redis-server rix,
+
+# Configuration file and working directory
+/etc/redis/redis.conf r,
+/etc/redis/** r,
+/var/lib/redis/** rw,
+/var/log/redis/** rwk,
+/run/redis/redis-server.pid rw,
+/run/redis/** rw,
+
+# System info (for status reporting)
+/proc/*/status r,
+/proc/*/cmdline r,
+/proc/*/stat r,
+/proc/sys/vm/overcommit_memory r,
+
+# Sockets and TCP (127.0.0.1:6379)
+capability net_bind_service,
+network inet stream,
+unix (send, receive),
+
+# Needed for journal/systemd notify
+/dev/log w,
+/run/systemd/notify w,
+
+# Required if using private tmp
+/tmp/** rw,
+
+# If redis is using memory lock
+capability ipc_lock,
+
+# If redis logs memory stats via systemd
+dbus (send, receive) bus=system,
+
+# Prevent access to anything else
+deny /** wklx,
+}

@@ -1,14 +1,12 @@
-ansible_user: sidney
-ansible_password: "sinX=cosY*cotagX/2"
-ansible_become_password: "{{ ansible_password }}"
+#ansible_user: sidney
+#ansible_password: "sinX=cosY*cotagX/2"
+#ansible_become_password: "{{ ansible_password }}"
 server_trusted_ips:
   - 127.0.0.1
   - 194.59.28.86
 
 # Smtp
-smtp_server: default
-smtp_from: default
-smtp_to: default
+smtp_username: default
 smtp_password: default
 
 # Git
@@ -21,16 +19,22 @@ wazuh_reg_password: "T5y0S!!69Zuo9o7QNAxTpi"
 docker_username: 'sidneyelagib'
 docker_password: 'dckr_pat_SY3Q27R2z28HLZUCSY-R9ZBILcI'
 
+# Mongo
+mongodb_admin_user: admin
+mongodb_admin_password: "baW2^KEnnqURe9"
+
 # Graylog
 graylog_password_secret: "zVwu18V2exj5790S*7tu4$"
 graylog_root_password: "GBYQChmpkU01sOkE^N%O00"
 graylog_root_password_sha2: 4006bf28d660281319b525c8fb88836b5b5cb481e5be1878894567d5de1be006
 http_tls_key_password: "HkcYLCIsVyFKUaN7"
-gl_mongo_username: admin
+gl_mongo_username: graylog
 gl_mongo_password: "PvU*k57N8vML#bo1z02!Yp"
+gl_mongo_db: graylog
 
 # OpenSearch
-opensearch_admin_password: "La@q54@jLjmIb5%%lpC8tI"
+opensearch_admin_username: admin
+opensearch_admin_password: "kmWr31&p#Ez9M4"
 
 # Libvirt
 vm_username: cloud-libvirt

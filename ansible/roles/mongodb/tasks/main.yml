@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for ansible_role_template
+
 - name: 'Mongodb | Include OS-specific tasks'
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
 
@@ -39,14 +40,6 @@
     state: started
   become: true
 
-#- name: 'Mongodb | Initialize MongoDB replica set if needed'
-#  ansible.builtin.command: mongosh --quiet --eval 'rs.initiate()'
-#  register: rs_init
-#  failed_when: rs_init.rc != 0 and "'already initialized'" not in rs_init.stdout
-#  changed_when: false
-#  when: mongodb_authorization == 'enabled'
-#  notify: Restart MongoDB
-
 - name: 'Mongodb | Allow MongoDB access from trusted host'
   community.general.ufw:
     rule: allow
@@ -54,3 +47,31 @@
     proto: tcp
     from_ip: "{{ mongodb_bind_ip | default('127.0.0.1') }}"
   become: true
+
+# ─── Admin User Creation ────────────────────────────────────────────────
+
+- name: 'Mongodb | Wait for MongoDB to be up'
+  ansible.builtin.wait_for:
+    host: "{{ mongodb_bind_ip | default('127.0.0.1') }}"
+    port: "{{ mongodb_port | default(27017) }}"
+    delay: 2
+    timeout: 30
+
+- name: 'Mongodb | Check if admin user exists'
+  ansible.builtin.shell: |
+    mongosh admin --quiet --eval "db.getUser('{{ mongodb_admin_user }}')"
+  register: mongodb_admin_check
+  changed_when: false
+  failed_when: false
+
+- name: 'Mongodb | Create admin user if not exists'
+  ansible.builtin.shell: |
+    mongosh admin --quiet --eval '
+      db.createUser({
+        user: "{{ mongodb_admin_user }}",
+        pwd: "{{ mongodb_admin_password }}",
+        roles: [ "userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase" ]
+      });
+    '
+  when: mongodb_admin_check.stdout == "null"
+  no_log: true

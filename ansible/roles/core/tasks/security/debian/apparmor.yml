@@ -35,7 +35,6 @@
     enabled: true
   register: apparmor_started
   become: true
-  notify: Reload apparmor profiles
   when: apparmor_installed
 
 - name: 'Core | Security | Debian | AppArmor | Update kernel boot parameters for AppArmor'
@@ -46,3 +45,39 @@
     backrefs: true
   become: true
   notify: Update grub
+
+- name: 'Core | Security | Create systemd abstraction for apparmor'
+  ansible.builtin.template:
+    src: security/systemd_abstraction.apparmor.j2
+    dest: /etc/apparmor.d/abstractions/systemd
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+
+- name: 'Core | Security | Create hostname abstraction for apparmor'
+  ansible.builtin.template:
+    src: security/hostname_abstraction.apparmor.j2
+    dest: /etc/apparmor.d/abstractions/hostname
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+
+- name: 'Core | Security | Create net abstraction for apparmor'
+  ansible.builtin.template:
+    src: security/net_abstraction.apparmor.j2
+    dest: /etc/apparmor.d/abstractions/net
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed

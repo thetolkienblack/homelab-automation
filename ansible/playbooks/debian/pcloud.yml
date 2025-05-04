@@ -3,6 +3,9 @@
   hosts: all
   become: true
   gather_facts: true
+  vars_files:
+    - '../../group_vars/all.yml'
+    - '../../group_vars/vault.yml'
   vars:
     core_install_nvidia: false
     containers_install_docker: false
@@ -10,8 +13,8 @@
     graylog_http_external_uri: 'https://sl2rd15ecd4125.pcloud.axway.int:12201'
     wazuh_install_agent: true
   roles:
-#    - role: common
-    - role: core
+    - role: common
+#    - role: core
 #      core_ufw_allowed_sources:
 #        - "10.134.128.180/16"
 #    - role: gde_remove
@@ -21,7 +24,7 @@
 #    - role: containers
 #    - role: mongodb
 #    - role: opensearch
-#    - role: graylog
+    - role: graylog
 #    - role: wazuh
 #    - role: trivy
 #    - role: falco

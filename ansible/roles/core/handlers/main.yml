@@ -1,12 +1,12 @@
 ---
 - name: 'Include Starship handlers'
-  ansible.builtin.import_tasks: "{{ role_path }}/handlers/starship/main.yml"
+  ansible.builtin.import_tasks: "starship/main.yml"
 
 - name: 'Include Cockpit handlers'
-  ansible.builtin.import_tasks: "{{ role_path }}/handlers/cockpit/main.yml"
+  ansible.builtin.import_tasks: "cockpit/main.yml"
 
 - name: 'Include Nvidia handlers'
-  ansible.builtin.import_tasks: "{{ role_path }}/handlers/nvidia/main.yml"
+  ansible.builtin.import_tasks: "nvidia/main.yml"
 
 - name: 'Include Security handlers'
-  ansible.builtin.import_tasks: "{{ role_path }}/handlers/security/main.yml"
+  ansible.builtin.import_tasks: "security/main.yml"

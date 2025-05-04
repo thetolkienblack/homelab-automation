@@ -1,0 +1,164 @@
+#include <tunables/global>
+
+profile /usr/lib/cockpit/cockpit-ws flags=(attach_disconnected) {
+
+# Abstractions
+# These should exist on Debian 12
+# If missing, create stubs or remove as needed
+# You can inline any of these for stricter control
+# They provide base syscall and file access
+
+# Core
+# Do not remove base unless you're replacing it with syscall-specific grants
+# Common for all services to include
+# Replace with low-level coverage only if you want deep isolation
+# or have strict reproducibility needs
+
+# Standard library and system access
+# Add custom abstraction files as needed
+# Required for standard operation of cockpit components
+# and dynamically linked binaries
+
+# Include required abstractions
+# These may need to be installed or written manually
+# Comment out if unavailable and replace with manual rules
+
+# Safe set on Debian 12
+# All known to exist by default
+# If any are missing, adjust manually
+# Includes glibc access, basic syscall sets, certs, and common services
+
+# ========================
+# ABSTRACTIONS
+# ========================
+# Comment out if missing and inline relevant access rules
+# These are safe default includes
+
+# Base system
+# Core libc/syscall usage
+# Always required
+# You can manually rewrite to avoid abstraction includes
+# for containerized/microservice setups
+
+# Include abstraction files
+# Replace or remove per your environment
+
+# Standard abstractions
+# Add custom ones as needed
+
+# Verified on Debian 12
+
+#include <abstractions/base>
+#include <abstractions/nameservice>
+#include <abstractions/user-tmp>
+#include <abstractions/ssl_certs>
+#include <abstractions/dbus>
+#include <abstractions/systemd>
+#include <abstractions/openssl>
+#include <abstractions/hostname>
+#include <abstractions/authentication>
+
+# ========================
+# BINARIES
+# ========================
+/usr/lib/cockpit/cockpit-ws                  rix,
+/usr/bin/cockpit-bridge                      mr,
+/usr/lib/cockpit/cockpit-session            px,
+/usr/lib/cockpit/cockpit-wsinstance-factory mr,
+/usr/lib/cockpit/cockpit-tls                mr,
+/usr/lib/cockpit/cockpit-certificate-helper mr,
+/usr/lib/cockpit/cockpit-certificate-ensure mr,
+/usr/lib/cockpit/cockpit-ssh                mr,
+/usr/lib/cockpit/cockpit-askpass            mr,
+/usr/lib/cockpit/cockpit-client             mr,
+/usr/lib/cockpit/cockpit-client.ui          r,
+/usr/lib/cockpit/cockpit-desktop            mr,
+
+# ========================
+# FILE ACCESS
+# ========================
+/usr/share/cockpit/**                        r,
+/etc/cockpit/**                              r,
+/var/lib/cockpit/**                          rwk,
+/var/log/cockpit/**                          rwk,
+/run/cockpit/**                              rwk,
+/run/cockpit-bridge/**                       rwk,
+/tmp/**                                      rwk,
+/var/run/**                                  rwk,
+/var/lib/AccountsService/**                  r,
+/usr/lib/security/**                         mr,
+/run/systemd/seats/**                        r,
+
+# PAM
+/etc/pam.d/**                                r,
+/etc/shadow                                  r,
+/etc/passwd                                  r,
+/etc/group                                   r,
+/etc/environment                             r,
+/etc/default/locale                          r,
+/etc/login.defs                              r,
+/etc/security/pam_env.conf                   r,
+/etc/security/sepermit.conf                  r,
+/etc/cockpit/disallowed-users                r,
+
+# Certs / entropy
+/etc/cockpit/ws-certs.d/**                   r,
+/dev/urandom                                 r,
+/dev/random                                  r,
+
+# UI + Pixmaps
+/usr/share/pixmaps/**                        r,
+
+# Proc & runtime info
+/proc/*/cmdline                              r,
+/proc/*/status                               r,
+/proc/*/stat                                 r,
+/proc/self/**                                r,
+/proc/filesystems                            r,
+/proc/*/mounts                               r,
+/proc/mounts                                 r,
+/proc/*/uid_map                              r,
+/proc/*/loginuid                             rw,
+
+# Shared libs & dynamic loading
+/etc/ld.so.cache                             r,
+/lib/**                                      mr,
+/usr/lib/**                                  mr,
+/usr/lib/x86_64-linux-gnu/**                 mr,
+
+# Additional runtime
+/run/systemd/ask-password/**                 r,
+/run/user/**                                 rwk,
+/run/lock/**                                 rw,
+/run/systemd/userdb/io.systemd.*             rw,
+/run/dbus/system_bus_socket                  rw,
+/dev/log                                     rw,
+/run/pam-debug.log                           rw,
+
+# Temp file for debugging/tracing
+/tmp/cockpit.trace                           rw,
+
+# Capabilities
+capability setuid,
+capability setgid,
+capability dac_override,
+capability audit_write,
+capability net_bind_service,
+
+# Networking + IPC
+network inet stream,
+unix (send, receive),
+
+# D-Bus
+dbus (send, receive) bus=system,
+
+# Home
+owner @{HOME}/                               r,
+owner @{HOME}/.ssh/**                        r,
+
+# Ptrace needed for some session introspection
+ptrace (read, trace),
+
+# Avoid blocking other components (comment to debug)
+# deny /** wklx,
+}

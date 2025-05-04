@@ -7,20 +7,27 @@
   changed_when: false
   failed_when: false
 
-- name: 'Core | Starship | FiraCode | Set firacode_install'
+- name: 'Core | Starship | FiraCode | Set firacode_installed'
   ansible.builtin.set_fact:
-    firacode_installed: firacode_check is defined and firacode_check.stdout != ""
+    firacode_installed: "{{ (firacode_check.stdout | default('')) | length > 0 }}"
 
 - name: 'Core | Starship | FiraCode | Download FiraCode font zip'
   ansible.builtin.get_url:
-    url: https://github.com/tonsky/FiraCode/releases/download/6.2/Fira_Code_v6.2.zip
-    dest: /tmp/Fira_Code_v6.2.zip
+    url: "https://github.com/tonsky/FiraCode/releases/download/{{ firacode_version }}/Fira_Code_v{{ firacode_version }}.zip"
+    dest: "/tmp/Fira_Code_v{{ firacode_version }}.zip"
     mode: '0644'
+  when: not firacode_installed
+
+- name: 'Core | Starship | FiraCode | Create directory for unarchiving FiraCode'
+  ansible.builtin.file:
+    path: /tmp/firacode_fonts
+    state: directory
+    mode: '0755'
   when: not firacode_installed
 
 - name: 'Core | Starship | FiraCode | Unzip FiraCode font archive'
   ansible.builtin.unarchive:
-    src: /tmp/Fira_Code_v6.2.zip
+    src: "/tmp/Fira_Code_v{{ firacode_version }}.zip"
     dest: /tmp/firacode_fonts
     remote_src: true
   when: not firacode_installed
@@ -33,20 +40,30 @@
   become: true
   when: not firacode_installed
 
-- name: 'Core | Starship | FiraCode | Copy FiraCode ttf files to system font directory'
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: /usr/local/share/fonts/firacode/
-    remote_src: true
-    mode: '0644'
-  with_fileglob:
-    - /tmp/firacode_fonts/**/ttf/*.ttf
-  become: true
+- name: 'Core | Starship | FiraCode | Find FiraCode ttf files in extracted archive'
+  ansible.builtin.find:
+    paths: /tmp/firacode_fonts
+    patterns: '*.ttf'
+    recurse: true
+  register: firacode_fonts_found
   when: not firacode_installed
 
-- name: 'Core | Starship | FiraCode | Refresh font cache'
-  ansible.builtin.command: fc-cache -f -v
-  become: true
-  changed_when: false
+- name: 'Core | Starship | FiraCode | Check if each font file exists in system directory'
+  ansible.builtin.stat:
+    path: "/usr/local/share/fonts/firacode/{{ item.path | basename }}"
+  register: firacode_existing_fonts
+  loop: "{{ firacode_fonts_found.files }}"
   when: not firacode_installed
+
+- name: 'Core | Starship | FiraCode | Copy only missing FiraCode ttf files'
+  ansible.builtin.copy:
+    src: "{{ item.0.path }}"
+    dest: "/usr/local/share/fonts/firacode/{{ item.0.path | basename }}"
+    remote_src: true
+    mode: '0644'
+  loop: "{{ firacode_fonts_found.files | zip(firacode_existing_fonts.results) }}"
+  loop_control:
+    label: "{{ item.0.path | basename }}"
+  when: not firacode_installed and not item.1.stat.exists
+  become: true
   notify: Re-Check if FiraCode font is installed

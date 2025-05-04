@@ -1,0 +1,54 @@
+#include <tunables/global>
+
+profile /usr/bin/wireshark flags=(attach_disconnected) {
+# Required abstractions
+#include <abstractions/base>
+#include <abstractions/nameservice>
+#include <abstractions/user-tmp>
+#include <abstractions/net>
+#include <abstractions/X>
+
+# Binary
+/usr/bin/wireshark rix,
+
+# Support binary (used to capture)
+/usr/bin/dumpcap rix,
+
+# Shared libraries
+/lib/**              mr,
+/usr/lib/**          mr,
+/usr/lib/x86_64-linux-gnu/** mr,
+
+# Config and plugin files
+/etc/wireshark/**    r,
+/usr/share/wireshark/** r,
+
+# Allow packet capture
+capability net_raw,
+capability net_admin,
+
+# Device access
+/dev/null            rw,
+/dev/urandom         r,
+/dev/random          r,
+/dev/bus/usb/**      r,
+/dev/tty             rw,
+/dev/*               r,
+
+# GUI assets
+/usr/share/icons/**  r,
+/usr/share/mime/**   r,
+/usr/share/glib-2.0/** r,
+
+# File save/load
+@{HOME}/.wireshark/** rw,
+/tmp/**              rw,
+/var/tmp/**          rw,
+owner @{HOME}/**     rw,
+
+# D-Bus (used by GTK if applicable)
+dbus (send, receive) bus=session,
+
+# Deny all else
+deny /** wklx,
+}

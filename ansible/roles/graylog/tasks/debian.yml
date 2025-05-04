@@ -14,7 +14,6 @@
   register: dpkg_result
   changed_when: dpkg_result.stdout is defined and dpkg_result.stdout != "" and not dpkg_result.stdout is search("already installed")
   become: true
-  notify: Update apt cache
 
 - name: 'Graylog | Debian | Install Graylog server'
   ansible.builtin.apt:

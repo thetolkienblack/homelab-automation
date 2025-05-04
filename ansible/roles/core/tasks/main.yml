@@ -1,6 +1,12 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # tasks file for common
+- name: 'Core | Include Starship tasks'
+  ansible.builtin.include_tasks: "starship/main.yml"
+  when:
+    - core_install_starship is defined
+    - core_install_starship
+
 - name: 'Core | Include Security tasks'
   ansible.builtin.include_tasks: "security/main.yml"
 
@@ -19,15 +25,15 @@
     - core_install_network_tools is defined
     - core_install_network_tools
 
+- name: 'Core | Include Cockpit tasks'
+  ansible.builtin.include_tasks: "cockpit/main.yml"
+  when:
+    - core_install_cockpit is defined
+    - core_install_cockpit
+
 - name: 'Core | Include Nvidia tasks'
   ansible.builtin.include_tasks: "nvidia/main.yml"
   when:
     - core_install_nvidia is defined
     - core_install_nvidia
     - has_nvidia_gpu
-
-- name: 'Core | Include Starship tasks'
-  ansible.builtin.include_tasks: "starship/main.yml"
-  when:
-    - core_install_starship is defined
-    - core_install_starship

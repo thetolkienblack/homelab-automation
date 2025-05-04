@@ -1,4 +1,7 @@
 ---
+- name: 'OpenSearch | Debian | Include core debian handlers'
+  ansible.builtin.include_tasks: "{{ role_path }}/../common/handlers/debian.yml"
+
 - name: "OpenSearch | Debian | Check if OpenSearch GPG exists"
   ansible.builtin.stat:
     path: /usr/share/keyrings/opensearch.gpg
@@ -43,7 +46,7 @@
     mode: "0644"
   become: true
   notify: Update apt cache
-  when: opensearch_repo.stat.exists
+  when: not opensearch_repo.stat.exists
 
 - name: "OpenSearch | Debian | Copy opensearch repository template"
   ansible.builtin.template:
@@ -54,7 +57,7 @@
     mode: "0644"
   become: true
   notify: Update apt cache
-  when: opensearch_repo.stat.exists
+  when: not opensearch_repo.stat.exists
 
 - name: "OpenSearch | Debian | Ensure OpenSearch and OpenSearch Dashboard is installed"
   ansible.builtin.apt:
@@ -77,6 +80,16 @@
   register: aa_status
   changed_when: false
 
+- name: "OpenSearch | Debian | Set if opensearch apparmor is applied"
+  ansible.builtin.set_fact:
+    aa_opensearch_installed: "'/usr/share/opensearch/bin/opensearch' in aa_status.stdout"
+  changed_when: false
+
+- name: "OpenSearch | Debian | Set if opensearch apparmor should be applied"
+  ansible.builtin.set_fact:
+    aa_should_apply: (not aa_opensearch_installed and opensearch_binary.stat.exists and aa_status.stat.exists)
+  changed_when: false
+
 - name: "OpenSearch | Debian | Enable apparmor for OpenSearch from template"
   ansible.builtin.template:
     src: opensearch.apparmor.j2
@@ -85,22 +98,21 @@
     group: root
     mode: "0644"
   become: true
-  when: "'/usr/share/opensearch/bin/opensearch' not in aa_status.stdout"
+  when: aa_should_apply
 
 - name: "OpenSearch | Debian | Parse and load the OpenSearch AppArmor profile in complain mode"
   ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/usr.sbin.opensearch
-  changed_when: false
-  when: "'/usr/share/opensearch/bin/opensearch' not in aa_status.stdout"
+  when: aa_should_apply
 
 - name: "OpenSearch | Debian | Switch to enforce mode once tested for OpenSearch"
   ansible.builtin.command: aa-enforce /usr/bin/opensearch
-  changed_when: false
-  when: "'/usr/share/opensearch/bin/opensearch' not in aa_status.stdout"
+  when:
+    - aa_should_apply
+    - apparmor_enforce_mode
 
-- name: "OpenSearch | Debian | Allow OpenSearch from anywhere UFW"
-  community.general.ufw:
-    rule: allow
-    port: "{{ item }}"
-    proto: tcp
-  loop: "{{ opensearch_ufw_ports }}"
-  become: true
+- name: "OpenSearch | Debian | Switch to enforce mode once tested for OpenSearch"
+  ansible.builtin.command: aa-complain /usr/bin/opensearch
+  when:
+    - aa_should_apply
+    - not apparmor_enforce_mode
+

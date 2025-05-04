@@ -14,3 +14,49 @@
     state: present
     update_cache: true
   become: true
+
+- name: 'Core | Network | Debian | Check if wireshark is installed'
+  ansible.builtin.stat:
+    path: /usr/bin/wireshark
+  register: wireshark_exec
+
+# AppArmor profiles for diagnostic tools that need it
+- name: 'Core | Network | Debian | Create AppArmor profile for wireshark'
+  ansible.builtin.template:
+    src: network_tools/wireshark.apparmor.j2
+    dest: /etc/apparmor.d/usr.sbin.wireshark
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - wireshark_exec.stat.exists
+
+- name: 'Core | Diagnostic | Parse and load the Wireshark AppArmor profile in complain mode'
+  ansible.builtin.command: "apparmor_parser -r /etc/apparmor.d/usr.sbin.wireshark"
+  register: apparmor_parser_results
+  changed_when: false
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - wireshark_exec.stat.exists
+
+- name: 'Core | Diagnostic | Switch to enforce mode once tested for Wireshark'
+  ansible.builtin.command: "aa-enforce /etc/apparmor.d/usr.sbin.wireshark"
+  register: aa_enforce_results
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - wireshark_exec.stat.exists
+    - apparmor_enforce_mode
+
+- name: 'Core | Diagnostic | Switch to complain mode once tested for Wireshark'
+  ansible.builtin.command: "aa-complain /etc/apparmor.d/usr.sbin.wireshark"
+  register: aa_complain_results
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - wireshark_exec.stat.exists
+    - not apparmor_enforce_mode

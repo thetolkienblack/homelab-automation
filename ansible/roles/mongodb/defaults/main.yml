@@ -3,7 +3,6 @@
 mongodb_repo_version: "8.0"
 mongodb_bind_ip: 127.0.0.1
 mongodb_port: 27017
-mongodb_authorization: enabled
 mongodb_keyfile: /etc/mongodb-keyfile
 mongodb_keyfile_content: "{{ lookup('password', '/dev/null length=96 chars=ascii_letters,digits') }}"
-replSetName: rs0
+replSetName: ""

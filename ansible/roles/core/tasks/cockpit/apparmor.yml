@@ -1,0 +1,91 @@
+- name: 'Core | Cockpit | Check if cockpit is installed'
+  ansible.builtin.stat:
+    path: /usr/lib/cockpit/cockpit-ws
+  register: cockpit_ws_exec
+
+- name: 'Core | Cockpit | Enable apparmor for Cockpit from template'
+  ansible.builtin.template:
+    src: cockpit/cockpit.apparmor.j2
+    dest: /etc/apparmor.d/usr.lib.cockpit.cockpit-ws
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - cockpit_ws_exec.stat.exists
+
+- name: 'Core | Cockpit | Check if redis is installed'
+  ansible.builtin.stat:
+    path: /usr/bin/redis-server
+  register: redis_exec
+
+- name: 'Core | Cockpit | Enable apparmor for Redis from template'
+  ansible.builtin.template:
+    src: cockpit/redis.apparmor.j2
+    dest: /etc/apparmor.d/usr.bin.redis-server
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - redis_exec.stat.exists
+
+- name: 'Core | Cockpit | Check if dnsmasq is installed'
+  ansible.builtin.stat:
+    path: /usr/sbin/dnsmasq
+  register: dnsmasq_exec
+
+- name: 'Core | Cockpit | Enable apparmor for DNSMasq from template'
+  ansible.builtin.template:
+    src: cockpit/dnsmasq.apparmor.j2
+    dest: /etc/apparmor.d/usr.sbin.dnsmasq
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - dnsmasq_exec.stat.exists
+
+- name: 'Core | Cockpit | Parse and load the Cockpit AppArmor profile in complain mode'
+  ansible.builtin.command: "apparmor_parser -r {{ item }}"
+  loop: "{{ core_cockpit_aa_profiles }}"
+  register: apparmor_parser_results
+  loop_control:
+    label: "{{ item }}"
+  changed_when: false
+  failed_when: apparmor_parser_results.results is defined and
+    (apparmor_parser_results.results | selectattr('rc', '!=', 0) | list | length > 0)
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - cockpit_ws_exec.stat.exists
+
+- name: 'Core | Cockpit | Switch to enforce mode once tested for Cockpit'
+  ansible.builtin.command: "aa-enforce {{ item }}"
+  loop: "{{ core_cockpit_aa_exec }}"
+  register: aa_enforce_results
+  failed_when: aa_enforce_results.results is defined and
+    (aa_enforce_results.results | selectattr('rc', '!=', 0) | list | length > 0)
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - cockpit_ws_exec.stat.exists
+    - apparmor_enforce_mode
+
+- name: 'Core | Cockpit | Switch to complain mode once tested for Cockpit'
+  ansible.builtin.command: "aa-complain {{ item }}"
+  loop: "{{ core_cockpit_aa_exec }}"
+  register: aa_complain_results
+  failed_when: aa_complain_results.results is defined and
+    (aa_complain_results.results | selectattr('rc', '!=', 0) | list | length > 0)
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - cockpit_ws_exec.stat.exists
+    - not apparmor_enforce_mode

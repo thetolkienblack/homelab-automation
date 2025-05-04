@@ -1,4 +1,7 @@
 ---
+- name: 'Core | Cockpit | Redis | Include redis vars'
+  ansible.builtin.include_vars: "{{ role_path }}/vars/cockpit/main.yml"
+
 - name: 'Core | Cockpit | Redis | Check if redis memory limit is already configured'
   ansible.builtin.command: grep -q '^maxmemory {{ core_redis_memory_usage }}' /etc/redis/redis.conf
   register: redis_memory_output

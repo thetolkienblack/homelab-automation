@@ -1,7 +1,8 @@
 server:
   host: {{ opensearch_dashboards_host }}
   port: {{ opensearch_dashboards_port }}
-  rewriteBasePath: true
+  basePath: "/dashboards"
+  rewriteBasePath: false
   maxPayloadBytes: 1048576
   name: {{ opensearch_dashboards_hostname | default("opensearch-dashboards") }}
   ssl:
@@ -10,12 +11,9 @@ server:
     key: {{ opensearch_ssl_pemkey_filepath | default("/etc/opensearch/certs/transport.key") }}
     certificateAuthorities:
       - {{ opensearch_ssl_pemtrustedcas_filepath | default("/etc/opensearch/certs/ca.pem") }}
-    verificationMode: full
-    redirectHttpFromPort: 80
-    redirectHttpFromPortEnabled: true
 
 opensearch:
-  hosts: {{ opensearch_dashboards_opensearch_hosts | default("['http://localhost:9200']") }}
+  hosts: {{ opensearch_dashboards_opensearch_hosts | default("['https://localhost:9200']") }}
   optimizedHealthcheck:
     id: {{ opensearch_node_name }}
   username: "{{ opensearch_admin_username }}"

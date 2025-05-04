@@ -31,7 +31,37 @@
   become: true
   notify: Update apt cache
 
-- name: 'Mongodb | Enable apparmor for MongoDB from template'
+- name: 'Mongodb | Debian | AppArmor | Check if AppArmor binary exists'
+  ansible.builtin.stat:
+    path: /usr/sbin/aa-status
+  register: apparmor_binary
+
+- name: 'Core | Security | Debian | AppArmor | Check if AppArmor is installed'
+  ansible.builtin.stat:
+    path: /etc/apparmor.d
+  register: apparmor_dir
+  become: true
+  when: apparmor_binary.stat.exists
+
+- name: 'Mongodb | Debian | Check if AppArmor is installed'
+  ansible.builtin.stat:
+    path: /etc/apparmor.d
+  register: apparmor_dir
+  become: true
+  when: apparmor_binary.stat.exists
+
+- name: 'Core | Debian | AppArmor | Set Apparmor is installed'
+  ansible.builtin.set_fact:
+    apparmor_installed: apparmor_binary.stat.exists and apparmor_dir.stat.exists and apparmor_dir.stat.isdir
+  changed_when: false
+  failed_when: false
+
+- name: 'Mongodb | Debian | Check if Mongodb is installed'
+  ansible.builtin.stat:
+    path: /usr/bin/mongod
+  register: mongod_exec
+
+- name: 'Mongodb | Debian | Enable apparmor for MongoDB from template'
   ansible.builtin.template:
     src: mongodb.apparmor.j2
     dest: /etc/apparmor.d/usr.bin.mongod
@@ -39,11 +69,33 @@
     group: root
     mode: '0644'
   become: true
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - mongod_exec.stat.exists
 
-- name: 'Mongodb | Parse and load the MongoDB AppArmor profile in complain mode'
+- name: 'Mongodb | Debian | Parse and load the MongoDB AppArmor profile in complain mode'
   ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/usr.bin.mongod
   changed_when: false
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - mongod_exec.stat.exists
 
-- name: 'Mongodb | Switch to enforce mode once tested for MongoDB'
+- name: 'Mongodb | Debian | Switch to enforce mode once tested for MongoDB'
   ansible.builtin.command: aa-enforce /usr/bin/mongod
   changed_when: false
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - mongod_exec.stat.exists
+    - apparmor_enforce_mode
+
+- name: 'Mongodb | Debian | Switch to complain mode once tested for MongoDB'
+  ansible.builtin.command: aa-complain /usr/bin/mongod
+  changed_when: false
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - mongod_exec.stat.exists
+    - not apparmor_enforce_mode

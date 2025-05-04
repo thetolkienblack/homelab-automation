@@ -1,3 +1,4 @@
 # SPDX-License-Identifier: MIT-0
 ---
 # vars file for ansible_role_template
+firacode_version: 6.2

@@ -8,6 +8,12 @@
   register: opensearch_binary
   changed_when: false
 
+- name: 'OpenSearch | Ensure shared group exists for TLS access'
+  ansible.builtin.group:
+    name: opensearch-tls
+    state: present
+    system: true
+
 - name: 'OpenSearch | Include tasks for OpenSearch'
   ansible.builtin.include_tasks: opensearch/main.yml
   when: not opensearch_binary.stat.exists
@@ -23,3 +29,11 @@
   when:
     - opensearch_binary.stat.exists
     - not opensearch_dashboards_executable.stat.exists
+
+- name: 'OpenSearch | Certs | Include tasks for OpenSearch certs'
+  ansible.builtin.include_tasks: opensearch_certs.yml
+  when:
+    - opensearch_binary.stat.exists
+    - opensearch_dashboards_executable.stat.exists
+
+

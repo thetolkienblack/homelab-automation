@@ -12,12 +12,14 @@ net:
   port: {{ mongodb_port | default(27017) }}
 
 # Security configuration
-{% if mongodb_authorization == 'enabled' %}
 security:
-  authorization: "{{ mongodb_authorization | default('enabled') }}"
-{% if mongodb_keyfile is defined %}
+{% if mongodb_admin_check is defined and mongodb_admin_check.stdout != "null" %}
+  authorization: "enabled"
   keyFile: "{{ mongodb_keyfile }}"
+{% else %}
+authorization: "disabled"
 {% endif %}
+{% if replSetName != '' %}
 replication:
     replSetName: "{{ replSetName }}"
 {% endif %}

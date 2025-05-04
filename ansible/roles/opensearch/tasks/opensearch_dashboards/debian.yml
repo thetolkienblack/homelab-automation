@@ -1,4 +1,7 @@
 ---
+- name: 'OpenSearch | Debian | Include core debian handlers'
+  ansible.builtin.include_tasks: "{{ role_path }}/../common/handlers/debian.yml"
+
 - name: "OpenSearch | Dashboard | Debian | Check if OpenSearch GPG exists"
   ansible.builtin.stat:
     path: /usr/share/keyrings/opensearch.gpg

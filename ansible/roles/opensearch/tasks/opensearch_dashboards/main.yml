@@ -11,6 +11,16 @@
     - not opensearch_dashboards_executable.stat.exists
     - opensearch_binary.stat.exists
 
+- name: 'OpenSearch | Configure OpenSearch'
+  ansible.builtin.template:
+    src: opensearch_dashboards.yml.j2
+    dest: /etc/opensearch-dashboards/opensearch_dashboards.yml
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  when: opensearch_dashboards_executable.stat.exists
+
 - name: 'OpenSearch | Dashboard | Get OpenSearch Dashboards plugins'
   ansible.builtin.command: /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin list
   register: opensearch_dashboards_plugins_list

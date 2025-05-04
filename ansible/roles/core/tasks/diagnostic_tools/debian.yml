@@ -13,6 +13,11 @@
     update_cache: true
   become: true
 
+- name: 'Core | Diagnostic | Debian | Check if tcpdump is installed'
+  ansible.builtin.stat:
+    path: /usr/bin/tcpdump
+  register: tcpdump_exec
+
 # AppArmor profiles for diagnostic tools that need it
 - name: 'Core | Diagnostic | Debian | Create AppArmor profile for tcpdump'
   ansible.builtin.template:
@@ -25,4 +30,31 @@
   when:
     - apparmor_installed is defined
     - apparmor_installed
-  notify: Reload AppArmor profiles
+    - tcpdump_exec.stat.exists
+
+- name: 'Core | Diagnostic | Parse and load the TcpDump AppArmor profile in complain mode'
+  ansible.builtin.command: "apparmor_parser -r /etc/apparmor.d/usr.sbin.tcpdump"
+  register: apparmor_parser_results
+  changed_when: false
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - tcpdump_exec.stat.exists
+
+- name: 'Core | Diagnostic | Switch to enforce mode once tested for TcpDump'
+  ansible.builtin.command: "aa-enforce /etc/apparmor.d/usr.sbin.tcpdump"
+  register: aa_enforce_results
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - tcpdump_exec.stat.exists
+    - apparmor_enforce_mode
+
+- name: 'Core | Diagnostic | Switch to complain mode once tested for TCPDump'
+  ansible.builtin.command: "aa-complain /etc/apparmor.d/usr.sbin.tcpdump"
+  register: aa_complain_results
+  when:
+    - apparmor_installed is defined
+    - apparmor_installed
+    - tcpdump_exec.stat.exists
+    - not apparmor_enforce_mode

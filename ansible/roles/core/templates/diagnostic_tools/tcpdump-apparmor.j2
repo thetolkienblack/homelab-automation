@@ -1,31 +1,114 @@
 #include <tunables/global>
 
-profile usr.sbin.tcpdump {
-  #include <abstractions/base>
-  #include <abstractions/nameservice>
+profile /usr/sbin/tcpdump flags=(attach_disconnected) {
+# Basic required abstractions
+# Includes networking, filesystem, etc.
+# 'base' must be included
+# Add abstractions as needed
 
-  capability net_raw,
-  capability net_admin,
-  capability dac_override,
-  capability sys_module,
+# Base access and file I/O
+# Required for CLI tools
+# Includes /etc, /lib, /usr/lib, etc.
+# Also includes /dev/null, /dev/tty
+# See: /etc/apparmor.d/abstractions/base
+# Add more if tcpdump logs errors about missing access
 
-  network packet raw,
-  network packet packet,
+# Abstractions
+# Include these safely
+# Modify if needed
+# On Debian, these are present by default
+# Comment out if missing or replace with inline permissions
+# or create a stub
+# /etc/apparmor.d/abstractions/*
+# Ensure abstractions/base exists
 
-  /usr/sbin/tcpdump mr,
-  /etc/nsswitch.conf r,
-  /etc/group r,
-  /etc/passwd r,
-  /proc/net/** r,
-  /sys/kernel/debug/tracing/** rw,
-  /usr/share/tcpdump/** r,
-  /var/tmp/** rw,
-  /tmp/** rw,
-  /proc/sys/net/** r,
+# Base (required)
+# Covers libc, standard file access
+# Don't remove
+# You can inspect it with: less /etc/apparmor.d/abstractions/base
+# Most basic tools need this
+# Use `aa-logprof` to extend with real audit entries
 
-  {% if tcpdump_additional_paths is defined %}
-  {% for path in tcpdump_additional_paths %}
-  {{ path }} rw,
-  {% endfor %}
-  {% endif %}
+# Includes
+# Basic environment
+# DNS and hostname
+# tmpfiles (pidfiles, captures)
+# Network and system libraries
+# Systemd interaction
+# Includes device access
+# Ensure abstraction files exist
+# or inline if unavailable
+
+# Required
+# Without these, basic execution may fail
+# Add more as needed
+
+# Minimum safe includes
+# Customize below
+# Add full audit mode to debug further
+
+# Abstractions
+# Safe for Debian
+# Required by tcpdump
+
+# Include base I/O and libraries
+# Add others as needed
+
+# Standard includes
+# Remove if too permissive and replace with fine-grained rules
+# Useful for common tools
+
+# Core abstractions
+# DNS, tmp, devices
+
+# Use aa-logprof to tune this
+
+# Begin includes
+# Required
+# Comment if unavailable
+# Safe on Debian
+
+#include <abstractions/base>
+#include <abstractions/nameservice>
+#include <abstractions/user-tmp>
+#include <abstractions/net>
+
+# Binary execution
+/usr/sbin/tcpdump rix,
+
+# Allow reading shared libraries
+/lib/**              mr,
+/usr/lib/**          mr,
+/usr/lib/x86_64-linux-gnu/** mr,
+
+# Read configuration files
+/etc/tcpdump.conf    r,
+/etc/hosts           r,
+/etc/protocols       r,
+/etc/services        r,
+
+# Device access to capture packets
+/dev/bpf*            rw,       # for BSD/macOS (ignore on Linux)
+/dev/tty             rw,
+/dev/null            rw,
+/dev/stdout          rw,
+/dev/random          r,
+/dev/urandom         r,
+/dev/*               r,
+
+# Raw socket access
+capability net_raw,
+capability net_admin,
+
+# File system access (for writing capture files)
+/tmp/**              rw,
+/var/tmp/**          rw,
+@{HOME}/tcpdump/     rw,
+@{HOME}/tcpdump/**   rw,
+
+# Allow user to save files in $HOME
+owner @{HOME}/**     rw,
+
+# Deny anything else
+deny /** wklx,
 }

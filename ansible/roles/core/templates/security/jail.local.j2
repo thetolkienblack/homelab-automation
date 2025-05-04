@@ -4,12 +4,14 @@ findtime = 10m
 maxretry = 5
 banaction = ufw
 backend = auto
+ignoreip = 127.0.0.1/8 192.168.50.0/24 10.0.0.0/8
 
 [sshd]
 enabled = true
 port = ssh
 filter = sshd
 logpath = /var/log/auth.log
-maxretry = 3
+backend = systemd
+maxretry = 5
 findtime = 5m
 bantime = 1h

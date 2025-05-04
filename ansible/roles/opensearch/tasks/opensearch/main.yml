@@ -3,6 +3,14 @@
   ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
   when: not opensearch_binary.stat.exists
 
+- name: "OpenSearch | Debian | Allow OpenSearch from anywhere UFW"
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ opensearch_ufw_ports }}"
+  become: true
+
 - name: 'OpenSearch | Configure OpenSearch'
   ansible.builtin.template:
     src: opensearch.yml.j2
@@ -47,6 +55,13 @@
   notify: Restart OpenSearch
   when: not opensearch_java_options.stat.exists
 
+- name: 'OpenSearch | Get current max_map_count'
+  ansible.builtin.command: sysctl -n vm.max_map_count
+  register: vm_max_map_count
+  changed_when: false
+  check_mode: false
+  become: true
+
 - name: 'OpenSearch | Configure max_map_count in sysctl.conf'
   ansible.posix.sysctl:
     name: vm.max_map_count
@@ -88,3 +103,12 @@
     - Reload systemd
     - Restart OpenSearch
   when: not opensearch_service_d_limits.stat.exists
+
+- name: 'OpenSearch | Ensure OpenSearch is started and enabled'
+  ansible.builtin.systemd:
+    name: opensearch
+    enabled: true
+    state: started
+  become: true
+  when:
+    - opensearch_binary.stat.exists

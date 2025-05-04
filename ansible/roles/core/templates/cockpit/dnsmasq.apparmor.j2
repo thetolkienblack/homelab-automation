@@ -1,0 +1,51 @@
+#include <tunables/global>
+
+profile dnsmasq /usr/sbin/dnsmasq flags=(attach_disconnected) {
+
+# Allow execution of dnsmasq binary
+/usr/sbin/dnsmasq rix,
+
+# Configuration files
+/etc/dnsmasq.conf r,
+/etc/dnsmasq.d/** r,
+/etc/hosts r,
+/etc/ethers r,
+/etc/resolv.conf r,
+/etc/passwd r,
+
+# PID file and runtime socket
+/run/dnsmasq.pid rw,
+/run/dnsmasq/** rw,
+
+# Lease file and DHCP state
+/var/lib/misc/dnsmasq.leases rw,
+
+# Log output
+/var/log/** rw,
+
+# Capabilities
+capability net_admin,
+capability net_bind_service,
+capability setgid,
+capability setuid,
+capability dac_override,
+
+# Network and socket support
+network inet stream,
+network inet6 stream,
+unix (send, receive),
+
+# Access to /dev/null and /dev/urandom (common for daemons)
+/dev/null rw,
+/dev/urandom r,
+
+# Proc access for status
+/proc/*/status r,
+/proc/self/** r,
+
+# Systemd notify socket (if applicable)
+/run/systemd/notify w,
+
+# Deny all else
+deny /** wklx,
+}

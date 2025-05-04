@@ -14,7 +14,18 @@ core_cockpit_apparmor_profiles:
   - { profile: "usr.lib.cockpit.cockpit-ws", template: "cockpit-apparmor.j2" }
 
 core_cockpit_services:
-  - redis
-  - dnsmasq
-  - cockpit
-  - cockpit-ws
+#  - redis
+#  - dnsmasq
+  - cockpit.socket
+
+core_cockpit_aa_exec:
+  - /usr/lib/cockpit/cockpit-ws
+  - /usr/lib/cockpit/cockpit-session
+#  - /usr/bin/dnsmasq
+#  - /usr/bin/redis-server
+
+core_cockpit_aa_profiles:
+  - /etc/apparmor.d/usr.bin.redis-server
+  - /etc/apparmor.d/usr.sbin.dnsmasq
+  - /etc/apparmor.d/usr.lib.cockpit.cockpit-ws
+  - /etc/apparmor.d/usr.lib.cockpit.cockpit-session

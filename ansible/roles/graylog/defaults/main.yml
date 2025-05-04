@@ -6,9 +6,15 @@ graylog_port: 12201
 graylog_datanode_http_port: 12202
 graylog_is_master_node: true
 graylog_master_node_server: "192.168.50.1:12201"
-graylog_http_external_uri: "https://graylog.graylock.eu"
-graylog_trusted_proxies: ""
-graylog_mongodb_uri: "mongodb://{{ gl_mongo_username }}:{{ gl_mongo_password }}@{{ ansible_hostname }}:27017/graylog"
+graylog_http_external_uri: "https://{{ ansible_fqdn }}:{{ graylog_port }}/"
+graylog_http_bind_address: "0.0.0.0:{{ graylog_port }}"
+graylog_http_bind_uri: "https://{{ ansible_default_ipv4.address }}:{{ graylog_port }}/"
+graylog_web_listen_uri: "{{ graylog_http_bind_uri }}"
+graylog_trusted_proxies: "{{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.netmask | ansible.utils.ipaddr('prefix') }}"
+graylog_mongodb_uri: "mongodb://{{ gl_mongo_username }}:{{ gl_mongo_password }}@127.0.0.1:27017/{{ gl_mongo_db }}"
 graylog_transport_email_enabled: true
 graylog_prometheus_exporter_enabled: true
 graylog_prometheus_exporter_bind_address: "127.0.0.1:9833"
+graylog_server_location: /etc/graylog/server/
+graylog_user: graylog
+graylog_es_auto_discovery: false

@@ -1,7 +1,7 @@
 #include <tunables/global>
 
 profile /usr/bin/mongod flags=(attach_disconnected) {
-/usr/bin/mongod px,
+/usr/bin/mongod Px,
 
 # Config and keys
 /etc/mongod.conf r,
@@ -43,6 +43,15 @@ profile /usr/bin/mongod flags=(attach_disconnected) {
 /proc/self/exe r,
 /proc/*/mountinfo r,
 /proc/*/maps r,
+/proc/pressure/memory r,
+/proc/pressure/cpu r,
+/proc/pressure/io r,
+/proc/stat r,
+/proc/vmstat r,
+/proc/sys/fs/file-nr r,
+/proc/*/net/netstat r,
+/proc/*/net/snmp r,
+/proc/*/net/sockstat r,
 
 # /sys CPU topology needed by tcmalloc
 /sys/devices/system/cpu/possible r,
@@ -69,6 +78,10 @@ profile /usr/bin/mongod flags=(attach_disconnected) {
 /proc/diskstats r,
 /proc/[0-9]*/mountinfo r,
 /proc/[0-9]*/maps r,
+/proc/pressure/** r,
+/proc/stat r,
+/proc/cpuinfo r,
+/proc/vmstatus r,
 
 # Required for MongoDB DB path probing at startup
 /var/lib/mongodb/ r,

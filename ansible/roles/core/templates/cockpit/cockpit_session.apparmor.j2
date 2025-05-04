@@ -1,0 +1,230 @@
+#include <tunables/global>
+
+profile /usr/lib/cockpit/cockpit-session flags=(attach_disconnected) {
+
+# Standard abstractions
+# Adjust based on what's available on your system
+# If missing, comment out or create your own
+# Safe on Debian 12
+# Provides access to libc, DNS, /tmp, etc.
+# Required for correct behavior
+# Also covers /proc and systemd basics
+# These avoid the need to list common libraries
+# and environment files
+
+# Core includes
+# (Comment out if unavailable)
+# You can replace with explicit rules if needed
+# But abstractions are simpler and more maintainable
+# when available
+# See `man apparmor.d` for abstraction details
+
+# Base functionality
+# Required for any realistic application profile
+# Do NOT remove unless manually covering libc, syscall, IO
+# Should always be first
+# Includes many required permissions
+# like /etc/ld.so.cache, /proc/self/, etc.
+
+# Required
+# Provides access to libc, /dev, /proc, etc.
+# This profile assumes abstraction files exist
+
+# Includes are preferred to explicit rules unless you're isolating tightly
+# For deep-hardening, replace with strict rule set
+
+# Includes:
+# - nameservice: /etc/hosts, /etc/nsswitch.conf, etc.
+# - user-tmp: access to /tmp, /var/tmp
+# - systemd: runtime dirs under /run, etc.
+
+# Abstractions
+# If your system is missing any, replace or create stubs
+# They usually live in /etc/apparmor.d/abstractions/
+
+# General includes
+# ----------------------------------------------------
+# These provide core system and userland access
+
+# Do not omit these unless you know what you're doing
+
+# Runtime includes
+# Core operating system needs
+
+# Important!
+# systemd abstraction may need to be included manually
+# via stub if missing on minimal installs
+
+# Common
+# Good defaults for desktop/server environments
+# Includes D-Bus, pam, locale, etc.
+
+# Recommended set
+# Adjust as necessary
+
+# For full sandboxing, replace with custom low-level perms
+# Not advised for initial setup
+
+# Core access
+# ===============================
+
+# Include abstractions
+# (comment out if missing on your system)
+# You can inline if needed
+
+# Safe on Debian 12
+# Replace with specific rules if needed
+
+# Required for session login, D-Bus, PAM, etc.
+# ----------------------------------------------------
+
+# Minimal session profile
+# Adds access to PAM, shells, login defs
+# and cockpit-bridge
+
+# Includes common library paths and /proc
+
+# Minimal session profile
+# Focused on what cockpit-session uses
+
+# Begin profile body
+# ===============================
+
+# Abstractions
+# ------------
+
+# Common includes
+# Don't remove unless you're fully replacing
+
+# Basic env
+# Required for almost all processes
+# These must exist or be stubbed
+
+# If you use AppArmor on a hardened system, replace abstractions
+
+# Safe on stock Debian
+# ----------------------------------------------------
+
+# Abstraction includes
+# --------------------
+
+# Standard runtime
+# ----------------
+# Recommended
+
+# Core
+# Recommended
+
+# AppArmor includes
+# -----------------
+# Add any needed abstractions here
+
+# Load standard system abstractions
+# Safe to use unless you're hard-isolating
+
+# Critical: allows libc, file IO, /proc/self/
+# and other low-level syscall access
+
+# These are essential unless you're replicating libc
+# in rules manually
+
+# Includes
+# --------------------
+# Safe for login session tools
+
+# Safe on all Debian installs with full userland
+# Comment if not present, or replace
+# --------------------
+
+# Include safe standard files
+# Add more as needed
+
+# Needed for PAM environment loading
+# and common session operations
+
+# Safe defaults
+# --------------------
+
+# Add abstractions
+# --------------------
+
+# Abstractions
+# --------------------
+# Login stack and runtime
+
+# Load systemd and session helpers
+
+# Abstraction paths
+# --------------------
+# You can create missing ones if needed
+
+# Load required rules
+# --------------------
+# For runtime session
+
+# Auth and shell helpers
+
+# Exec cockpit-session
+/usr/lib/cockpit/cockpit-session     rix,
+
+# PAM and environment
+/etc/pam.d/**                         r,
+/etc/shadow                           r,
+/etc/passwd                           r,
+/etc/group                            r,
+/etc/login.defs                       r,
+/etc/environment                      r,
+/etc/default/locale                   r,
+/etc/security/pam_env.conf           r,
+/etc/security/sepermit.conf          r,
+/etc/cockpit/disallowed-users        r,
+
+# Shells
+/usr/bin/bash                         ix,
+/usr/bin/dash                         ix,
+
+# Bridge helper
+/usr/bin/cockpit-bridge               ux,
+
+# Session tracking
+/run/utmp                             rw,
+/var/log/wtmp                         rwk,
+/var/log/btmp                         rk,
+/var/log/lastlog                      rwk,
+
+# /proc session info
+/proc/*/cmdline                       r,
+/proc/*/status                        r,
+/proc/*/stat                          r,
+/proc/self/**                         r,
+/proc/*/uid_map                       r,
+/proc/*/loginuid                      rw,
+
+# Shared libs
+/etc/ld.so.cache                      r,
+/lib/**                               mr,
+/usr/lib/**                           mr,
+/usr/lib/x86_64-linux-gnu/**         mr,
+
+# Capabilities
+capability setuid,
+capability setgid,
+capability audit_write,
+capability net_admin,
+
+# Signal back to cockpit-ws
+signal peer=unconfined,
+
+# D-Bus (system bus)
+dbus (send, receive) bus=system,
+
+# Logging socket
+/dev/log                              rw,
+
+# Home dir (minimal)
+owner @{HOME}/                        r,
+owner @{HOME}/.ssh/                   r,
+
+# Final catch-all (optional lockdown)
+#deny /** wklx,
+}
