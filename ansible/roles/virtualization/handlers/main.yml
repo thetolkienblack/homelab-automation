@@ -1,3 +1,13 @@
 # SPDX-License-Identifier: MIT-0
 ---
-# handlers file for ansible_role_template
+- name: build_vbox_modules
+  ansible.builtin.command: "/sbin/vboxconfig"
+    register: vboxconfig
+    changed_when: "'Recompiling VirtualBox kernel modules' in vboxconfig.stdout"
+  notify: reload_vboxdrv
+
+- name: reload_vboxdrv
+  ansible.builtin.shell: |
+    modprobe -r vboxpci vboxnetflt vboxnetadp vboxdrv || true
+    modprobe vboxdrv
+  when: ansible_facts.virtualization_role != "guest"

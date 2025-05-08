@@ -1,0 +1,20 @@
+---
+- name: Setup pCloud Debian server
+  hosts: all
+  become: true
+  gather_facts: true
+  vars_files:
+    - '../../group_vars/all.yml'
+    - '../../group_vars/vault.yml'
+  vars:
+    core_install_nvidia: false
+    containers_install_docker: false
+  roles:
+    - role: common
+    - role: core
+    - role: gde_remove
+    - role: development_tools
+    - role: hashicorp
+    - role: virtualization
+    - role: containers
+

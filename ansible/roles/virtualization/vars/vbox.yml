@@ -1,0 +1,4 @@
+---
+vbox_major: "7.0"
+vbox_repo: "https://download.virtualbox.org/virtualbox/debian"
+vbox_key_url: "https://www.virtualbox.org/download/oracle_vbox_2016.asc"

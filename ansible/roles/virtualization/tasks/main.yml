@@ -1,5 +1,8 @@
 # SPDX-License-Identifier: MIT-0
 ---
+- name: 'MongoDB | Handlers | Include common handlers'
+  ansible.builtin.import_tasks: '../../common/handlers/main.yml'
+
 # tasks file for ansible_role_template
 - name: 'Virtualization | Include Libvirt tasks'
   ansible.builtin.include_tasks: "libvirt/main.yml"

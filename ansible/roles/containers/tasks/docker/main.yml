@@ -24,3 +24,7 @@
 - name: 'Containers | Docker | Apply UFW rules'
   ansible.builtin.include_tasks: "ufw.yml"
   when: docker_binary.stat.exists and containers_docker_ports | length > 0
+
+- name: 'Containers| Docker | Include Docker container configurations'
+  ansible.builtin.include_tasks: "docker_containers.yml"
+  when: docker_binary.stat.exists

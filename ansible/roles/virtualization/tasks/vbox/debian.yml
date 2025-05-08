@@ -1,0 +1,24 @@
+---
+- name: Add Oracle VirtualBox APT key
+  ansible.builtin.apt_key:
+    url: "{{ vbox_key_url }}"
+    state: present
+
+- name: Add Oracle VirtualBox APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] {{ vbox_repo }} {{ ansible_lsb_codename }} contrib"
+    state: present
+    filename: virtualbox
+
+- name: Pin VirtualBox to {{ vbox_major }}
+  ansible.builtin.template:
+    src: virtualbox.pref.j2
+    dest: /etc/apt/preferences.d/virtualbox
+  notify: Apt
+
+- name: Install VirtualBox
+  ansible.builtin.apt:
+    name: "virtualbox-{{ vbox_major }}"
+    state: present
+  update_cache: yes
+  notify: build_vbox_modules

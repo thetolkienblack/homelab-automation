@@ -65,6 +65,12 @@
     - docker_password == ''
   become: false
 
+- name: 'Containers | Podman | Include Podman pods tasks'
+  ansible.builtin.include_tasks: "podman_pods.yml"
+  when:
+    - podman_pods is defined
+    - podman_pods | length > 0
+
 - name: 'Containers | Podman | Apply UFW rules'
   ansible.builtin.include_tasks: "ufw.yml"
   when:

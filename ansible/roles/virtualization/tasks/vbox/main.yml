@@ -1,0 +1,7 @@
+---
+- name: 'Virtualization | VBox | Gather distribution codename'
+  ansible.builtin.set_fact:
+    ansible_lsb_codename: "{{ ansible_lsb.codename | default(ansible_facts.lsb.codename) }}"
+
+- name: 'Virtualization | VBox | Include OS-releated tasks'
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"

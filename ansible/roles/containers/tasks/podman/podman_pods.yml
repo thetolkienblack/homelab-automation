@@ -1,0 +1,20 @@
+---
+- name: "Containers | Podman | Include podman vars"
+  ansible.builtin.include_vars: "{{ role_path }}/vars/podman.yml"
+
+- name: Ensure Podman pod manifests directory exists
+  ansible.builtin.file:
+    path: /etc/podman/pods
+    state: directory
+    mode: "0755"
+
+- name: Render Podman kube manifest from template
+  ansible.builtin.template:
+    src: podman/podman-pod.yaml.j2
+    dest: "/etc/podman/pods/{{ pod.name }}.yaml"
+    mode: "0644"
+
+- name: Deploy pod using podman play kube
+  containers.podman.podman_play:
+    kube_file: "/etc/podman/pods/{{ pod.name }}.yaml"
+    state: started
