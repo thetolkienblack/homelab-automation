@@ -1,0 +1,1622 @@
+---
+compose_file_dir: /opt/docker/compose
+
+airtrail.server_url: airtrail.sidney.bg
+
+cadvisor.server_url: cadvisor.graylock.eu
+
+ollama:
+  base_url: http://ollama:11434
+  server_url: ollama.graylock.eu
+
+openai:
+  base_url: https://api.openai.com/v1
+  model: gpt-4o
+  send_data: false
+
+openwebui:
+  base_url: https://chat.graylock.eu
+  enable_signup: false
+  default_models: llama3.2
+  enable_rag_web_search: true
+  enable_image_generation: true
+  webui_url: chat.graylock.eu
+
+crowdsec:
+  collections: "crowdsecurity/nginx crowdsecurity/http-cve crowdsecurity/whitelist-good-actors LePresidente/adguardhome LePresidente/authelia LePresidente/grafana gauth-fr/immich andreasbrett/paperless-ngx crowdsecurity/plex LePresidente/authelia crowdsecurity/smb crowdsecurity/sshd timokoessler/mongodb crowdsecurity/mssql crowdsecurity/mysql crowdsecurity/pgsql timokoessler/uptime-kuma crowdsecurity/base-http-scenarios"
+  parsers: "LePresidente/adguardhome-logs LePresidente/authelia-logs firix/authentik-logs crowdsecurity/docker-logs crowdsecurity/home-assistant-logs crowdsecurity/http-logs gauth-fr/immich-logs crowdsecurity/iptables-logs crowdsecurity/k8s-audit crowdsecurity/kasm-logs crowdsecurity/mariadb-logs timokoessler/mongodb-logs ZoeyVid/npmplus-logs openappsec/openappsec-logs crowdsecurity/palo-alto-threat-log andreasbrett/paperless-ngx-logs crowdsecurity/pgsql-logs crowdsecurity/plex-allowlist crowdsecurity/smb-logs crowdsecurity/sshd-logs crowdsecurity/sshd-success-logs crowdsecurity/sysmon-logs crowdsecurity/tcpdump-logs timokoessler/uptime-kuma-logs crowdsecurity/whitelists"
+  scenarios: "crowdsecurity/sshd-fail2ban crowdsecurity/sshd-bf crowdsecurity/sshd-dumb-pass crowdsecurity/sshd-portscan crowdsecurity/sshd-brute-force crowdsecurity/sshd-bf-2 crowdsecurity/sshd-bf-3 crowdsecurity/sshd-bf-4 crowdsecurity/sshd-bf-5 crowdsecurity/sshd-bf-6 crowdsecurity/sshd-bf-7 crowdsecurity/sshd-bf-8 crowdsecurity/sshd-bf-9 crowdsecurity/sshd-bf-10 crowdsecurity/sshd-bf-11 crowdsecurity/sshd-bf-12 crowdsecurity/sshd-bf-13 crowdsecurity/sshd-bf-14 crowdsecurity/sshd-bf-15"
+  postoverflows: "crowdsecurity/ipv6_to_range"
+  appsec:
+    configs: "crowdsecurity/base-config crowdsecurity/crs"
+    rules: "crowdsecurity/base-config crowdsecurity/crs"
+    url: "http://crowdsec:3000"
+  lapi:
+    url: "http://crowdsec:8080"
+  use_wal: true
+  custom_hostname: graylock
+  cert:
+    cert_file: /etc/ca-certificates/cert.crt
+    key_file: /etc/ca-certificates/cert.key
+    tls: true
+  server_url: crowdsec.graylock.eu
+  captcha_provider: recaptcha
+
+dockge.server_url: docker.graylock.eu
+
+duplikati:
+  cli_args: --ping-pong-keepalive
+  server_url: backups.graylock.eu
+  cpu: "1.0"
+  memory: "4G"
+
+gethomepage.server_url: home.graylock.eu
+glances.server_url: glances.graylock.eu
+
+immich:
+  metrics:
+    server_metrics: true
+    api_metrics: true
+    host_metrics: true
+    io_metrics: true
+    job_metrics: true
+  redis.cmd: --databases 1
+  server_url: photos.sidney.bg
+  ml:
+    resources:
+      cpu: "10.0"
+      memory: "10G"
+
+home_gallery:
+  server_url: gallery.sidney.bg
+  resources:
+    cpu: "1.0"
+    memory: "2G"
+  backend: node
+  api_server:
+    concurrent: 5
+    timeout: 30
+    open_browser: true
+    watch_poll_interval: 300
+
+qbittorrent.server_url: downloads.graylock.eu
+
+piavpn:
+  location: Sofia
+  local_network: "192.168.50.1/24,172.25.0.1/24,100.86.72.119,100.67.7.113,100.73.121.62,100.117.119.74"
+  dns: "192.168.50.54,9.9.9.9,194.242.2.2,1.1.1.1"
+  port_forwardin: 1
+  mtu: 1420
+  keepalive: 25
+  port_file: /pia-shared/port.dat
+  port_persist: 1
+  pia_firewall: 1
+  active_healthcheck: 1
+  port_script: "/scripts/qbit_pf.sh"
+  qbittorrent_host: http://localhost:6886
+
+plex:
+  resources:
+    cpu: "4.0"
+    memory: "4G"
+  rewind:
+    enabled: true
+    max_seconds: 60
+    server_url: plex-rewind.graylock.eu
+
+swag:
+  docker_mods: "linuxserver/mods:universal-docker|linuxserver/mods:swag-dashboard|linuxserver/mods:swag-auto-proxy|linuxserver/mods:swag-auto-reload|linuxserver/mods:swag-cloudflare-real-ip|linuxserver/mods:swag-geoip2influx|linuxserver/mods:swag-maxmind|linuxserver/mods:swag-crowdsec|linuxserver/mods:nginx-proxy-confs|linuxserver/mods:swag-auto-reload|linuxserver/mods:universal-cloudflared"
+  pip_pkgs: "certbot-dns-cloudflare"
+  subdomains: wildcard
+  dnsplugin: cloudflare
+  staging: false
+  validation: dns
+  cs:
+    mode: stream
+    update_frequency: 10
+    tunnel:
+      config: /config/tunnel.json
+      name: "graylock-swag-tunnel"
+  influxdb:
+    init:
+      mode: setup
+      bucket: geoip2influx
+
+wikijs.server_url: wiki.sidney.bg
+uptimekuma:
+  server_url: uptime.sidney.bg
+  enable_embeded_mariadb: 1
+
+socketproxy:
+  controls:
+    allow_start: 1
+    allow_stop: 1
+    allow_restart: 1
+    allow_auth: 0
+    allow_build: 0
+    allow_commit: 0
+    allow_configs: 0
+    allow_containers: 1
+    allow_disable_ipv6: 0
+    allow_distribution: 0
+    allow_events: 0
+    allow_exec: 0
+    allow_images: 1
+    allow_info: 1
+    allow_networks: 1
+    allow_nodes: 0
+    allow_ping: 1
+    allow_post: 0
+    allow_plugins: 0
+    allow_secrets: 0
+    allow_services: 0
+    allow_session: 1
+    allow_swarm: 0
+    allow_system: 0
+    allow_tasks: 0
+    allow_version: 1
+    allow_volumes: 1
+
+speedtest:
+  server_url: speedtest.graylock.eu
+  connection_type: pgsql
+  app_name: Graylock
+  polling:
+    dashboard: 60s
+    results: 60s
+  public_dashboard: false
+  cron_schedule: "*/5 * * * *"
+  ping_url: "{{ domain_names[0] }}"
+
+yourspotify:
+  server_url: spotify.graylock.eu
+
+tailscale:
+  hostname: "graylock"
+  extra_hosts: []
+
+netdata:
+  extra_deb_packages: apcupsd,lm-sensors, netcat-openbsd
+  server_url: netdata.graylock.eu
+
+mealie:
+  server_url: recipes.graylock.eu
+  allow_signup: false
+  max_workers: 10
+  web_concurrency: 10
+  api_docs: false
+  port: 80
+  log_level: info
+
+kavita.server_url: books.sidney.bg
+
+influxdb:
+  server_url: influxdb.graylock.eu
+  init_mode: setup
+
+wazuh:
+  manager:
+    server_url: wazuh.graylock.eu
+    port: 55000
+  indexer:
+    java_opts: "-Xms512m -Xmx512m"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+  dashboard:
+    server_url: wazuh-dashboard.graylock.eu
+    port: 5601
+
+falco:
+  server_url: falco.graylock.eu
+  driver: ""
+  grpc:
+    enabled: false
+  rules_dir: "/etc/falco/rules.d"
+
+syslogng:
+  server_url: syslog.graylock.eu
+  port_tcp: 514
+  port_udp: 514
+
+checkmk:
+  server_url: checkmk.graylock.eu
+  container_name: checkmk
+  site_id: cmksite
+  image: checkmk/check-mk-raw:2.3.0-latest
+  timezone: '{{ timezone }}'
+  site_admin_password: '{{ vault_checkmk_admin_password }}'  # Use Ansible Vault
+
+compose_files:
+  adguardhome:
+    services:
+      adguardhome:
+        image: adguard/adguardhome:latest
+        container_name: adguardhome
+        environment:
+          - TZ={{ timezone }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+        volumes:
+          - "{{ homelab_dir }}/docker/adguardhome:/opt/adguardhome/work"
+          - "{{ homelab_dir }}/docker/adguardhome/conf:/opt/adguardhome/conf"
+        ports:
+          - "{{ docker.ip }}:53:53/tcp"
+          - "{{ docker.ip }}:53:53/udp"
+          - "1668:68/udp"
+          - "6060:6060/tcp"
+          - "{{ docker.ip }}:5443:5443/tcp"
+          - "{{ docker.ip }}:5443:5443/udp"
+          - "{{ docker.ip }}:853:853/udp"
+          - "{{ docker.ip }}:853:853/tcp"
+          - 4380:80
+          - 4343:443
+          - 4300:3000"
+        healthcheck:
+          test:
+            - "{{ docker.healthcheck.wget }} http://localhost || exit 1"
+        labels:
+          - swag_port=80
+          - swag_url=dns.graylock.eu
+          - crowdsec.enable=true
+          - crowdsec.labels.type=adguardhome
+        depends_on:
+          unbound:
+            condition: service_healthy
+      unbound:
+        image: mvance/unbound:latest
+        container_name: unbound
+        environment:
+          - TZ={{ timezone }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=unbound
+  airtrail:
+    services:
+      airtrail_server:
+        image: johly/airtrail:latest
+        container_name: airtrail_server
+        environment:
+          - TZ={{ timezone }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - ORIGIN=https://airtrail.sidney.bg
+          - DB_URL="postgres://{{ airtrail.db.username }}:{{ airtrail.db.password }}@airtrail_db:5432/{{ airtrail.db.database_name }}"
+          - DB_USERNAME={{ airtrail.db.username }}
+          - DB_PASSWORD={{ airtrail.db.password }}
+          - DB_DATABASE_NAME={{ airtrail.db.database_name }}
+        ports:
+          - "1530:3000/tcp"
+        labels:
+          - swag=enable
+          - swag_port=3000
+          - swag_url={{ airtrail.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=modsecurity
+        depends_on:
+          airtrail_db:
+            condition: service_started
+      airtrail_db:
+        image: postgres:16-alpine
+        container_name: airtrail_db
+        environment:
+          - TZ={{ timezone }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - POSTGRES_USER={{ airtrail.db.username }}
+          - POSTGRES_PASSWORD={{ airtrail.db.password }}
+          - POSTGRES_DB={{ airtrail.db.database_name }}
+        volumes:
+          - "{{ homelab_dir }}/airtrail/postgres:/var/lib/postgresql/data"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=postgresql
+        healthcheck:
+          test:
+            - "pg_isready -U {{ airtrail.db.username }} -d {{ airtrail.db.password }}"
+  cadvisor:
+    services:
+      cadvisor:
+        image: gcr.io/cadvisor/cadvisor:v0.50.0
+        environment:
+          - TZ={{ timezone }}
+          - DOCKER_HOST={{ docker.socket_endpoint }}
+        ports:
+          - "9118:8080/tcp"
+        command: --enable_load_reader=false --store_container_labels=true
+        volumes:
+          - /:/rootfs:ro
+          - /var/run:/var/run:ro
+          - /sys:/sys:ro
+          - /dev/disk/:/dev/disk:ro
+          - /etc/machine-id:/etc/machine-id:ro
+          - /etc/localtime:/etc/localtime:ro
+        devices:
+          - /dev/kmsg:/dev/kmsg
+        cap_add:
+          - SYS_ADMIN
+        deploy:
+          resources:
+            limits:
+              cpus: "1.0"
+              memory: "1G"
+        healthcheck:
+          test:
+            - "{{ docker.healthcheck.wget }} http://localhost:8080 || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=8080
+          - swag_url={{ cadvisor.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=cadvisor
+  cloudflared:
+    services:
+      cloudflared:
+        image: cloudflare/cloudflared:2025.4.2
+        environment:
+          - TUNNEL_TOKEN={{ cloudflare.token.tunnel.jumphost }}
+        volumes:
+          - "{{ homelab_dir }}/docker/cloudflared:/etc/cloudflared"
+        command: tunnel run
+        ports:
+          - 44733:44733
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=cloudflared
+  aitools:
+    services:
+      codeproject-ai-server:
+        image: codeproject/ai-server:cuda12_2
+        nvidia: true
+        command: --Modules:BackgroundRemover:Activate=True --Modules:CustomDetection:Activate=True --Modules:CustomObjectDetection:Activate=True --Modules:PortraitFilter:Activate=True --Modules:SceneClassification:Activate=True --Modules:VisionObjectDetection:Activate=True --Modules:FaceProcessing:EnvironmentVariables:USE_CUDA=True
+        ports:
+          - "32168:32168/tcp"
+        environment:
+          - TZ={{ timezone }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+        volumes:
+          - "{{ homelab_dir }}/ai-server/modules:/app/modules"
+          - "{{ homelab_dir }}/ai-server/data:/app/data"
+        healthcheck:
+          test:
+            - "{{ docker.healthcheck.curl }} http://localhost:32168 || exit 1"
+        deploy:
+          resources:
+            limits:
+              cpus: "8.0"
+              memory: "6G"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=ollama
+      ollama:
+        image: ollama/ollama:latest
+        nvidia: true
+        environment:
+          - TZ={{ timezone }}
+        volumes:
+          - "{{ homelab_dir }}/ollama:/root/.ollama"
+          - "{{ homelab_dir }}/open-webui:/app/backend/data"
+        ports:
+          - "11434:11434/tcp"
+        deploy:
+          resources:
+            limits:
+              cpus: "10.0"
+              memory: "48G"
+        labels:
+          - swag=enable
+          - swag_port=11434
+          - swag_url={{ ollama.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=ollama
+      openwebui:
+        image: ghcr.io/open-webui/open-webui:main
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - OLLAMA_BASE_URL={{ ollama.base_url }}
+          - OPENAI_API_BASE_URL={{ openai.base_url }}
+          - OPENAI_API_KEY={{ openai.api_key }}
+          - WEBUI_URL={{ openwebui.webui_url }}
+          - ENABLE_SIGNUP={{ openwebui.enable_signup }}
+          - DEFAULT_MODELS={{ openwebui.default_models }}
+          - ENABLE_RAG_WEB_SEARCH={{ openwebui.enable_rag_web_search }}
+          - ENABLE_IMAGE_GENERATION={{ openwebui.enable_image_generation }}
+          - ADMIN_EMAIL={{ openwebui.admin_email }}
+          - WEBUI_SECRET_KEY={{ openwebui.webui_secret_key }}
+        volumes:
+          - "{{ homelab_dir }}/open-webui:/app/backend/data"
+        depends_on:
+          ollama:
+            condition: service_started
+        healthcheck:
+          test:
+            - "{{ docker.healthcheck.curl }} http://localhost:8080 || exit 1"
+        ports:
+          - 2671:8080
+        labels:
+          - swag=enable
+          - swag_port=8080
+          - swag_url={{ openwebui.webui_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=web-ui
+      mosquitto:
+        image: eclipse-mosquitto:latest
+        volumes:
+          - "{{ homelab_dir }}/mqqt/etc/conf:/mosquitto/config"
+          - "{{ homelab_dir }}/mqqt/etc/data:/mosquitto/data"
+          - "{{ homelab_dir }}/mqqt/var/log:/mosquitto/log"
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        ports:
+          - "1883:1883/tcp"
+        healthcheck.test:
+          - "mosquitto_sub -t '$$SYS/#' -C 1 -i healthcheck -W 3 || exit 1"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=mosquitto
+  crowdsec:
+    services:
+      crowdsec:
+        image: crowdsecurity/crowdsec:latest
+        environment:
+          - COLLECTIONS={{ crowdsec.collections }}
+          - PARSERS={{ crowdsec.parsers }}
+          - SCENARIOS={{ crowdsec.scenarios }}
+          - POSTOVERFLOWS={{ crowdsec.postoverflows }}
+          - APPSEC_CONFIGS={{ crowdsec.appsec.configs }}
+          - APPSEC_RULES={{ crowdsec.appsec.rules }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - USE_WAL={{ crowdsec.use_wal }}
+          - CUSTOM_HOSTNAME={{ crowdsec.custom_hostname }}
+          - ENROLL_KEY={{ crowdsec.enroll_key }}
+          - ENROLL_INSTANCE_NAME={{ crowdsec.custom_hostname }}
+          - CROWDSEC_API_KEY={{ crowdsec.api_key }}
+          - LAPI_CERT_FILE={{ crowdsec.cert.cert_file }}
+          - LAPI_KEY_FILE={{ crowdsec.cert.key_file }}
+          - CROWDSEC_UPDATE_FREQUENCY={{ crowdsec.update_frequency }}
+        cap_add:
+          - NET_ADMIN
+          - NET_RAW
+          - SYS_ADMIN
+        cap_drop:
+          - ALL
+        volumes:
+          - "{{ homelab_dir }}/crowdsec/data:/var/lib/crowdsec"
+          - "{{ homelab_dir }}/crowdsec/config:/etc/crowdsec/"
+          - "{{ homelab_dir }}/crowdsec/config/acquis.yaml:/etc/crowdsec/acquis.yaml:ro"
+          - "{{ homelab_dir }}/swag/keys/cert.crt:/etc/ca-certificates/cert.crt:ro"
+          - "{{ homelab_dir }}/swag/keys/cert.key:/etc/ca-certificates/cert.key:ro"
+          - "{{ homelab_dir }}/swag/app/geoip2db/GeoLite2-ASN.mmdb:/var/lib/crowdsec/data/GeoLite2-ASN.mmdb:ro"
+          - "{{ homelab_dir }}/swag/app/geoip2db/GeoLite2-City.mmdb:/var/lib/crowdsec/data/GeoLite2-City.mmdb:ro"
+          - "{{ homelab_dir }}/swag/app/geoip2db/GeoLite2-Country.mmdb:/var/lib/crowdsec/data/GeoLite2-Country.mmdb:ro"
+          - "/var/log/:/run/log/:ro"
+          - "{{ homelab_dir }}/swag/app/log:/var/log/swag/:ro"
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        ports:
+          - "14880:8080/tcp"
+          - "14881:6060/tcp"
+        healthcheck:
+          test:
+            - "{{ docker.healthcheck.wget }} http://localhost:8080/health || exit 1"
+        deploy:
+          resources:
+            limits:
+              cpus: "2.0"
+              memory: "4G"
+        labels:
+          - swag=enable
+          - swag_port=8080
+          - swag_url={{ crowdsec.server_url }}
+        depends_on:
+          socket-proxy:
+            condition: service_started
+      cs-blocklist-mirror:
+        image: crowdsecurity/blocklist-mirror:v0.0.3
+        environment:
+          - CROWDSEC_LAPI_URL={{ crowdsec.lapi.url }}
+          - CROWDSEC_LAPI_KEY={{ crowdsec.api_key }}
+          - LISTEN_ADDR=0.0.0.0
+          - LISTEN_PORT=41412
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - LAPI_CERT_FILE={{ crowdsec.cert.cert_file }}
+          - LAPI_KEY_FILE={{ crowdsec.cert.key_file }}
+        cap_add:
+          - NET_BIND_SERVICE
+        ports:
+          - "41412:41412"
+        volumes:
+          - "{{ homelab_dir }}/crowdsec/bouncers/blocklist-mirror:/etc/crowdsec/bouncers/"
+          - "{{ homelab_dir }}/crowdsec/bouncers/blocklist-mirror/crowdsec-blocklist-mirror.yaml:/etc/crowdsec/bouncers/crowdsec-blocklist-mirror.yaml:ro"
+          - "{{ homelab_dir }}/swag/keys/cert.crt:/etc/ca-certificates/cert.crt:ro"
+          - "{{ homelab_dir }}/swag/keys/cert.key:/etc/ca-certificates/cert.key:ro"
+        depends_on:
+          crowdsec:
+            condition: service_started
+          swag:
+            condition: service_started
+      crowdsec-firewall-bouncer-iptables:
+        image: crowdsecurity/firewall-bouncer-iptables:v0.0.3
+        environment:
+          - CROWDSEC_LAPI_URL={{ crowdsec.lapi.url }}
+          - CROWDSEC_LAPI_KEY={{ crowdsec.api_key }}
+          - CF_API_TOKEN={{ cloudflare.token.crowdsec }}
+          - CF_ZONES=*
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        volumes:
+          - "{{ homelab_dir }}/crowdsec/bouncers/cloudflare-bouncer:/etc/crowdsec/bouncers/"
+          - "{{ homelab_dir }}/crowdsec/bouncers/cloudflare-bouncer/crowdsec-cloudflare-bouncer.yaml:/etc/crowdsec/bouncers/crowdsec-cloudflare-bouncer.yaml:ro"
+        ports:
+          - 14882:2112
+  dockge:
+    services:
+      dockge:
+        image: dockge/dockge:latest
+        volumes:
+          - "{{ homelab_dir }}/dockge/data:/app/data"
+          - "{{ home_dir }}/Developer/repos:/opt/stacks"
+        environment:
+          - DOCKGE_STACKS_DIR=/opt/stacks
+          - DOCKER_HOST={{ docker.socket_endpoint }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        healthcheck:
+          test:
+            - "{{ docker.healthcheck.curl }} http://localhost:5001 || exit 1"
+        ports:
+          - "5001:5001/tcp"
+        labels:
+          - swag=enable
+          - swag_port=5001
+          - swag_url={{ dockge.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=dockge
+  duplicati:
+    services:
+      duplicati:
+        image: lscr.io/linuxserver/duplicati:latest
+        user: root
+        ports:
+          - "8200:8200/tcp"
+        environment:
+          - TZ={{ timezone }}
+          - SETTINGS_ENCRYPTION_KEY={{ duplikati.encryption_key }}
+          - DUPLICATI__WEBSERVICE_PASSWORD={{ duplikati.webservice_password }}
+          - CLI_ARGS={{ duplikati.cli_args }}
+        volumes:
+          - "{{ homelab_dir }}/duplicati/config:/config"
+          - "{{ homelab_dir }}/duplicati/source:/source"
+          - "{{ nas_dir }}/Backups:/backups"
+          - "{{ movies_dir }}/Movies:/data/Movies:ro"
+          - "{{ books_dir }}/Books:/data/Books:ro"
+          - "{{ docs_dir }}/Documents:/data/Documents:ro"
+          - "{{ music_dir }}/Music:/data/Music:ro"
+          - "{{ photos_dir }}/Photos:/data/Photos:ro"
+          - "{{ podcasts_dir }}/Podcasts:/data/Podcasts:ro"
+          - "{{ tvshows_dir }}/TVShows:/data/TVShows:ro"
+          - "{{ videos_dir }}/Videos:/data/Videos:ro"
+          - "{{ audiobooks_dir }}/Audiobooks:/data/Audiobooks:ro"
+          - "{{ homelab_dir }}:/data/Homelab:ro"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:8200/api/v1/system/status || exit 1"
+        deploy:
+          resources:
+            limits:
+              cpus: { { duplikati.cpu } }
+              memory: { { duplikati.memory } }
+        labels:
+          - swag=enable
+          - swag_port=8200
+          - swag_url={{ duplikati.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=duplikati
+  samba:
+    services:
+      samba:
+        image: dperson/samba:latest
+        environment:
+          - TZ={{ timezone }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - SAMBA_USER={{ samba.username }}
+          - SAMBA_PASS={{ samba.password }}
+        volumes:
+          - "{{ nas_dir }}/samba:/storage/nas"
+          - "{{ home_dir }}:/storage/home"
+        ports:
+          - "139:139/tcp"
+          - "445:445/tcp"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=samba
+        healthcheck.test:
+          - "smbclient -L localhost -U {{ samba.username }}%{{ samba.password }}"
+  gethomepage:
+    services:
+      gethomepage:
+        image: gethomepage/gethomepage:latest
+        environment:
+          - TZ={{ timezone }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - GETHOMEPAGE_URL={{ gethomepage.server_url }}
+          - DOCKER_HOST={{ docker.socket_endpoint }}
+        ports:
+          - "3113:3000/tcp"
+        volumes:
+          - "{{ homelab_dir }}/gethomepage/config:/app/config"
+        labels:
+          - swag=enable
+          - swag_port=3000
+          - swag_url={{ gethomepage.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=gethomepage
+  glances:
+    services:
+      glances:
+        image: nicolargo/glances:latest
+        ports:
+          - "61208:61208/tcp"
+        volumes:
+          - "{{ homelab_dir }}/glances/glances.conf:/usr/local/etc/glances/glances.conf:ro"
+          - "{{ homelab_dir }}/glances/sidney.pwd:/root/.config/glances/sidney.pwd"
+          - "/proc:/host/proc:ro"
+          - "/sys:/host/sys:ro"
+          - "/:/rootfs:ro"
+          - "/sys/class/hwmon:/sys/class/hwmon:ro"
+        environment:
+          - GLANCES_OPT=-w -C /usr/local/etc/glances/glances.conf --diskio-show-ramfs --sparkline --meangpu
+          - GLANCES_ENVIRONMENT=container
+          - GLANCES_FS_PATH=/rootfs
+          - GLANCES_PROC_PATH=/host/proc
+          - GLANCES_SYS_PATH=/host/sys
+          - DOCKER_HOST={{ docker.socket_endpoint }}
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:61208/ || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=61208
+          - swag_auth=http
+          - swag_url={{ glances.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=glances
+  immich:
+    services:
+      immich_server:
+        image: ghcr.io/immich-app/immich-server:latest
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - DB_HOSTNAME=immich_db
+          - DB_USERNAME={{ immich.db.username }}
+          - DB_PASSWORD={{ immich.db.password }}
+          - DB_DATABASE_NAME={{ immich.db.database_name }}
+          - REDIS_HOSTNAME=immich_redis
+          - IMMICH_METRICS={{ immich.metrics.server_metrics }}
+          - IMMICH_API_METRICS={{ immich.metrics.api_metrics }}
+          - IMMICH_HOST_METRICS={{ immich.metrics.host_metrics }}
+          - IMMICH_IO_METRICS={{ immich.metrics.io_metrics }}
+          - IMMICH_JOB_METRICS={{ immich.metrics.job_metrics }}
+        volumes:
+          - "{{ homelab_dir }}/immich/data:/usr/src/app/upload"
+          - "{{ homelab_dir }}/immich/backup:/mnt/backup"
+          - "/etc/localtime:/etc/localtime:ro"
+        ports:
+          - "2283:3001/tcp"
+        labels:
+          - swag=enable
+          - swag_port=3001
+          - swag_url={{ immich.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=immich
+        depends_on:
+          immich-db:
+            condition: service_healthy
+          immich-redis:
+            condition: service_healthy
+          immich-ml:
+            condition: service_started
+      immich_ml:
+        image: ghcr.io/immich-app/immich-machine-learning:latest
+        nvidia: true
+        volumes:
+          - "{{ homelab_dir }}/immich/machine_learning/cache:/cache"
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        deploy:
+          resources:
+            limits:
+              cpus: "{{ immich.ml.resources.cpu }}"
+              memory: "{{ immich.ml.resources.memory }}"
+        ports:
+          - "2284:3003/tcp"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=immich
+      immich_redis:
+        image: docker.io/redis:6.2-alpine@sha256:e3b17ba9479deec4b7d1eeec1548a253acc5374d68d3b27937fcfe4df8d18c7e
+        command: { { immich.redis.cmd } }
+        healthcheck.test:
+          - "redis-cli -h localhost ping"
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        volumes:
+          - "{{ homelab_dir }}/immich/caching/redis:/data"
+        ports:
+          - "6379:6379/tcp"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=redis
+      immich_db:
+        image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0
+        environment:
+          - DB_USERNAME={{ immich.db.username }}
+          - DB_PASSWORD={{ immich.db.password }}
+          - DB_DATABASE_NAME={{ immich.db.database_name }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        volumes:
+          - "{{ homelab_dir }}/immich/db:/var/lib/postgresql/data"
+        healthcheck.test:
+          - "pg_isready -U {{ immich.db.username }} -d {{ immich.db.database_name }}"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=postgresql
+  home_gallery:
+    services:
+      home_gallery_api_server:
+        image: xemle/home-gallery-api-server:latest
+        nvidia: true
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - BACKEND={{ home_gallery.backend }}
+        deploy:
+          resources:
+            limits:
+              cpus: "{{ home_gallery.resources.cpu }}"
+              memory: "{{ home_gallery.resources.memory }}"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:3000/ || exit 1"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=home-gallery
+      home_gallery_web_server:
+        image: xemle/home-gallery-web-server:latest
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - GALLERY_API_SERVER=http://home_gallery_api_server:3000
+          - GALLERY_API_SERVER_CONCURRENT={{ home_gallery.api_server.concurrent }}
+          - GALLERY_API_SERVER_TIMEOUT={{ home_gallery.api_server.timeout }}
+          - GALLERY_OPEN_BROWSER={{ home_gallery.api_server.open_browser }}
+          - GALLERY_WATCH_POLL_INTERVAL={{ home_gallery.api_server.watch_poll_interval }}
+        volumes:
+          - "{{ photos_dir }}/Public:/data/Pictures"
+          - "{{ homelab_dir}}/home-gallery:/data"
+        ports:
+          - "9812:3000/tcp"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:3000/ || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=3000
+          - swag_url={{ home_gallery.server_url }}
+          - crowdsec.enable=true
+            - crowdsec.labels.type=home-gallery
+        entrypoint: ["node", "/app/gallery.js"]
+        command: ["run", "server"]
+        depends_on:
+          home_gallery_api_server:
+            condition: service_healthy
+  qbittorrent:
+    services:
+      qbittorrent:
+        image: lscr.io/linuxserver/qbittorrent:latest
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - WEBUI_PORT=6886
+          - WEBUI_ADMIN_USERNAME={{ qbittorrent.admin.username }}
+          - WEBUI_ADMIN_PASSWORD={{ qbittorrent.admin.password }}
+          - TZ={{ timezone }}
+        volumes:
+          - "{{ homelab_dir }}/qbittorrent/config:/config"
+          - "{{ downloads_dir }}/Downloads:/downloads"
+          - "{{ movies_dir }}/Downloads:/downloads/movies"
+          - "{{ tvshows_dir }}/Downloads:/downloads/tvshows"
+        ports:
+          - "16886:6886/tcp"
+        labels:
+          - swag=enable
+          - swag_port=6886
+          - swag_url={{ qbittorrent.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=qbittorrent
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:6886/ || exit 1"
+        depends_on:
+          piavpn:
+            condition: service_healthy
+      piavpn:
+        image: thrnz/docker-wireguard-pia:latest
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - LOC={{ piavpn.location }}
+          - USER={{ piavpn.username }}
+          - PASS={{ piavpn.password }}
+          - LOCAL_NETWORK={{ piavpn.local_network }}
+          - KEEPALIVE={{ piavpn.keepalive }}
+          - MTU={{ piavpn.mtu }}
+          - VPNDNS={{ piavpn.dns }}
+          - PORT_FORWARDING={{ piavpn.port_forwarding }}
+          - PORT_FILE={{ piavpn.port_file }}
+          - PORT_PERSIST={{ piavpn.port_persist }}
+          - PORT_SCRIPT={{ piavpn.port_script }}
+          - FIREWALL={{ piavpn.pia_firewall }}
+          - ACTIVE_HEALTHCHECKS={{ piavpn.active_healthcheck }}
+          - QBIT_USER={{ qbittorrent.username }}
+          - QBIT_PASSWORD={{ qbittorrent.password }}
+          - QBIT_HOST={{ qbittorrent.host }}
+        cap_add:
+          - NET_ADMIN
+          - SYS_MODULE
+        ports:
+          - "6886:6886/tcp"
+          - "6881:6881/tcp"
+          - "7256:8000"
+        volumes:
+          - "{{ homelab_dir }}/piavpn/data:/pia"
+          - "{{ homelab_dir }}/piavpn/shared:/pia-shared"
+        devices:
+          - /dev/net/tun:/dev/net/tun
+        healthcheck.test:
+          - "/scripts/healthcheck.sh || exit 1"
+        sysctls:
+          - net.ipv4.conf.all.src_valid_mark=1
+          - net.ipv6.conf.default.disable_ipv6=1
+          - net.ipv6.conf.all.disable_ipv6=1
+          - net.ipv6.conf.lo.disable_ipv6=1
+  plex:
+    services:
+      plex:
+        image: lscr.io/linuxserver/plex:latest
+        ports:
+          - "32400:32400/tcp"
+          - "8324:8324/tcp" # Roku server
+          - "32469:32469/tcp" # DLNA
+          - "1900:1900/udp" # DLNA SERVER
+          - "32410:32410/udp" # GDM network discovery
+          - "32412-32414:32412-32414/udp" # GDM network ports
+        nvidia: true
+        environment:
+          - TZ={{ timezone }}
+          - "ADVERTISE_IP=http://{{ docker.public_ip }}:32400"
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+        volumes:
+          - "{{ home_dir }}/Developer/container-data/plextv/config:/config"
+          - "{{ home_dir }}/Developer/container-data/plextv/transcode:/transcode"
+          - "{{ movies_dir }}:/data/movies"
+          - "{{ music_dir }}:/data/music"
+          - "{{ tvshows_dir }}:/data/tvshows"
+          - "{{ photos_dir }}:/data/photos"
+          - "{{ audiobooks_dir }}:/data/audiobooks"
+          - "{{ homelab_dir }}/swag/keys/:/certs:ro"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:32400/identity || exit 1"
+        deploy:
+          resources:
+            limits:
+              cpus: { { plex.resources.cpu } }
+              memory: { { plex.resources.memory } }
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=plex
+      plex-rewind:
+        image: ghcr.io/raunot/plex-rewind:latest
+        environment:
+          - "NEXTAUTH_SECRET={{ plex.rewind.nextauth_secret }}"
+          - "NEXTAUTH_URL=https://{{ plex.rewind.server_url }}"
+          - "NEXT_PUBLIC_SITE_URL=https://{{ plex.rewind.server_url }}"
+        volumes:
+          - "{{ homelab_dir }}/plex-rewind/config:/app/data"
+        ports:
+          - "8383:8383/tcp"
+        healthcheck.test:
+          - "{{ docker.healthcheck.wget }} http://127.0.0.1:8383/ || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=8383
+          - swag_url={{ plex.rewind.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=plex-rewind
+        depends_on:
+          plex:
+            condition: service_healthy
+  swag:
+    services:
+      swag:
+        image: lscr.io/linuxserver/swag:latest
+        cap_add:
+          - NET_ADMIN
+          - MKNOD
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - DOCKER_MODS={{ swag.docker_mods }}
+          - INSTALL_PIP_PACKAGES={{ swag.pip_pkgs }}
+          - URL={{ domain_names[0] }}
+          - SUBDOMAINS={{ swag.subdomains }}
+          - EXTRA_DOMAINS="{{ domain_names[1]}}, *.{{ domain_names[1] }}, {{ domain_names[2] }}, *.{{ domain_names[2] }}, {{ domain_names[3] }}, *.{{ domain_names[3] }}"
+          - VALIDATION={{ swag.validation }}
+          - DNSPLUGIN={{ swag.dnsplugin }}
+          - EMAIL={{ certbot.email }}
+          - STAGING={{ swag.staging }}
+          - MAXMINDDB_LICENSE_KEY={{ maxminddb.license_key }}
+          - MAXMINDDB_USER_ID={{ maxminddb.user_id }}
+          - DOCKER_HOST={{ docker.socket_endpoint }}
+          - INFLUX_HOST=swag-influx
+          - INFLUX_USER={{ swag.influxdb.username }}
+          - INFLUX_PASS={{ swag.influxdb.password }}
+          - CROWDSEC_API_KEY={{ crowdsec.token.crowdsec }}
+          - CROWDSEC_MODE={{ swag.cs.mode }}
+          - CROWDSEC_LAPI_URL={{ crowdsec.lapi.url }}
+          - CROWDSEC_UPDATE_FREQUENCY={{ swag.cs.update_frequency }}
+          - CF_ACCOUNT_ID={{ cloudflare.account_id }}
+          - CF_API_TOKEN={{ cloudflare.token.admin }}
+          - CF_TUNNEL_NAME={{ swag.cs.tunnel.name }}
+          - CF_TUNNEL_CONFIG={{ swag.cs.tunnel.config }}
+        volumes:
+          - "{{ homelab_dir }}/swag/app:/config"
+          - "{{ homelab_dir }}/swag/app/geoip2db/GeoLite2-ASN.mmdb:/config/geoip2db/GeoLite2-ASN.mmdb:ro"
+          - "{{ homelab_dir }}/swag/app/geoip2db/GeoLite2-City.mmdb:/config/geoip2db/GeoLite2-City.mmdb:ro"
+          - "{{ homelab_dir }}/swag/app/geoip2db/GeoLite2-Country.mmdb:/config/geoip2db/GeoLite2-Country.mmdb:ro"
+          - "/dev/net/tun:/dev/net/tun:ro"
+        extra_hosts:
+          - "{{ domain_names[0] }}:{{ docker.public_ip }}"
+          - "{{ domain_names[1] }}:{{ docker.public_ip }}"
+          - "{{ domain_names[2] }}:{{ docker.public_ip }}"
+          - "{{ domain_names[3] }}:{{ docker.public_ip }}"
+          - "{{ domain_names[4] }}:{{ docker.public_ip }}"
+        ports:
+          - "443:443/tcp"
+          - "80:80/tcp"
+        sysctls:
+          - "net.ipv4.conf.all.src_valid_mark=1"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost/ || exit 1"
+        depends_on:
+          swag-influx:
+            condition: service_healthy
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=swag
+      swag-influx:
+        image: influxdb:1.8
+        volumes:
+          - "{{ homelab_dir }}/swag/influxdb/data:/var/lib/influxdb2"
+          - "{{ homelab_dir }}/swag/influxdb/config:/etc/influxdb2"
+          - "{{ homelab_dir }}/swag/app/geoip2db/GeoLite2-ASN.mmdb:/etc/influxdb2/GeoLite2-ASN.mmdb:ro"
+          - "{{ homelab_dir }}/swag/app/geoip2db/GeoLite2-City.mmdb:/etc/influxdb2/GeoLite2-City.mmdb:ro"
+          - "{{ homelab_dir }}/swag/app/geoip2db/GeoLite2-Country.mmdb:/etc/influxdb2/GeoLite2-Country.mmdb:ro"
+        environment:
+          - DOCKER_INFLUXDB_INIT_MODE={{ swag.influxdb.init.mode }}
+          - DOCKER_INFLUXDB_INIT_USERNAME={{ swag.influxdb.username }}
+          - DOCKER_INFLUXDB_INIT_PASSWORD={{ swag.influxdb.username }}
+          - DOCKER_INFLUXDB_INIT_BUCKET={{ swag.influxdb.init.bucket }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=influxdb
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:8086/ping || exit 1"
+  wikijs:
+    services:
+      wikijs:
+        image: ghcr.io/requarks/wiki:latest
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - DB_TYPE=postgres
+          - DB_HOST=wikijs_db
+          - DB_PORT=5432
+          - DB_USER={{ wikijs.db.username }}
+          - DB_PASS={{ wikijs.db.password }}
+          - DB_NAME={{ wikijs.db.database_name }}
+          - WIKI_ADMIN_EMAIL={{ wikijs.admin.email }}
+          - WIKI_ADMIN_USERNAME={{ wikijs.admin.username }}
+          - WIKI_ADMIN_PASSWORD={{ wikijs.admin.password }}
+          - WIKI_SERVER_URL=https://{{ wikijs.sever_url }}
+        volumes:
+          - "{{ homelab_dir }}/wikijs/app:/data"
+        ports:
+          - "3000:3000/tcp"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:3000/ || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=3000
+          - swag_url={{ wikijs.sever_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=wikijs
+        depends_on:
+          wikijs_db:
+            condition: service_healthy
+      wikijs_db:
+        image: postgres:16-alpine
+        volumes:
+          - "{{ homelab_dir }}/wikijs/db:/var/lib/postgresql/data"
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - POSTGRES_USER={{ wikijs.db.username }}
+          - POSTGRES_PASSWORD={{ wikijs.db.password }}
+          - POSTGRES_DB={{ wikijs.db.database_name }}
+        healthcheck.test:
+          - "pg_isready -U {{ wikijs.db.username }} -d {{ wikijs.db.database_name }}"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=postgresql
+  uptimekuma:
+    services:
+      uptime-kuma:
+        image: louislam/uptime-kuma:latest
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - UPTIME_KUMA_ENABLE_EMBEDDED_MARIADB={{ uptimekuma.enable_embedded_mariadb }}
+        volumes:
+          - "{{ homelab_dir }}/uptime-kuma/data:/app/data"
+        ports:
+          - "3001:3001/tcp"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:3001/ || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=3001
+          - swag_url={{ uptimekuma.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=uptime-kuma
+  socketproxy:
+    services:
+      socket-proxy:
+        image: lscr.io/linuxserver/socket-proxy:latest
+        environment:
+          - ALLOW_START={{ socketproxy.controls.allow_start }}
+          - ALLOW_STOP={{ socketproxy.controls.allow_stop }}
+          - ALLOW_RESTARTS={{ socketproxy.controls.allow_restarts }}
+          - AUTH={{ socketproxy.controls.auth }}
+          - BUILD={{ socketproxy.controls.build }}
+          - COMMIT={{ socketproxy.controls.commit }}
+          - CONFIGS={{ socketproxy.controls.configs }}
+          - CONTAINERS={{ socketproxy.controls.containers }}
+          - DISABLE_IPV6={{ socketproxy.controls.disable_ipv6 }}
+          - DISTRIBUTION={{ socketproxy.controls.distribution }}
+          - EVENTS={{ socketproxy.controls.events }}
+          - EXEC={{ socketproxy.controls.exec }}
+          - IMAGES={{ socketproxy.controls.images }}
+          - INFO={{ socketproxy.controls.info }}
+          - NETWORKS={{ socketproxy.controls.networks }}
+          - NODES={{ socketproxy.controls.nodes }}
+          - PING={{ socketproxy.controls.ping }}
+          - POST={{ socketproxy.controls.post }}
+          - PLUGINS={{ socketproxy.controls.plugins }}
+          - SECRETS={{ socketproxy.controls.secrets }}
+          - SERVICES={{ socketproxy.controls.services }}
+          - SESSION={{ socketproxy.controls.session }}
+          - SWARM={{ socketproxy.controls.swarm }}
+          - SYSTEM={{ socketproxy.controls.system }}
+          - TASKS={{ socketproxy.controls.tasks }}
+          - VERSION={{ socketproxy.controls.version }}
+          - VOLUMES={{ socketproxy.controls.volumes }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        ports:
+          - "2375:2375/tcp"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=socket-proxy
+        read_only: true
+        tmpfs:
+          - /run
+  speedtest:
+    services:
+      speedtest_tracker:
+        image: lscr.io/linuxserver/speedtest-tracker:latest
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - DB_CONNECTION={{ speedtest.connection_type }}
+          - DB_HOST=speedtest_tracker_db
+          - DB_PORT=5432
+          - DB_DATABASE={{ speedtest.db.database_name }}
+          - DB_USERNAME={{ speedtest.db.username }}
+          - DB_PASSWORD={{ speedtest.db.password }}
+          - DASHBOARD_POLLING={{ speedtest.polling.dashboard }}
+          - RESULTS_POLLING={{ speedtest.polling.results }}
+          - APP_KEY={{ speedtest.app_key }}
+          - APP_NAME={{ speedtest.app_name }}
+          - PUBLIC_DASHBOARD={{ speedtest.public_dashboard }}
+          - APP_TIMEZONE={{ timezone }}
+          - SPEEDTEST_PING_URL=https://{{ speedtest.ping_url }}
+          - SPEEDTEST_SCHEDULE={{ speedtest.cron_schedule }}
+        volumes:
+          - ${DATADIR}/speedtest/data:/config
+          - ${DATADIR}/speedtest/web:/etc/ssl/web
+        ports:
+          - "3080:80/tcp"
+          - "3083:443/tcp"
+        depends_on:
+          speedtest_tracker_db:
+            condition: service_healthy
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost/ || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=80
+          - swag_url={{ speedtest.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=speedtest-tracker
+      speedtest_tracker_db:
+        image: postgres:16-alpine
+        environment:
+          - POSTGRES_USER={{ speedtest.db.username }}
+          - POSTGRES_PASSWORD={{ speedtest.db.password }}
+          - POSTGRES_DB={{ speedtest.db.database_name }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        volumes:
+          - "{{ homelab_dir }}/speedtest/db:/var/lib/postgresql/data"
+        healthcheck.test:
+          - "pg_isready -U {{ speedtest.db.username }} -d {{ speedtest.db.database_name }}"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=postgresql
+  yourspotify:
+    services:
+      yourspotify:
+        image: lscr.io/linuxserver/your_spotify:latest
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - APP_URL=https://{{ yourspotify.server_url }}
+          - SPOTIFY_PUBLIC={{ yourspotify.app.client_id }}
+          - SPOTIFY_SECRET={{ yourspotify.app.client_secret }}
+          - CORS=http://localhost:80,https://localhost:443,https://{{ yourspotify.server_url }}
+          - MONGO_ENDPOINT=mongodb://{{ yourspotify.db.username }}:{{ yourspotify.db.password }}@yourspotify_db:27017/{{ yourspotify.db.database_name }}
+        ports:
+          - "8220:80/tcp"
+          - "8023:443/tcp"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost/ || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=443
+          - swag_url={{ yourspotify.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=yourspotify
+        depends_on:
+          yourspotify_db:
+            condition: service_started
+      yourspotify_db:
+        image: mongo:8.0
+        environment:
+          - MONGO_INITDB_ROOT_USERNAME={{ yourspotify.db.username }}
+          - MONGO_INITDB_ROOT_PASSWORD={{ yourspotify.db.password }}
+          - MONGO_INITDB_DATABASE={{ yourspotify.db.database_name }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        volumes:
+          - "{{ homelab_dir }}/yourspotify/db:/data/db"
+        healthcheck.test:
+          - "mongo --username {{ yourspotify.db.username }} --password {{ yourspotify.db.password }} --authenticationDatabase admin --eval 'db.runCommand({ ping: 1 })'"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=mongodb
+  tailscale:
+    services:
+      tailscale:
+        image: tailscale/tailscale:latest
+        network_mode: host
+        cap_add:
+          - NET_ADMIN
+          - NET_RAW
+        cap_drop:
+          - ALL
+        environment:
+          - TS_AUTH_KEY={{ tailscale.auth.key.value }}
+          - TS_AUTH_KEY_FILE={{ tailscale.auth.key.file }}
+          - TS_AUTH_KEY_NAME={{ tailscale.auth.key.name }}
+          - TS_AUTH_KEY_CAPS={{ tailscale.auth.key.caps }}
+          - TS_AUTH_KEY_EXPIRES={{ tailscale.auth.key.expires }}
+          - TS_HOSTNAME={{ tailscale.hostname }}
+          - TS_EXTRA_ARGS={{ tailscale.extra_args }}
+        volumes:
+          - "{{ homelab_dir }}/tailscale:/var/lib/tailscale"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=tailscale  
+  netdata:
+    services:
+      netdata:
+        image: netdata/netdata:latest
+        cap_add:
+          - SYS_PTRACE
+          - SYS_ADMIN
+          - CHOWN
+          - DAC_OVERRIDE
+          - SETGID
+          - SETUID
+          - NET_ADMIN
+          - SYS_RESOURCE
+          - SYS_NICE
+        cap_drop:
+          - ALL
+        user: root
+        network_mode: host
+        environment:
+          - TZ={{ timezone }}
+          - NETDATA_EXTRA_DEB_PACKAGES={{ netdata.extra_deb_packages }}
+        volumes:
+          - "{{ homelab_dir }}/netdata/conf:/etc/netdata"
+          - "{{ homelab_dir }}/netdata/lib:/var/lib/netdata"
+          - "{{ homelab_dir }}/netdata/cache:/var/cache/netdata"
+          - "/:/host/root:ro,rslave"
+          - "/etc/passwd:/host/etc/passwd:ro"
+          - "/etc/group:/host/etc/group:ro"
+          - "/etc/localtime:/etc/localtime:ro"
+          - "/proc:/host/proc:ro"
+          - "/sys:/host/sys:ro"
+          - "/etc/os-release:/host/etc/os-release:ro"
+          - "/var/log:/host/var/log:ro"
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+          - "/run/dbus:/run/dbus:ro"
+        ports:
+          - "19999:19999/tcp"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:19999/api/v1/info || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=19999
+          - swag_url={{ netdata.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=netdata
+  mealie:
+    services:
+      mealie_server:
+        image: ghcr.io/mealie-recipes/mealie:latest
+        environment:
+          - TZ={{ timezone }}
+          - PGID={{ default_gid }}
+          - PUID={{ default_uid }}
+          - ALLOW_SIGNUP={{ mealie.allow_signup }}
+          - "BASE_URL=https://{{ mealie.server_url }}"
+          - MAX_WORKERS={{ mealie.max_workers }}
+          - WEB_CONCURRENCY={{ mealie.web_concurrency }}
+          - API_DOCS={{ mealie.api_docs }}
+          - DB_TYPE=postgres
+          - DB_HOST=mealie_db
+          - DB_PORT=5432
+          - DB_NAME={{ mealie.db.database_name }}
+          - DB_USERNAME={{ mealie.db.username }}
+          - DB_PASSWORD={{ mealie.db.password }}
+          - MEALIE_PORT=80
+          - SMTP_USER={{ smtp.username }}
+          - SMTP_PASSWORD={{ smtp.password }}
+          - SMTP_HOST={{ smtp.host }}
+          - SMTP_PORT={{ smtp.port }}
+          - SMTP_FROM_EMAIL={{ smtp.username }}
+          - OPENAI_BASE_URL={{ openai.base_url }}
+          - OPENAI_API_KEY={{ openai.api_key }}
+          - OPENAI_MODEL={{ openai.model }}
+          - OPENAI_SEND_DATABASE_DATA={{ openai.send_database_data }}
+          - LOG_LEVEL={{ mealie.log_level }}
+        volumes:
+          - "{{ homelab_dir }}/mealie/app:/app/data"
+        ports:
+          - "9925:9000/tcp"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:9925/ || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=9000
+          - swag_url={{ mealie.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=mealie
+        depends_on:
+          mealie_db:
+            condition: service_started
+          ollama:
+            condition: service_started
+      mealie_db:
+        image: postgres:16-alpine
+        volumes:
+          - "{{ homelab_dir }}/mealie/db:/var/lib/postgresql/data"
+        environment:
+          - TZ={{ timezone }}
+          - PGID={{ default_gid }}
+          - PUID={{ default_uid }}
+          - POSTGRES_USER={{ mealie.db.username }}
+          - POSTGRES_DB={{ mealie.db.database_name }}
+          - POSTGRES_PASSWORD={{ mealie.db.password }}
+        healthcheck.test:
+          - "pg_isready -U {{ mealie.db.username }} -d {{ mealie.db.database_name }}"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=pgsql
+  kavita:
+    services:
+      kavita:
+        image: ghcr.io/kareadita/kavita:latest
+        environment:
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+          - KAVITA__Logging__LogLevel__Default=Information
+          - KAVITA__Logging__LogLevel__Microsoft=Warning
+          - KAVITA__Logging__LogLevel__Microsoft.Hosting.Lifetime=Information
+          - KAVITA__Logging__LogLevel__Microsoft.AspNetCore=Warning
+          - KAVITA__Logging__LogLevel__Microsoft.AspNetCore.Hosting.Diagnostics=Warning
+          - KAVITA__Logging__LogLevel__Microsoft.AspNetCore.Server.Kestrel=Warning
+          - KAVITA__Logging__LogLevel__Microsoft.AspNetCore.Server.Kestrel.Core=Warning
+          - KAVITA__Logging__LogLevel__Microsoft.AspNetCore.Server.Kestrel.Https=Warning
+          - KAVITA__Logging__LogLevel__Microsoft.AspNetCore.Server.Kestrel.Transports=Warning
+        volumes:
+          - "{{ homelab_dir }}/kavita/config:/kavita/config"
+          - "{{ books_dir }}/Books:/data/Books:ro"
+        ports:
+          - "5000:5000/tcp"
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:5000/ || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=5000
+          - swag_url={{ kavita.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=kavita
+  influx:
+    services:
+      influxdb: 
+        image: influxdb:2.7
+        volumes:
+          - "{{ homelab_dir }}/influxdb/data:/var/lib/influxdb2"
+          - "{{ homelab_dir }}/influxdb/config:/etc/influxdb2"
+        environment:
+          - DOCKER_INFLUXDB_INIT_MODE={{ influxdb.init_mode }}
+          - DOCKER_INFLUXDB_INIT_USERNAME={{ influxdb.admin.username }}
+          - DOCKER_INFLUXDB_INIT_PASSWORD={{ influxdb.admin.password }}
+          - DOCKER_INFLUXDB_INIT_ORG={{ influxdb.admin.org_name }}
+          - DOCKER_INFLUXDB_INIT_BUCKET={{ influxdb.admin.bucket_name }}
+          - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN={{ influxdb.admin.token }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        ports:
+          - "8086:8086/tcp"
+        labels:
+          - swag=enable
+          - swag_port=8086
+          - swag_url={{ influxdb.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=influxdb
+        healthcheck.test:
+          - "{{ docker.healthcheck.curl }} http://localhost:8086/ || exit 1"
+      telegraf:
+        image: telegraf:1.32.0
+        nvidia: true
+        depends_on:
+          influxdb2:
+            condition: service_healthy
+        volumes:
+          # Mount for telegraf config
+          - "{{ homelab_dir }}/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro"
+          - "/:/hostfs:ro"
+        environment:
+          - HOST_PROC=/hostfs/proc
+          - HOST_SYS=/hostfs/sys
+          - HOST_MOUNT_PREFIX=/hostfs
+          - DOCKER_HOST={{ docker.socket_endpoint }}
+          - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN={{ influxdb.admin.token }}
+          - DOCKER_INFLUXDB_INIT_ORG={{ influxdb.admin.org_name }}
+          - DOCKER_INFLUXDB_INIT_BUCKET={{ influxdb.admin.bucket_name }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+          - TZ={{ timezone }}
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=telegraf
+  wazuh:
+    services:
+      wazuh.manager:
+        image: wazuh/wazuh-manager:4.7.4
+        container_name: wazuh.manager
+        hostname: wazuh.manager
+        ports:
+          - "{{ wazuh.manager.port }}:55000/tcp"
+        environment:
+          - TZ={{ timezone }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+        volumes:
+          - "{{ homelab_dir }}/wazuh/manager:/var/ossec/data"
+        depends_on:
+          wazuh.indexer:
+            condition: service_healthy
+          wazuh.dashboard:
+            condition: service_healthy
+        labels:
+          - swag=enable
+          - swag_port=55000
+          - swag_url={{ wazuh.manager.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=wazuh-manager
+
+      wazuh.indexer:
+        image: wazuh/wazuh-indexer:4.7.4
+        container_name: wazuh.indexer
+        hostname: wazuh.indexer
+        ulimits:
+          nofile:
+            soft: {{ wazuh.indexer.ulimits.nofile.soft }}
+            hard: {{ wazuh.indexer.ulimits.nofile.hard }}
+        environment:
+          - "JAVA_OPTS={{ wazuh.indexer.java_opts }}"
+        volumes:
+          - "{{ homelab_dir }}/wazuh/indexer/data:/var/lib/wazuh-indexer"
+          - "{{ homelab_dir }}/wazuh/indexer/config:/usr/share/wazuh-indexer/config"
+        healthcheck:
+          test:
+            - "curl --silent --fail http://localhost:9200/_cluster/health || exit 1"
+        ports:
+          - "9200:9200"
+        labels:
+          - crowdsec.enable=true
+          - crowdsec.labels.type=wazuh-indexer
+
+      wazuh.dashboard:
+        image: wazuh/wazuh-dashboard:4.7.4
+        container_name: wazuh.dashboard
+        hostname: wazuh.dashboard
+        environment:
+          - WAZUH_MANAGER_URL=https://wazuh.manager
+          - WAZUH_API_PORT={{ wazuh.manager.port }}
+        ports:
+          - "{{ wazuh.dashboard.port }}:5601"
+        healthcheck:
+          test:
+            - "curl --silent --fail http://localhost:5601 || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=5601
+          - swag_url={{ wazuh.dashboard.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=wazuh-dashboard
+  falco:
+    services:
+      falco:
+        image: falcosecurity/falco:latest
+        container_name: falco
+        privileged: false
+        user: root
+        pid: host
+        network_mode: host
+        cap_add:
+          - NET_ADMIN
+          - SYS_ADMIN
+          - SYS_PTRACE
+          - DAC_READ_SEARCH
+        security_opt:
+          - apparmor:unconfined
+        environment:
+          - TZ={{ timezone }}
+          - FALCO_GRPC_ENABLED={{ falco.grpc.enabled | lower }}
+        volumes:
+          - /proc:/host/proc:ro
+          - /boot:/host/boot:ro
+          - /lib/modules:/host/lib/modules:ro
+          - /usr:/host/usr:ro
+          - /etc:/host/etc:ro
+          - /var/run/docker.sock:/host/var/run/docker.sock:ro
+          - "{{ homelab_dir }}/falco/config:/etc/falco"
+          - "{{ homelab_dir }}/falco/rules:/etc/falco/rules.d"
+        command: >
+          falco
+          --modern-bpf
+          --disable-cri-async
+          --disable-syscall-capture
+          --option=log_stderr=true
+          --option=log_syslog=false
+          --option=log_level=info
+        healthcheck:
+          test:
+            - "pidof falco || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=8765
+          - swag_url={{ falco.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=falco
+  syslogng:
+    services:
+      syslogng:
+        image: lscr.io/linuxserver/syslog-ng:latest
+        container_name: syslogng
+        environment:
+          - TZ={{ timezone }}
+          - PUID={{ default_uid }}
+          - PGID={{ default_gid }}
+        volumes:
+          - "{{ homelab_dir }}/syslog-ng/config:/config"
+          - "{{ homelab_dir }}/syslog-ng/log:/var/log/syslog-ng"
+        ports:
+          - "{{ syslogng.port_udp }}:514/udp"
+          - "{{ syslogng.port_tcp }}:514/tcp"
+        read_only: true
+        healthcheck:
+          test:
+            - "pgrep syslog-ng || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=514
+          - swag_url={{ syslogng.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=syslogng
+  checkmk:
+    services:
+      checkmk:
+        image: {{ checkmk.image }}
+        container_name: {{ checkmk.container_name }}
+        environment:
+          - TZ={{ checkmk.timezone }}
+        volumes:
+          - "{{ homelab_dir }}/checkmk/{{ checkmk.site_id }}:/omd/sites/{{ checkmk.site_id }}"
+        tmpfs:
+          - /tmp
+        ports:
+          - "5003:5000/tcp"
+        command: "{{ checkmk.site_id }}"
+        healthcheck:
+          test:
+            - "curl -f http://localhost:5000/{{ checkmk.site_id }}/check_mk || exit 1"
+        labels:
+          - swag=enable
+          - swag_port=5000
+          - swag_url={{ checkmk.server_url }}
+          - crowdsec.enable=true
+          - crowdsec.labels.type=checkmk

@@ -12,14 +12,14 @@
 
 - name: 'Containers | Docker | Login to Docker registry'
   community.docker.docker_login:
-    registry_url: "{{ containers_docker_registry }}"
-    username: "{{ docker_username }}"
-    password: "{{ docker_password }}"
+    registry_url: "{{ docker.registry }}"
+    username: "{{ docker.username }}"
+    password: "{{ docker.password }}"
   become: true
   when:
     - docker_binary.stat.exists
-    - docker_username != ''
-    - docker_password != ''
+    - docker.username != ''
+    - docker.password != ''
 
 - name: 'Containers | Docker | Apply UFW rules'
   ansible.builtin.include_tasks: "ufw.yml"

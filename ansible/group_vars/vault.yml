@@ -6,8 +6,10 @@ server_trusted_ips:
   - 194.59.28.86
 
 # Smtp
-smtp_username: default
-smtp_password: default
+smtp:
+  username: selagibaxway@gmail.com
+  password: fwukosunwetmcdfs
+  to: sid.el.agib@gmail.com
 
 # Git
 git_access_token: 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
@@ -16,8 +18,9 @@ git_access_token: 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
 wazuh_reg_password: "T5y0S!!69Zuo9o7QNAxTpi"
 
 # Docker
-docker_username: 'sidneyelagib'
-docker_password: 'dckr_pat_SY3Q27R2z28HLZUCSY-R9ZBILcI'
+docker:
+  username: "sidneyelagib"
+  password: "dckr_pat_SY3Q27R2z28HLZUCSY-R9ZBILcI"
 
 # Mongo
 mongodb_admin_user: admin
@@ -44,21 +47,178 @@ vm_password: n0tsh3ll2011
 wazuh_admin_username: admin
 wazuh_admin_password: "La@q54@jLjmIb5%%lpC8tI"
 
-
 # Netdata
 netdata_claim_token: b2GTYmA3uAd_LxHfOB7H562kQgZ3OYenbV-UmCasKe8rUSFJkwTKjx6yN7ujpDL35nCuhT1dYT1lw38B_qkOvXCciFG0v98GPMV0TUqyVCr8ZJjKpRWlPspK-Z5ShMcKskfmRNM
 netdata_room_id: d9002c8e-330a-45ac-ae83-a8ec73924922
 
 # Kibana
-kibana_encryption_key: 'bevwQVj$9hUZ!$OELRS9lCPoXGcCw3WS'
+kibana_encryption_key: "bevwQVj$9hUZ!$OELRS9lCPoXGcCw3WS"
 
 # Grafana
 grafana_admin_user: admin
 grafana_admin_password: KX4fAwndJChD3zB0b5WqbS
 
+# Certbot
+certbot: 
+  email: "avowed-version.0i@icloud.com"
+
 # Crowdsec
-crowdsec_cti_token: 4qd5s3rLw93pCKHCFrIE91n0cRvnp1e76h7v2kBx
+crowdsec:
+  cti_token: 4qd5s3rLw93pCKHCFrIE91n0cRvnp1e76h7v2kBx
+  enroll_key: cm2g2wbsv000a1088hmufec96
+  api_key: 4qd5s3rLw93pCKHCFrIE91n0cRvnp1e76h7v2kBx
+  graylock:
+    bouncers:
+      swag: w2jV46NGCZtMN+9VPefjIDes+arQb0i1eJdnMfe8Odc
+      blocklist: AU7axNd5Z+wM0WOY9igcIm/b/ooAVw+BpDG/BVyHDPw
+      cloudflare: aBKZFLAUMvwSuHwFVHZtwMFO7pOA1vaoXNFaRwNEtzc
 
 # Elastic
 elastic_username: elastic
-elastic_password: 'xH3q*k2M$80b7a'
+elastic_password: "xH3q*k2M$80b7a"
+
+# OpenAI
+openai:
+  api_key: "sk-4qk2v3rLw93pCKHCFrIE91n0cRvnp1e76h7v2kBx"
+
+# OpenWebUI
+openwebui:
+  admin_email: "avowed-version.0i@icloud.com"
+  secret_key: "C46cvPnx7v#9t#vGY*uGtjkk"
+
+# Airtrail
+airtrail:
+  db:
+    password: "XML35UG4t2J1Nm!yMCc^bXVQJetZAy5Q"
+    username: "Scouring9894"
+    database_name: "Joystick7471"
+
+# Cloudflared
+cloudflare:
+  account_id: d71066d0ff0a88033c66da113ecd32bf
+  zones:
+    graylock_zone_id: 0c8e02b49b98ea03721deba6748b2faf
+    sidney_zone_id: 80ab150c55cc2a3763d430c03b4699a1
+  token:
+    admin: pPMM7wWd2sU3ZT1XdwFSrbLU3fMUrzsy4_rKbTt_
+    crowdsec: U-83nluE8cc3FbBmcoN4kb5Yc9BI3k5p2qqiqBaU
+    tunnel:
+      jumphost: eyJhIjoiZDcxMDY2ZDBmZjBhODgwMzNjNjZkYTExM2VjZDMyYmYiLCJ0IjoiYzcyNTVmOTQtYWEyNi00NjViLWI4ZDktNmE0NWUyYWViNDlkIiwicyI6Ik9HUTVZak5rTmpVdE5qUXdOeTAwWWpBNExUZzNOamd0TURrd01URmhOekUwTjJRNSJ9
+
+# Duplikati
+duplikati:
+  encryption_key: "dCe5bX6hn2a823hi5ol"
+  web_password: "G7S@9JbxHj6KKEC!DcC37$^$"
+
+# Samba
+samba:
+  username: sidney
+  password: sinX=cosY*cotagX/2
+
+# Immich
+immich:
+  db:
+    username: Handmade9655
+    password: "n7NXKJa8k7uRnz7dAW^&oxMMQwKqq@J!"
+    database_name: Decorated6319
+
+# qBittorrent
+qbittorrent:
+  username: admin
+  password: 2GWT$&gNb&yYkV
+
+# PIAVPN
+piavpn:
+  username: "sidneyelagib"
+  password: "dckr_pat_SY3Q27R2z28HLZUCSY-R9ZBILcI"
+
+# Plex
+plex:
+  rewind.nextauth_secret: "GrHf4ju98K1cwcLI9Sx6aenIh2+XzHn21CkaYmYJrqY="
+
+# Maxindb
+maxminddb:
+  account_id: 1003317
+  license_key: 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
+
+# Swag
+swag:
+  influxdb:
+    username: emit0643
+    password: h!JcR^sXPs7Cf7
+    token: Progress-Coastline-Obsession3-Guide-Navy
+
+# Wiki.js
+wikijs:
+  db:
+    username: "crimp4974"
+    password: "NCA@s#P%*08q8Q*LN#W5m4"
+    database_name: "kindling4027"
+  admin:
+    username: "admin"
+    email: "avowed-version.0i@icloud.com"
+    password: "RHC4#I9*9CG*Ai@c9OzG1P"
+
+# Speedtest
+speedtest:
+  db: 
+    username: "dinner3117"
+    password: "Garnish-Ambiance-Molecule-Canteen-Duckling5"
+    database_name: "implosion8408"
+  app_key: base64:0gqr1uhH8WRaG8BicnImgvYMysKyFixUT22IJpxQtFY=
+
+# Yourspotify
+yourspotify:
+  app:
+    client_id: fdeefdcd6e0441cdb8a70323f0b4da76
+    client_secret: 7ec99b430c5e49d7bdc596be9d42340b
+  db:
+    username: spotify42
+    password: 5FJaz079gv0MNngdpqrLNr
+    database_name: "your_spotify-db"
+
+# Tailscale
+tailscale:
+  auth:
+    key: 
+      name: "tailscale-auth-key"
+      value: "tskey-auth-kUiXa2k7zM11CNTRL-QE1MN2Szj4DjB9JUbi1e5DPerFs2xqVuR"
+      file: "/var/lib/tailscale/authkey"
+      caps:
+        - "device:write"
+        - "device:read"
+        - "auth:read"
+      expires: "24h"
+
+# Mealie
+mealie:
+  db:
+    username: "mealie0983"
+    password: "Abroad-Dusk6-Shout-Resemble-Seizing"
+    database_name: "Xbox6172"
+
+# Influxdb
+influxdb:
+  admin:
+    username: "emit0643"
+    password: "h!JcR^sXPs7Cf7"
+    token: "Progress-Coastline-Obsession3-Guide-Navy"
+    org_name: "graylock"
+    bucket_name: "singular4967"
+
+# Wazuh
+wazuh:
+  manager:
+    app: 
+      username: "admin"
+      password: "La@q54@jLjmIb5%%lpC8tI"
+    api:
+      username: "{{ wazuh.manager.username }}"
+      password: "{{ wazuh.manager.password }}"
+  indexer:
+    opensearch:
+      username: "admin"
+      password: "8RdeREns5hJL"
+  dashboard:
+    username: "admin"
+    password: "La@q54@jLjmIb5%%lpC8tI"

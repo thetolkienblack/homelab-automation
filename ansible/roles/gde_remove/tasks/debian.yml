@@ -1,9 +1,0 @@
-# roles/qemu/tasks/debian.yml
----
-- name: 'GDE Remove | Debian | Install QEMU packages'
-  ansible.builtin.apt:
-    name:
-      - qemu-kvm
-      - libvirt-daemon-driver-qemu
-    state: present
-  notify: Update apt cache

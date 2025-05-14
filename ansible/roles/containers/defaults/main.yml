@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT-0
 ---
-containers_install_podman: true
+containers_install_podman: false
 containers_install_docker: true
 containers_docker_ports:
   - port: 2375
@@ -9,59 +9,3 @@ containers_docker_ports:
   - port: 2376
     proto: tcp
     comment: Docker API (encrypted)
-containers_podman_profile_name: default
-containers_docker_registry: docker.io
-containers_docker_default_uid: 1000
-containers_docker_default_gid: 1000
-containers_docker_default_tz: Europe/Sofia
-containers_docker_nas: /mnt/nas/
-containers_docker_homelab_dir: "{{ containers_docker_nas }}/Homelab/"
-containers_docker_network: homelab
-containers_docker_deployments:
-  - name: netdata
-    image: netdata/netdata:stable
-    caps:
-      - SYS_PTRACE
-      - SYS_ADMIN
-      - CHOWN
-      - DAC_OVERRIDE
-      - SETGID
-      - SETUID
-      - NET_ADMIN
-      - SYS_RESOURCE
-    user: root
-    group: wheel
-    environment:
-      - TZ={{ containers_docker_default_tz }}
-      - NVIDIA_DRIVER_CAPABILITIES
-      - NVIDIA_VISIBLE_DEVICES
-      - NETDATA_EXTRA_DEB_PACKAGES=apcupsd,lm-sensors, netcat-openbsd
-    volumes:
-      - "{{ containers_docker_homelab_dir }}/netdata/conf:/etc/netdata"
-      - "{{ containers_docker_homelab_dir }}/netdata/lib:/var/lib/netdata"
-      - "{{ containers_docker_homelab_dir }}/netdata/cache:/var/cache/netdata"
-      - /:/host/root:ro,rslave
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /etc/localtime:/etc/localtime:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /etc/os-release:/host/etc/os-release:ro
-      - /var/log:/host/var/log:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /run/dbus:/run/dbus:ro
-    devices:
-      - /dev/nvidia0:/dev/nvidia0:ro
-      - /dev/nvidiactl:/dev/nvidiactl:ro
-      - /dev/nvidia-modeset:/dev/nvidia-modeset:ro
-      - /dev/nvidia-uvm:/dev/nvidia-uvm:ro
-      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:ro
-      - /dev/kmsg:/dev/kmsg
-    runtime: nvidia
-    healthcheck: ["CMD-SHELL", "curl --connect-timeout 15 --silent --show-error --fail http://localhost:19999/api/v1/info || exit 1"]
-    labels:
-      - swag=enable
-      - swag_port=19999
-      - swag_url=sysmon.graylock.eu
-      - crowdsec.enable=true
-      - crowdsec.labels.type=netdata

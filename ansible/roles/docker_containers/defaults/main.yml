@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: MIT-0
+---
+# Base directories
+compose_file_dir: "/home/{{ ansible_user }}/docker-compose-files"
+container_data_dir: "/home/{{ ansible_user }}/Developer/container-data"
+
+# Default Docker settings
+docker_default:
+  restart_policy: "unless-stopped"
+  stop_grace_period: "5s"
+  security_opts:
+    - "no-new-privileges:true"
+  healthcheck:
+    interval: "1m30s"
+    timeout: "30s"
+    retries: 5
+    start_period: "30s"
+
+# Network settings
+host_ipv4_addr: "192.168.50.54"
+public_ip: "194.59.28.86"
+
+# User settings
+default_uid: 1000
+default_gid: 1000
+timezone: "Europe/Sofia"
+
+# Data Directories
+nas_mount: "/media/{{ ansible_user }}/NAS"
+data_dirs:
+  movies: "{{ nas_mount }}/Movies"
+  music: "{{ nas_mount }}/Music"
+  tvshows: "{{ nas_mount }}/TVShows"
+  photos: "{{ nas_mount }}/Photos"
+  audiobooks: "{{ nas_mount }}/Audiobooks"
+  homelab: "{{ nas_mount }}/Homelab"
+
+# NVIDIA settings
+nvidia:
+  enabled: true
+  runtime: "nvidia"
+  devices:
+    - "/dev/nvidia0:/dev/nvidia0:ro"
+    - "/dev/nvidiactl:/dev/nvidiactl:ro"
+    - "/dev/nvidia-modeset:/dev/nvidia-modeset:ro"
+    - "/dev/nvidia-uvm:/dev/nvidia-uvm:ro"
+    - "/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:ro"
+  environment:
+    - "NVIDIA_VISIBLE_DEVICES=all"
+    - "NVIDIA_DRIVER_CAPABILITIES=compute,utility"
+    - "NVIDIA_DISABLE_REQUIRE=1"
+
+# Define which services to deploy
+docker_services:
+  - name: "plex"
+  - name: "watchtower"
+  # Add other services as needed

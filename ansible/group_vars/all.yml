@@ -1,36 +1,97 @@
 ansible_become: true
 ansible_become_method: sudo
+ansible_ssh_private_key_file: ~/.ssh/graylock_ed25519
+ansible_host_dir: ~/Developer/home-automation/ansible
+ssh_key_source: ~/.ssh/id_rsa.pub
+
 bridge_name: "br0"
 kde_user: sidney
+
 install_vagrant: false
 install_lxc: false
 install_lxd: false
+
 # Data Directories
-media_dir: /mnt/media
-data_dir: /mnt/data
-ansible_ssh_private_key_file: ~/.ssh/graylock_ed25519
-host_ipv4_addr: 192.168.50.54
-host_ipv4_gw: 192.168.50.1
+nas_dir: /mnt/nas
+homelab_dir: "{{ nas_dir }}/Homelab"
+videos_dir: "{{ nas_dir }}/Videos"
+music_dir: "{{ nas_dir }}/Music"
+books_dir: "{{ nas_dir }}/Books"
+pictures_dir: "{{ nas_dir }}/Pictures"
+downloads_dir: "{{ nas_dir }}/Downloads"
+movies_dir: "{{ nas_dir }}/Movies"
+tvshows_dir: "{{ nas_dir }}/TVShows"
+photos_dir: "{{ nas_dir }}/Photos"
+podcasts_dir: "{{ nas_dir }}/Podcasts"
+docs_dir: "{{ nas_dir }}/Documents"
+developer_dir: "{{ nas_dir }}/Developer"
+audiobooks_dir: "{{ nas_dir }}/Audiobooks"
+
+
+# Networking
+public_ip: "194.59.28.86"
+host_ipv4_addr: "192.168.50.54"
+host_ipv4_gw: "192.168.50.1"
 default_dns:
-  - "192.168.50.54"
+  - "{{ host_ipv4_addr }}"
   - "{{ host_ipv4_gw }}"
   - "45.90.28.252"
   - "1.1.1.1"
+  - "9.9.9.9"
+  - "8.8.8.8"
 host_bridge_name: br0
 host_network_interface: enp14s0
-timezone: Europe/Sofia
-ssh_key_source: ~/.ssh/id_rsa.pub
-ansible_host_dir: ~/Developer/home-automation/ansible
-docker_registry: docker.io
+domain_names:
+  - "graylock.eu"
+  - "sidney.bg"
+  - "74software.eu"
+  - "74software.net"
+  - "graylock.local"
+
+# Core
 default_shell: "/bin/bash"
-default_gid: 0
-default_uid: 0
+timezone: Europe/Sofia
+default_gid: 1000
+default_uid: 1000
+default_umask: "0022"
+
+# Security
 apparmor_enforce_mode: false
 
-# Smtp
-smtp_server: smtp.gmail.com
-smtp_port: 587
-smtp_use_auth: true
-smtp_from: default
-smtp_use_tls: true
-smtp_to: default
+# Cloudflare
+cloudflare:
+  ips: "173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22"
+
+# 
+smtp:
+  server: smtp.gmail.com
+  port: 587
+  use_auth: true
+  use_tls: true
+  starttls: true
+
+# Docker
+docker:
+  registry: docker.io
+  socket_endpoint: "tcp://socket-proxy:2375"
+  config_file: "{{ home_dir }}/.docker/config.json"
+  ip: "{{ host_ipv4_addr }}"
+  healthcheck:
+    curl: "curl --connect-timeout 15 --silent --show-error --fail"
+    wget: "wget --no-verbose --tries=1 --spider"
+  resources:
+    limits:
+      cpus: "0.50"
+      memory: "512M"
+  nvidia:
+    devices:
+      - /dev/nvidia0:/dev/nvidia0:ro
+      - /dev/nvidiactl:/dev/nvidiactl:ro
+      - /dev/nvidia-modeset:/dev/nvidia-modeset:ro
+      - /dev/nvidia-uvm:/dev/nvidia-uvm:ro
+      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:ro
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - NVIDIA_DISABLE_REQUIRE=1

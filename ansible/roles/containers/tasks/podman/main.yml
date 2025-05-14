@@ -45,7 +45,7 @@
 
 - name: 'Containers | Podman | Check if already logged in to Docker registry'
   ansible.builtin.command:
-    cmd: podman login --get-login {{ container_docker_registry }}
+    cmd: podman login --get-login {{ docker.registry }}
   register: podman_login_status
   ignore_errors: true
   changed_when: false
@@ -53,16 +53,16 @@
 
 - name: 'Containers | Podman | Log in to Docker registry'
   ansible.builtin.command:
-    cmd: podman login --username={{ docker_username }} --password={{ docker_password }} {{ containers_docker_registry }}
+    cmd: podman login --username={{ docker.username }} --password={{ docker.password }} {{ docker.registry }}
   when:
-    - docker_username is defined
-    - docker_password is defined
-    - docker_registry is defined
+    - docker.username is defined
+    - docker.password is defined
+    - docker.registry is defined
     - podman_login_status.rc != 0
   changed_when: podman_login_status.rc != 0
   failed_when:
-    - docker_username == ''
-    - docker_password == ''
+    - docker.username == ''
+    - docker.password == ''
   become: false
 
 - name: 'Containers | Podman | Include Podman pods tasks'
